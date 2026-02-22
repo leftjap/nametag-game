@@ -49,7 +49,8 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
 .avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--ac-light);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 
 /* Section */
-.sec{padding:14px 20px;border-bottom:1px solid var(--border)}
+.sec{padding:14px 20px}
+.sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx-m);margin-bottom:10px}
 
 /* Check items with inline week dots */
@@ -57,7 +58,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
 .chk-week-hdr{display:flex;align-items:center;padding:0 0 4px;margin-bottom:4px;border-bottom:1px solid var(--border)}
 .chk-week-hdr .chk-lb-space{flex:1;min-width:80px}
 .chk-week-hdr .day-labels{display:flex;gap:2px}
-.chk-week-hdr .day-lbl{width:16px;text-align:center;font-size:9px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;font-weight:500}
+.chk-week-hdr .day-lbl{width:16px;text-align:center;font-size:9px;color:var(--tx-d);font-family:'JetBrains Mono',monospace;font-weight:500}
 
 .chk-row{display:flex;align-items:center;padding:5px 0;cursor:pointer;user-select:none;border-radius:var(--r-sm);transition:background .15s;margin:0 -6px;padding-left:6px;padding-right:6px}
 .chk-row:hover{background:var(--bg-card)}
@@ -77,9 +78,9 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
 .st-card{background:var(--bg-white);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow)}
 .st-row{display:flex;justify-content:space-between;align-items:center}
 .st-lb{font-size:12px;color:var(--tx-d)}
-.st-sub{display:flex;gap:12px;margin-top:8px}
-.st-sub span{font-size:11px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}
-.st-sub b{color:var(--ac-d)}
+.st-sub{display:flex;gap:14px;margin-top:8px}
+.st-sub span{font-size:12px;color:var(--tx-d);font-family:'JetBrains Mono',monospace}
+.st-sub b{color:var(--ac-d);font-size:14px;font-weight:600}
 .st-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
 .st-bar-f{height:100%;background:linear-gradient(90deg,var(--ac-light),var(--ac));border-radius:2px;transition:width .5s}
 
@@ -110,7 +111,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
 .tab-dot{width:7px;height:7px;border-radius:50%}
 
 /* Sub-view toggle */
-.view-pane{display:none;flex:1;flex-direction:column;overflow:hidden}
+.view-pane{display:none;flex:1;flex-direction:column;overflow-y:auto}
 .view-pane.on{display:flex}
 .view-toggle{display:flex;gap:4px;padding:10px 60px;border-bottom:1px solid var(--border);background:var(--bg)}
 .vt-btn{padding:6px 14px;font-size:12.5px;font-weight:500;color:var(--tx-m);background:none;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;font-family:'Pretendard',sans-serif;transition:.2s}
@@ -126,7 +127,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
 .ed-title::placeholder{color:var(--border-l)}
 .ed-meta{display:flex;align-items:center;gap:10px;margin-top:14px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 .ed-date{font-size:12px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}
-.ed-wrap{flex:1;overflow-y:auto;padding:32px 72px 60px;display:flex;flex-direction:column;max-width:860px;margin:0 auto;width:100%}
+.ed-wrap{flex:1;padding:32px 72px 60px;display:flex;flex-direction:column;max-width:860px;margin:0 auto;width:100%}
 .ed-body{width:100%;min-height:100%;background:none;border:none;font-family:'Pretendard',sans-serif;font-size:16.5px;line-height:2.05;letter-spacing:-0.008em;word-spacing:0.03em;color:var(--tx);outline:none;resize:none}
 .ed-body::placeholder{color:var(--border-l)}
 .ed-foot{padding:10px 72px;border-top:1px solid var(--border);background:var(--bg);display:flex;gap:18px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--tx-m)}
@@ -165,6 +166,10 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
 .save-btn:hover{opacity:.85}
 
 /* Scrollbar */
+.view-pane::-webkit-scrollbar{width:6px}
+.view-pane::-webkit-scrollbar-track{background:transparent}
+.view-pane::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.view-pane::-webkit-scrollbar-thumb:hover{background:var(--border-l)}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -184,7 +189,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
     <div class="side-brand"><img class="avatar" src="data:image/jpeg;base64,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" alt="지오">이름표 붙이기 게임</div>
   </div>
 
-  <div class="sec">
+  <div class="sec sec-border">
     <div class="sec-t">오늘의 어구</div>
     <div class="q-card" id="randQuote" onclick="showRandomQuote()"><img class="q-avatar" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAAAAAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABQAFADASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUCAwYBBwD/xAA5EAACAQMDAAYHBwIHAAAAAAABAgMABBEFEiETMUFRgZEGFCJCYXGhIzJSYnKx0RbBJDM0Q4KS8f/EABoBAAMBAQEBAAAAAAAAAAAAAAIEBQMGAQD/xAAjEQACAgICAgIDAQAAAAAAAAABAgADBBESIQVBMTITIkJR/9oADAMBAAIRAxEAPwBTY+l9tp/MdlIxxgkyD+KU6jq1vqF5NdiOWN5X3Eb1IHy4plcx6XNF/qYQ46hGMDPlQSej7zzAQur5IwCesmjWsA7ER/OPcX+sx9WX8xXBcKO/zpxeei95FErNBCg6tyuTn+KRXNobVtpZW/S2aPXWxNN6PEjRl4ul+PnUhdD4+dCQwtIRhGwT94DinKejF9LaiaBFd84aLdhlGODzxQ7A+TNlrdvqIGLoHv8AOui4X8J8Ktn0LVbO0a6ksysKgEvuB4Pbx2UHC4fr6Pgdr4zXo03xBdWT7CE+sJ3N5ipCXIztbHhUGMLRgpFMCessRj9q+jyFx1UQEy5dQuOyjgcEdJOoPCpKvX8sVQ000V05QGM57X5phpjsFLzW/SEHjGQAfjnFFdDG4bpEB3dYYkjyFMCosP1k43hD+05a6tNNC6XwSeGQbZUJILD8QPYfjQvo5Doa6lINR/xDL/kpJ9w/PvP0qV5Z2sULSdMVVFzsTgZ8azHRyNlsc0pbSUGv9lbFyxc3N+9T1hr6G4c2fsLHJGejVQFGQRwO44qrS7mJIliuIU3gYY45zXn9nrE9vCIp4zMqn2GzyvwpnD6QwmE7g6t2KASfOkjUfidDXk0Eb3qa3XYjdaNNY6em+R4yoQHsrz+PSLkSbHQRFePa5PlWw0W+iQNLdiVMrlXBBH703j1jS7246CVSZQeC8OCfkRWlfKoEFdyflCrIYcXG5jYvR+8lCxLG5b9JH70yg9CbhwDc3UUPwUFj/Fa6OJxLiKAlT7w5o31Ncj1mZI0/Mf7UNmU5+o1Pq8CtO3O55WplhOw6rAT8+fGr4Z9zbfX5ZXPZCQx8ttEW2lWETK5baO0qOaKfS9DYl06cP+IHBqsrn3OXYJ6gt0lvdwiOWK5OBn7hFIJ9PZpMQo6Y7JGFO7ywniG+xv5JF/BISCPHqNDQRLONtzczJJnlAQK0IVxBRjX2DALXR7m4cgsiEe67gE0zt/R/o/tJikmBnAYf34q2KBFZzbS2t3heEmRgw/5Y5qNtqItwRdWLxn8KjigCr8TQ2WEbB6hfQ2DRgJG5bqKgUbAZ4NrRl+iX/blAbHy5pfHf2ky9MbCUqPeJOKM9ekkQJBbdHnzPhmvSoK6gJY6WBxNPZNHcQrIJSu7uzj60RPEoiIcFh+Xk0i0kXkbBWgkRDzkjgmnXSqoI3HPcDUK5ODaE7LHt/NWGPRmLCzbtqwLjvYV89td+66D4KhqxNQLnMbRuuesDg1cbqSUcmNPktXg04Yo0BFndsfa2N+rNdFic+3FDxRllNbTXyW1xO6F+NyjOT3Uxis2hlcwlDumyhcchfn38fWsLcxazr3KeJ4q7IHInQiu30e4mw0NozL3iM4NMF0eWbbbTwSNj3WTYf+xrSRzNlULjcR2nrq9mYDDkkd1It5Bm9CVV8Ki/0ZkP6BeS8Ms16scPGEUbz4E8A1pbTSLSxjCxjOPeY5Jrt/qMVlbGSUO4zgBBliayWoa9eS3OLeWWJD1KBjHzoUF2R76mjnGwvWzNhMbeFCWI86Q3msmKQiDDAdo6vCkHrEs77pbhCSeSzV0yhW2IyS/o5pqvCRTtzuT7vLWMNVjUWwafJbxn7dlTrIFTaDPPTyYHbnro6SJ0TcCXJ+nhQrlJfZkXOO8kU2JL5EyqPUYrJ5lEbMSpCOrD2SavguwtkgaSRpVcFBnJI/8AKg6RrGXEGEXrIFdSzkdRLDExHWGC4NLvjI3cp0+SsrUKR0JorjU4ILmynklkXEW11Ck9uRn605TX7dIS8jFVGMBlO4+FYc210zbmWVj+bJ/eoO9zH1xSE9/bWIwh7MZfy5b6iaHVNQmvyTHtCAcJu+tJjA7cSROR3bzVVrLfvJiK3QDvYZp0HZI8NAS2OSwCg+dOoFQcVkS1ndizHsxdFDCowLQD4uc0RGoUglAAOwcVTcXd6oJhtYTjsyST5VRbWt9cZlunMTE8IteHv4gjWtkz/9k=" alt=""><div class="q-content">
       <div class="q-text" id="rqText" style="color:var(--tx-m);font-size:12px">어구록에 문장을 추가해보세요</div>
@@ -198,11 +203,11 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
     <div class="chk-table" id="chkTable"></div>
   </div>
 
-  <div class="sec">
+  <div class="sec sec-border">
     <div class="sec-t">기록</div>
     <div class="stats">
       <div class="st-card">
-        <div class="st-row"><span class="st-lb">글쓴 양 (500자 습작)</span></div>
+        <div class="st-row"><span class="st-lb">오늘 쓴 글</span></div>
         <div class="st-sub">
           <span>오늘 <b id="wToday">0</b>매</span>
           <span>주간 <b id="wWeek">0</b>매</span>
@@ -211,7 +216,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);he
         <div class="st-bar"><div class="st-bar-f" id="wBar" style="width:0"></div></div>
       </div>
       <div class="st-card">
-        <div class="st-row"><span class="st-lb">읽은 책</span><button class="more-btn" onclick="switchTab('book');setSubView('book','list')">더보기 →</button></div>
+        <div class="st-row"><span class="st-lb">오늘 읽은 책</span><button class="more-btn" onclick="switchTab('book');setSubView('book','list')">더보기 →</button></div>
         <div id="bookMiniList" style="margin-top:4px"></div>
       </div>
     </div>
