@@ -22,16 +22,16 @@
   --ac: #b08968;
   --ac-d: #8a6a48;
   --ac-light: #c9a882;
-  --grn: #5a8a5a;
-  --grn-bg: #e8f0e8;
-  --grn-light: #d0e4d0;
+  --grn: #b08968;
+  --grn-bg: #f0e8e0;
+  --grn-light: #e0d0c0;
   --red: #a06060;
   --blue: #5878a0;
   --tab-navi: #b08968;
-  --tab-500: #5a8a5a;
-  --tab-blog: #5878a0;
-  --tab-book: #8a6898;
-  --tab-quote: #8a8060;
+  --tab-500: #c4956c;
+  --tab-blog: #8a7a6a;
+  --tab-book: #9a8878;
+  --tab-quote: #a08a6a;
   --r: 8px;
   --r-sm: 5px;
   --side-w: 340px;
@@ -231,7 +231,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <button class="tab" data-t="blog" onclick="switchTab('blog')"><span class="tab-dot" style="background:var(--tab-blog)"></span>블로그</button>
     <button class="tab" data-t="book" onclick="switchTab('book')"><span class="tab-dot" style="background:var(--tab-book)"></span>서재</button>
     <button class="tab" data-t="quote" onclick="switchTab('quote')"><span class="tab-dot" style="background:var(--tab-quote)"></span>어구록</button>
-    <button class="tab" data-t="memo" onclick="switchTab('memo')"><span class="tab-dot" style="background:#7a8a7a"></span>메모</button>
+    <button class="tab" data-t="memo" onclick="switchTab('memo')"><span class="tab-dot" style="background:#a09080"></span>메모</button>
   </div>
 
   <!-- 오늘의 네비 -->
@@ -289,6 +289,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
       <button class="vt-btn on" onclick="setSubView('book','list')">목록</button>
       <div class="vt-sp"></div>
       <button class="new-btn" onclick="newBook()">+ 새 책</button>
+      <button class="new-btn" onclick="saveBook()">저장</button>
     </div>
     <div class="sub-edit" data-g="book" style="display:none">
       <div class="book-form">
@@ -312,9 +313,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
         </div>
       </div>
       <div class="ed-wrap"><textarea class="ed-body" id="book-body" placeholder="책에 대한 메모를 남겨보세요..."></textarea></div>
-      <div style="padding:10px 60px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;background:var(--bg)">
-        <button class="save-btn" onclick="saveBook()">저장</button>
-      </div>
     </div>
     <div class="sub-list" data-g="book"><div class="list-view" id="book-list"></div></div>
   </div>
@@ -324,15 +322,15 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="view-toggle">
       <button class="vt-btn on" onclick="setSubView('quote','edit')">입력</button>
       <button class="vt-btn" onclick="setSubView('quote','list')">목록</button>
+      <div class="vt-sp"></div>
+      <button class="new-btn" onclick="newQuote()">+ 새 어구</button>
+      <button class="new-btn" onclick="saveQuote()">저장</button>
     </div>
     <div class="sub-edit" data-g="quote">
       <div class="by-row" style="margin-top:12px;margin-bottom:12px">
         <input class="by-input" id="quote-by" placeholder="출처 (책 제목, 저자 등)">
       </div>
       <div class="ed-wrap"><textarea class="ed-body" id="quote-body" placeholder="인상 깊은 문장을 기록하세요..." style="font-size:14px;line-height:1.9"></textarea></div>
-      <div style="padding:10px 60px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;background:var(--bg)">
-        <button class="save-btn" onclick="saveQuote()">저장</button>
-      </div>
     </div>
     <div class="sub-list" data-g="quote" style="display:none"><div class="list-view" id="quote-list"></div></div>
   </div>
@@ -344,13 +342,11 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
       <button class="vt-btn" onclick="setSubView('memo','list')">목록</button>
       <div class="vt-sp"></div>
       <button class="new-btn" onclick="newMemo()">+ 새 메모</button>
+      <button class="new-btn" onclick="saveMemo()">저장</button>
     </div>
     <div class="sub-edit" data-g="memo">
       <div class="ed-hdr"><input class="ed-title" id="memo-title" placeholder="메모 제목"><div class="ed-meta"><span class="ed-date" id="memo-date"></span></div></div>
       <div class="ed-wrap"><textarea class="ed-body" id="memo-body" placeholder="메모를 작성하세요..."></textarea></div>
-      <div style="padding:10px 60px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;background:var(--bg)">
-        <button class="save-btn" onclick="saveMemo()">완료</button>
-      </div>
     </div>
     <div class="sub-list" data-g="memo" style="display:none"><div class="list-view" id="memo-list"></div></div>
   </div>
@@ -543,8 +539,13 @@ function saveQuote(){
   const by=document.getElementById('quote-by').value.trim();
   const quotes=getQuotes();quotes.unshift({id:Date.now().toString(),text,by,created:new Date().toISOString()});
   saveQuotes(quotes);
-  document.getElementById('quote-body').value='';document.getElementById('quote-by').value='';
-  renderQuoteList();showRandomQuote();
+  newQuote();renderQuoteList();showRandomQuote();
+}
+
+function newQuote(){
+  document.getElementById('quote-body').value='';
+  document.getElementById('quote-by').value='';
+  setSubView('quote','edit');
 }
 
 function delQuote(id,e){
@@ -674,7 +675,7 @@ function renderMemoList(){
   if(!memos.length){el.innerHTML='<div style="text-align:center;padding:50px;color:var(--tx-m)">메모가 없습니다</div>';return}
   el.innerHTML=memos.map(m=>`
     <div class="list-item" onclick="loadMemo('${m.id}')">
-      <div class="list-tag" style="background:#7a8a7a"></div>
+      <div class="list-tag" style="background:#a09080"></div>
       <div class="list-info"><div class="list-title">${m.title||'제목 없음'}</div><div class="list-date">${fmtDate(m.created)}</div>${m.content?`<div class="list-preview">${m.content.replace(/\n/g,' ').slice(0,60)}</div>`:''}</div>
       <button class="list-del" onclick="delMemo('${m.id}',event)">✕</button></div>`).join('');
 }
