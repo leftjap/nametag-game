@@ -712,43 +712,28 @@ const SYNC = {
 
     try {
       this.setSyncStatus('동기화 중...', 'syncing');
-      const resp = await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'save_doc',
-          type: type,
-          title: fileName,
-          content: content
-        })
+      await this._post({
+        action: 'save_doc',
+        type: type,
+        title: fileName,
+        content: content
       });
-      const result = await resp.json();
-      if (result.success) {
-        this.setSyncStatus('Drive 저장 완료', 'ok');
-        setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
-      } else {
-        console.error('GAS save error:', result.error);
-        this.setSyncStatus('저장 실패', 'error');
-      }
+      this.setSyncStatus('Drive 저장 완료', 'ok');
+      setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
     } catch (e) {
-      console.error('GAS fetch error:', e);
-      this.setSyncStatus('연결 실패', 'error');
+      console.error('GAS save error:', e);
+      this.setSyncStatus('저장 실패', 'error');
     }
   },
 
   // 루틴 체크를 구글 시트에 저장
   async saveChecksToSheet() {
     if (!GAS_URL) return;
-    const todayChecks = getChk();
     try {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'save_routine',
-          date: today(),
-          checks: todayChecks
-        })
+      await this._post({
+        action: 'save_routine',
+        date: today(),
+        checks: getChk()
       });
     } catch (e) {
       console.error('GAS checks error:', e);
@@ -759,33 +744,25 @@ const SYNC = {
   async saveQuotesToSheet(text, by) {
     if (!GAS_URL) return;
     try {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'save_quote',
-          text: text || '',
-          by: by || ''
-        })
+      await this._post({
+        action: 'save_quote',
+        text: text || '',
+        by: by || ''
       });
     } catch (e) {
       console.error('GAS quotes error:', e);
     }
   },
 
-  // 서재를 구글 문서로 저장 (최근 저장된 책)
+  // 서재를 구글 문서로 저장
   async saveBooksToSheet(book) {
     if (!GAS_URL || !book) return;
     try {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'save_doc',
-          type: 'book',
-          title: book.title,
-          content: `저자: ${book.author||''}\n출판사: ${book.publisher||''}\n읽은 양: ${book.pages||0}p\n\n${book.memo||''}`
-        })
+      await this._post({
+        action: 'save_doc',
+        type: 'book',
+        title: book.title,
+        content: `저자: ${book.author||''}\n출판사: ${book.publisher||''}\n읽은 양: ${book.pages||0}p\n\n${book.memo||''}`
       });
     } catch (e) {
       console.error('GAS books error:', e);
@@ -796,19 +773,27 @@ const SYNC = {
   async saveMemosToSheet(memo) {
     if (!GAS_URL || !memo) return;
     try {
-      await fetch(GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'save_doc',
-          type: 'memo',
-          title: memo.title || '메모',
-          content: memo.content || ''
-        })
+      await this._post({
+        action: 'save_doc',
+        type: 'memo',
+        title: memo.title || '메모',
+        content: memo.content || ''
       });
     } catch (e) {
       console.error('GAS memos error:', e);
     }
+  },
+
+  // Apps Script 웹앱에 POST 전송 (공통)
+  async _post(data) {
+    const resp = await fetch(GAS_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    });
+    // Apps Script는 리다이렉트 후 opaque response를 줄 수 있음
+    try { return await resp.json(); } catch { return { status: 'sent' }; }
   },
 
   // 디바운스된 문서 저장
