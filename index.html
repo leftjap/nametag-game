@@ -1,9 +1,9 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/index.html b/index.html
-index 662c9bccfe302803e062e52d72da9f29997ccede..476aa57d1d5111376d4f94223e6704b2575f3df8 100644
+index 662c9bccfe302803e062e52d72da9f29997ccede..bfc3300f6aab4296767675dd44f2f3d8e4730f46 100644
 --- a/index.html
 +++ b/index.html
-@@ -1,175 +1,184 @@
+@@ -1,227 +1,247 @@
  <!DOCTYPE html>
  <html lang="ko">
  <head>
@@ -122,8 +122,12 @@ index 662c9bccfe302803e062e52d72da9f29997ccede..476aa57d1d5111376d4f94223e6704b2
  <!-- LOCK SCREEN -->
  <div id="lockScreen">
    <div class="lock-brand">이름표 붙이기 게임</div>
-   <input class="lock-input" id="lockPw" type="password" placeholder="비밀번호" autofocus>
-   <button class="lock-btn" onclick="tryUnlock()">입장</button>
+-  <input class="lock-input" id="lockPw" type="password" placeholder="비밀번호" autofocus>
+-  <button class="lock-btn" onclick="tryUnlock()">입장</button>
++  <form id="lockForm" onsubmit="event.preventDefault();tryUnlock();" style="display:flex;flex-direction:column;align-items:center;gap:12px">
++    <input class="lock-input" id="lockPw" type="password" placeholder="비밀번호" autofocus>
++    <button class="lock-btn" type="submit">입장</button>
++  </form>
    <div class="lock-err" id="lockErr"></div>
  </div>
  
@@ -211,16 +215,31 @@ index 662c9bccfe302803e062e52d72da9f29997ccede..476aa57d1d5111376d4f94223e6704b2
  </div>
  <script>
  // ═══ AUTH ═══
-@@ -178,50 +187,51 @@ const PW_HASH='dd745bd4519c28cc2132ecda8b8cc4b05abb98efa19aa808fad0304804c9a28c'
+ const APP_TOKEN='nametag2026';
+ const PW_HASH='dd745bd4519c28cc2132ecda8b8cc4b05abb98efa19aa808fad0304804c9a28c'; // sha256 of '0419'
  async function sha256(msg){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(msg));return[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('')}
  async function tryUnlock(){
-   const pw=document.getElementById('lockPw').value;
-   if(!pw){document.getElementById('lockErr').textContent='비밀번호를 입력하세요';return}
-   const hash=await sha256(pw);
-   if(hash===PW_HASH){sessionStorage.setItem('gb_auth','1');showApp()}
-   else{document.getElementById('lockErr').textContent='비밀번호가 틀립니다'}
+-  const pw=document.getElementById('lockPw').value;
+-  if(!pw){document.getElementById('lockErr').textContent='비밀번호를 입력하세요';return}
+-  const hash=await sha256(pw);
+-  if(hash===PW_HASH){sessionStorage.setItem('gb_auth','1');showApp()}
+-  else{document.getElementById('lockErr').textContent='비밀번호가 틀립니다'}
++  const pwEl=document.getElementById('lockPw');
++  const errEl=document.getElementById('lockErr');
++  const pw=(pwEl?.value||'').trim();
++  if(!pw){errEl.textContent='비밀번호를 입력하세요';return}
++  try{
++    const hash=window.crypto?.subtle?await sha256(pw):'';
++    const ok=(hash&&hash===PW_HASH)||pw==='0419';
++    if(ok){sessionStorage.setItem('gb_auth','1');showApp();return}
++    errEl.textContent='비밀번호가 틀립니다';
++  }catch(e){
++    console.error('unlock error:',e);
++    errEl.textContent='잠금 해제 중 오류가 발생했습니다';
++  }
  }
- document.getElementById('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
+-document.getElementById('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
++document.getElementById('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();tryUnlock();}});
  function showApp(){document.getElementById('lockScreen').classList.add('hidden');document.getElementById('mainApp').style.display='flex';init()}
  
  // ═══ Storage ═══
@@ -263,7 +282,7 @@ index 662c9bccfe302803e062e52d72da9f29997ccede..476aa57d1d5111376d4f94223e6704b2
    const doc=allDocs().find(d=>d.id===id);if(!doc)return;curIds[type]=id;
    document.getElementById('edTitle').value=doc.title;document.getElementById('edBody').innerHTML=doc.content;
    document.getElementById('edDate').textContent=fmtDate(doc.created);updateWC();renderListPanel();
-@@ -259,111 +269,135 @@ function renderBookMini(){const books=getBooks().filter(b=>b.date&&(b.date===tod
+@@ -259,111 +279,135 @@ function renderBookMini(){const books=getBooks().filter(b=>b.date&&(b.date===tod
  // ═══ Quotes ═══
  function getQuotes(){return L(K.quotes)||[]}
  function saveQuotes(q){S(K.quotes,q)}
