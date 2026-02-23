@@ -33,14 +33,14 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .sync-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-white);color:var(--tx-d);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:.15s}.sync-btn:hover{background:var(--bg-card)}
 
 .side-scroll{flex:1;overflow-y:auto;}
-.side-nav{padding:16px 16px 8px;}
+/* 사이드 메뉴 간격 및 메모 하단 구분선 추가 */
+.side-nav{padding:24px 16px 20px; border-bottom:1px solid var(--border);}
 .side-menu{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;margin-bottom:2px;border:none;border-radius:var(--r);background:none;cursor:pointer;transition:.15s;font-size:14px;font-family:'Pretendard',sans-serif;color:var(--tx-d)}
 .side-menu:hover{background:var(--bg-card)}
 .side-menu.on{background:var(--bg-white);color:var(--tx);box-shadow:0 1px 2px rgba(0,0,0,0.02)}
 .side-menu-l{font-size:14px;font-weight:500;letter-spacing:-.01em}
 .side-menu-c{font-size:13px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;}
 .side-menu.on .side-menu-c{color:var(--ac-d);font-weight:600;}
-.routine-jump{margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
 
 .sec{padding:16px 20px}.sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx-m);margin-bottom:12px}
@@ -112,7 +112,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-action-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lp-action-btn.pin.on svg { fill: currentColor; }
 
-
 /* 3단: EDITOR */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden}
 .ed-topbar{background:var(--bg);position:relative;justify-content:space-between;}
@@ -176,7 +175,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="sync-row"><span class="sync-status" id="syncStatus">초기화 중...</span><button class="sync-btn" onclick="SYNC.syncAll()">↻</button></div>
   </div>
   <div class="side-scroll">
-    <div class="sec sec-border" style="padding-bottom: 16px;">
+    <div class="sec sec-border" style="padding-bottom: 24px;">
       <div class="sec-t" style="margin-bottom:8px;">오늘의 어구</div>
       <div class="q-card" onclick="showRandomQuote()">
         <div class="q-content">
@@ -341,7 +340,6 @@ const formatTopDate=iso=>{
   return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${ampm} ${h}:${String(m).padStart(2,'0')}`;
 };
 
-// 🌟 추가: 기존에 구글 드라이브 뷰어(uc?export=view)로 저장되어 깨진 이미지를 자동 복구(thumbnail)하는 함수
 function fixDriveImageUrls(html) {
   if(!html) return '';
   return html.replace(/https:\/\/drive\.google\.com\/uc\?export=view(&amp;|&)id=([a-zA-Z0-9_-]+)/g, 'https://drive.google.com/thumbnail?id=$2&sz=w1000');
@@ -375,7 +373,6 @@ function newDoc(type){const doc={id:Date.now().toString(),type,title:'',content:
 function loadDoc(type,id){
   const doc=allDocs().find(d=>d.id===id);if(!doc)return;curIds[type]=id;
   document.getElementById('edTitle').value=doc.title;
-  // 저장된 깨진 이미지 링크를 열 때마다 실시간으로 정상화
   document.getElementById('edBody').innerHTML=fixDriveImageUrls(doc.content);
   document.getElementById('edDate').textContent=formatTopDate(doc.created);updateWC();renderListPanel();
 }
@@ -441,7 +438,6 @@ function getMemos(){return L(K.memos)||[]}
 function saveMemos(m){S(K.memos,m)}
 function saveMemo(){const title=document.getElementById('memo-title').value.trim();const body=document.getElementById('memo-body').innerHTML;if(!title&&!stripHtml(body).trim())return;const memos=getMemos();if(curMemoId){const idx=memos.findIndex(m=>m.id===curMemoId);if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}}else{const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};memos.unshift(memo);curMemoId=memo.id}saveMemos(memos);renderListPanel();SYNC.saveMemosToSheet({title,content:stripHtml(body)})}
 function loadMemo(id){const m=getMemos().find(x=>x.id===id);if(!m)return;curMemoId=id;document.getElementById('memo-title').value=m.title||'';
-  // 메모 역시 깨진 이미지 자동 복구 적용
   document.getElementById('memo-body').innerHTML=fixDriveImageUrls(m.content);
   renderListPanel();
 }
@@ -472,10 +468,9 @@ function renderSideMenu(){
       <span class="side-menu-c">${getTabCount(t)}</span>
     </button>
   `).join('');
-  nav.innerHTML=menu + `<div class="routine-jump"></div>`;
+  nav.innerHTML=menu;
 }
 
-// 모든 탭 항목에 대한 고정(Pin) 기능 지원
 function togglePin(type, id, e) {
   e.stopPropagation();
   if (type === 'memo') {
@@ -639,7 +634,7 @@ function insertChecklist(){
   document.execCommand('insertHTML', false, '<ul style="list-style:none;padding-left:0;"><li><input type="checkbox" style="margin-right:8px;"> </li></ul>');
 }
 
-// ═══ Image Paste Handler ═══
+// ═══ ★ 핵심 업데이트: 이미지 즉각 렌더링 및 백그라운드 업로드 ★ ═══
 async function handlePaste(e) {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   for (let item of items) {
@@ -649,39 +644,48 @@ async function handlePaste(e) {
       const reader = new FileReader();
       
       reader.onload = async function(ev) {
-        const base64Data = ev.target.result.split(',')[1];
+        const dataUrl = ev.target.result; // 로컬용 Base64 데이터
+        const base64Data = dataUrl.split(',')[1];
         const mimeType = file.type;
         const filename = 'img_' + Date.now() + (mimeType === 'image/png' ? '.png' : '.jpg');
+        const tempId = 'img_' + Date.now();
         
-        // 에디터에 임시 로딩 플레이스홀더 삽입
-        const tempId = 'img_temp_' + Date.now();
-        document.execCommand('insertHTML', false, `<div id="${tempId}" style="color:var(--ac);font-size:12px;padding:15px;text-align:center;border:1px dashed var(--border);border-radius:6px;margin:15px 0;">이미지를 구글 드라이브에 업로드 중입니다...</div>`);
+        // 1. 에디터에 '즉시' 이미지를 렌더링합니다. (투명도 0.5로 두어 백그라운드 작업 중임을 알림)
+        const imgHtml = `<img src="${dataUrl}" id="${tempId}" alt="첨부이미지" style="opacity:0.5; transition:opacity 0.3s;">`;
+        document.execCommand('insertHTML', false, imgHtml);
+        updateWC();
+        
+        // 2. 이 시점에서 이미 로컬 데이터가 본문에 있으므로, 우선 1차 자동저장을 수행합니다.
+        if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
         
         try {
-          // 구글 드라이브에 이미지 업로드 요청
+          // 구글 드라이브에 조용히 업로드를 진행합니다.
           const res = await SYNC.uploadImage(base64Data, filename, mimeType);
-          
-          // 🚨 수정사항: 구글 드라이브 기본 링크 대신 이미지가 렌더링되는 썸네일 전용 주소로 강제 변환
           const directUrl = `https://drive.google.com/thumbnail?id=${res.id}&sz=w1000`;
-          const imgHtml = `<img src="${directUrl}" alt="첨부이미지">`;
           
-          // 로딩 플레이스홀더를 실제 구글 드라이브 이미지 태그로 교체
+          // 3. 업로드 성공 시, 해당 이미지를 찾아 주소를 구글 드라이브 주소로 교체하고 투명도를 100%로 되돌립니다.
           const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
-          const placeholder = editor.querySelector(`#${tempId}`);
-          if(placeholder) {
-              placeholder.outerHTML = imgHtml;
-          } else {
-              document.execCommand('insertHTML', false, imgHtml);
+          const imgEl = editor.querySelector(`#${tempId}`);
+          if (imgEl) {
+              imgEl.src = directUrl;
+              imgEl.style.opacity = '1';
+              imgEl.removeAttribute('id'); // 처리 끝났으므로 임시 ID 제거
           }
           
-          updateWC();
+          // 최종 주소가 교체된 상태로 2차 자동저장 수행
           if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
           
         } catch(err) {
           console.error('Image upload failed:', err);
+          // 업로드에 실패하더라도(스크립트 미연결 등) 이미지는 엑스박스 없이 에디터에 온전히 남아 있습니다!
           const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
-          const placeholder = editor.querySelector(`#${tempId}`);
-          if(placeholder) placeholder.textContent = '이미지 업로드 실패. 구글 스크립트 연결을 확인하세요.';
+          const imgEl = editor.querySelector(`#${tempId}`);
+          if (imgEl) {
+              imgEl.style.opacity = '1';
+              imgEl.title = '구글 드라이브 연결 실패 (현재 기기에만 저장됨)';
+              imgEl.removeAttribute('id');
+          }
+          if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
         }
       };
       reader.readAsDataURL(file);
@@ -710,7 +714,7 @@ const SYNC={
   },
   async uploadImage(base64, filename, mimeType) {
     if(!GAS_URL) throw new Error("No GAS URL");
-    this.setSyncStatus('이미지 업로드 중...','syncing');
+    this.setSyncStatus('이미지 백그라운드 업로드 중...','syncing');
     try {
       const res = await this._post({
         action: 'upload_image',
@@ -719,10 +723,10 @@ const SYNC={
         mimeType: mimeType
       });
       if(res.status === 'error') throw new Error(res.message);
-      this.setSyncStatus('업로드 완료','ok');
+      this.setSyncStatus('드라이브 저장 완료','ok');
       return res;
     } catch(e) {
-      this.setSyncStatus('업로드 실패','error');
+      this.setSyncStatus('이미지 업로드 실패','error');
       throw e;
     }
   },
@@ -777,7 +781,7 @@ function init(){
   try{
     renderChk();updateBookStats();showRandomQuote();updateWritingStats();setupAutoSave();
     
-    // 이미지 붙여넣기 이벤트 리스너 등록
+    // 복사 붙여넣기 이벤트 리스너
     document.getElementById('edBody').addEventListener('paste', handlePaste);
     document.getElementById('memo-body').addEventListener('paste', handlePaste);
     
