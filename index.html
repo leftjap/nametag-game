@@ -341,6 +341,12 @@ const formatTopDate=iso=>{
   return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${ampm} ${h}:${String(m).padStart(2,'0')}`;
 };
 
+// 🌟 추가: 기존에 구글 드라이브 뷰어(uc?export=view)로 저장되어 깨진 이미지를 자동 복구(thumbnail)하는 함수
+function fixDriveImageUrls(html) {
+  if(!html) return '';
+  return html.replace(/https:\/\/drive\.google\.com\/uc\?export=view(&amp;|&)id=([a-zA-Z0-9_-]+)/g, 'https://drive.google.com/thumbnail?id=$2&sz=w1000');
+}
+
 // ═══ State ═══
 let activeTab='navi';
 const textTypes=['navi','fiction','blog'];
@@ -368,7 +374,9 @@ function saveDocs(docs){S(K.docs,docs)}
 function newDoc(type){const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};const docs=allDocs();docs.unshift(doc);saveDocs(docs);return doc}
 function loadDoc(type,id){
   const doc=allDocs().find(d=>d.id===id);if(!doc)return;curIds[type]=id;
-  document.getElementById('edTitle').value=doc.title;document.getElementById('edBody').innerHTML=doc.content;
+  document.getElementById('edTitle').value=doc.title;
+  // 저장된 깨진 이미지 링크를 열 때마다 실시간으로 정상화
+  document.getElementById('edBody').innerHTML=fixDriveImageUrls(doc.content);
   document.getElementById('edDate').textContent=formatTopDate(doc.created);updateWC();renderListPanel();
 }
 function saveCurDoc(type){
@@ -432,7 +440,11 @@ let curMemoId=null;
 function getMemos(){return L(K.memos)||[]}
 function saveMemos(m){S(K.memos,m)}
 function saveMemo(){const title=document.getElementById('memo-title').value.trim();const body=document.getElementById('memo-body').innerHTML;if(!title&&!stripHtml(body).trim())return;const memos=getMemos();if(curMemoId){const idx=memos.findIndex(m=>m.id===curMemoId);if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}}else{const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};memos.unshift(memo);curMemoId=memo.id}saveMemos(memos);renderListPanel();SYNC.saveMemosToSheet({title,content:stripHtml(body)})}
-function loadMemo(id){const m=getMemos().find(x=>x.id===id);if(!m)return;curMemoId=id;document.getElementById('memo-title').value=m.title||'';document.getElementById('memo-body').innerHTML=m.content||'';renderListPanel()}
+function loadMemo(id){const m=getMemos().find(x=>x.id===id);if(!m)return;curMemoId=id;document.getElementById('memo-title').value=m.title||'';
+  // 메모 역시 깨진 이미지 자동 복구 적용
+  document.getElementById('memo-body').innerHTML=fixDriveImageUrls(m.content);
+  renderListPanel();
+}
 function newMemoForm(){curMemoId=null;document.getElementById('memo-title').value='';document.getElementById('memo-body').innerHTML=''}
 function delMemo(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveMemos(getMemos().filter(m=>m.id!==id));renderListPanel()}
 
@@ -648,7 +660,10 @@ async function handlePaste(e) {
         try {
           // 구글 드라이브에 이미지 업로드 요청
           const res = await SYNC.uploadImage(base64Data, filename, mimeType);
-          const imgHtml = `<img src="${res.url}" alt="첨부이미지">`;
+          
+          // 🚨 수정사항: 구글 드라이브 기본 링크 대신 이미지가 렌더링되는 썸네일 전용 주소로 강제 변환
+          const directUrl = `https://drive.google.com/thumbnail?id=${res.id}&sz=w1000`;
+          const imgHtml = `<img src="${directUrl}" alt="첨부이미지">`;
           
           // 로딩 플레이스홀더를 실제 구글 드라이브 이미지 태그로 교체
           const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
@@ -680,11 +695,10 @@ function handleNew(){const t=activeTab;if(textTypes.includes(t)){const nd=newDoc
 function handleSave(){const t=activeTab;if(textTypes.includes(t)){saveCurDoc(t);SYNC.scheduleDocSave(t)}else if(t==='book')saveBook();else if(t==='quote')saveQuote();else if(t==='memo')saveMemo()}
 
 // ═══ GAS Sync ═══
-const GAS_URL='https://script.google.com/macros/s/AKfycbxnAnSWEg-F5Jd4AYj5DRaQNHEZpzQKNmHnwJEulvpFlErBNaXcCm9GFNyf8arY3z_Z/exec';
+const GAS_URL='https://script.google.com/macros/s/AKfycbysOb_XZi1k1FkhGhki9XqKraC-I5YMvpdSIBpcfUxDXtq7J9Nd-JcodVk5fM_78z4/exec';
 const SYNC={
   timer:null,checksTimer:null,checksSaving:false,checksPending:false,lastChecksPayload:'',
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
-  // 주의: no-cors 모드를 제거하여 백엔드의 응답(JSON)을 읽을 수 있도록 수정함.
   async _post(data){
     data.token=APP_TOKEN;
     const res = await fetch(GAS_URL, {
