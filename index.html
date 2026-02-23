@@ -426,7 +426,8 @@ function renderChk(){
   document.getElementById('chkTable').innerHTML=html;
 }
 
-function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk();SYNC.saveChecksToSheet()}
+var _chkTimer=null;
+function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk();clearTimeout(_chkTimer);_chkTimer=setTimeout(()=>SYNC.saveChecksToSheet(),10000)}
 
 // ═══ Documents ═══
 function allDocs(){return L(K.docs)||[]}
