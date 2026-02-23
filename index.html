@@ -426,7 +426,7 @@ function renderChk(){
   document.getElementById('chkTable').innerHTML=html;
 }
 
-function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk()}
+function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk();SYNC.saveChecksToSheet()}
 
 // ═══ Documents ═══
 function allDocs(){return L(K.docs)||[]}
