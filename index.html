@@ -647,9 +647,9 @@ async function handlePaste(e) {
       const filename = 'img_' + Date.now() + (mimeType === 'image/png' ? '.png' : '.jpg');
       const tempId = 'img_' + Date.now();
       
-      // 이미지 뒤에 <br><br>을 추가하여 커서가 자연스럽게 이미지 아래 빈 줄로 이동하게 함
-      const imgHtml = `<img src="${tempBlobUrl}" id="${tempId}" alt="첨부이미지" style="box-sizing: border-box; border: 3px solid var(--ac-light); transition: border-color 0.3s; opacity: 1;"><br><br>`;
-      document.execCommand('insertHTML', false, imgHtml);
+      // 줄바꿈(<br>) 한 번만 추가하여 이미지를 삽입한 다음 줄에서 바로 글쓰기를 이어나갈 수 있게 함
+      const imgHtml = `<img src="${tempBlobUrl}" id="${tempId}" alt="첨부이미지" style="box-sizing: border-box; border: 3px solid var(--ac-light); transition: border-color 0.3s; opacity: 1;">`;
+      document.execCommand('insertHTML', false, imgHtml + '<br>');
       updateWC();
       
       if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
@@ -713,7 +713,7 @@ function handleNew(){const t=activeTab;if(textTypes.includes(t)){const nd=newDoc
 function handleSave(){const t=activeTab;if(textTypes.includes(t)){saveCurDoc(t);SYNC.scheduleDocSave(t)}else if(t==='book')saveBook();else if(t==='quote')saveQuote();else if(t==='memo')saveMemo()}
 
 // ═══ GAS Sync ═══
-const GAS_URL='https://script.google.com/macros/s/AKfycbxQPZcWCGuzjE-ENOl3_cR22oJMw6TCfBoyFoDmFNLn128zmXwF0-SflyVeSdCZ_Rp8/exec';
+const GAS_URL='https://script.google.com/macros/s/AKfycbxLpsQekXm0HVwAfzjKo-zENiMalH1jHIWZwGiEYDy0XUCk2aWTYfG9rfREWBDUUV5P/exec';
 const SYNC={
   timer:null,checksTimer:null,checksSaving:false,checksPending:false,lastChecksPayload:'',
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
