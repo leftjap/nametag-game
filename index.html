@@ -177,6 +177,14 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .sec{animation:fadeIn .3s ease forwards}
+
+/* Sync status */
+.sync-status{font-size:10px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;transition:.3s}
+.sync-status.ok{color:#6a9960}
+.sync-status.syncing{color:var(--ac)}
+.sync-status.error{color:var(--red)}
+.sync-btn{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:var(--bg-white);color:var(--tx-d);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;padding:0;line-height:1}
+.sync-btn:hover{background:var(--bg-card);border-color:var(--border-l)}
 </style>
 </head>
 <body>
@@ -187,6 +195,10 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   <div class="side-hdr">
     <div class="side-date" id="sideDate"></div>
     <div class="side-brand"><img class="avatar" src="data:image/jpeg;base64,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" alt="지오">이름표 붙이기 게임</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <span class="sync-status" id="syncStatus">초기화 중...</span>
+      <button class="sync-btn" id="syncBtn" onclick="SYNC.syncAll()">↻</button>
+    </div>
   </div>
 
   <div class="sec">
@@ -414,7 +426,7 @@ function renderChk(){
   document.getElementById('chkTable').innerHTML=html;
 }
 
-function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk()}
+function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk();SYNC.saveChecksToSheet()}
 
 // ═══ Documents ═══
 function allDocs(){return L(K.docs)||[]}
@@ -494,7 +506,7 @@ function saveBook(){
   const data={title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').value,date:today(),updated:new Date().toISOString()};
   if(curBookId){const idx=books.findIndex(b=>b.id===curBookId);if(idx!==-1)Object.assign(books[idx],data)}
   else{data.id=Date.now().toString();data.created=new Date().toISOString();books.unshift(data);curBookId=data.id}
-  saveBooks(books);renderBookList();renderBookMini();setSubView('book','list');
+  saveBooks(books);renderBookList();renderBookMini();setSubView('book','list');SYNC.saveBooksToSheet();
 }
 
 function loadBook(id){
@@ -539,7 +551,7 @@ function saveQuote(){
   const by=document.getElementById('quote-by').value.trim();
   const quotes=getQuotes();quotes.unshift({id:Date.now().toString(),text,by,created:new Date().toISOString()});
   saveQuotes(quotes);
-  newQuote();renderQuoteList();showRandomQuote();
+  newQuote();renderQuoteList();showRandomQuote();SYNC.saveQuotesToSheet();
 }
 
 function newQuote(){
@@ -654,7 +666,7 @@ function saveMemo(){
     const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString()};
     memos.unshift(memo);curMemoId=memo.id;
   }
-  saveMemos(memos);renderMemoList();setSubView('memo','list');
+  saveMemos(memos);renderMemoList();setSubView('memo','list');SYNC.saveMemosToSheet();
 }
 
 function loadMemo(id){
@@ -680,24 +692,5 @@ function renderMemoList(){
       <button class="list-del" onclick="delMemo('${m.id}',event)">✕</button></div>`).join('');
 }
 
-// ═══ Auto-save ═══
-const timers={};
-function setupEditor(type){
-  const body=document.getElementById(`${type}-body`);const title=document.getElementById(`${type}-title`);if(!body)return;
-  const onInput=()=>{const sv=document.getElementById(`${type}-save`);if(sv)sv.textContent='저장 중...';clearTimeout(timers[type]);timers[type]=setTimeout(()=>saveCurDoc(type),800);updateWC(type)};
-  body.addEventListener('input',onInput);if(title)title.addEventListener('input',onInput);
-}
-
-// ═══ Init ═══
-function init(){
-  renderChk();renderBookMini();showRandomQuote();updateWritingStats();
-  ['navi','fiction','blog'].forEach(type=>{
-    setupEditor(type);const docs=getDocs(type);
-    if(docs.length)loadDoc(type,docs[0].id);else newDoc(type);
-  });
-  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();['navi','fiction','blog'].forEach(t=>saveCurDoc(t))}});
-}
-init();
-</script>
-</body>
-</html>
+// ═══ Google Apps Script 연동 ═══
+const GAS_URL = 'https://sc
