@@ -370,7 +370,7 @@ const K={docs:'gb_docs',checks:'gb_chk',books:'gb_books',quotes:'gb_quotes',memo
 const L=k=>{try{return JSON.parse(localStorage.getItem(k))||null}catch{return null}};
 const S=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 
-const today=()=>new Date().toISOString().slice(0,10);
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const weekdays=['일','월','화','수','목','금','토'];
 const fmtDate=iso=>{const d=new Date(iso);return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${weekdays[d.getDay()]})`};
 
@@ -427,7 +427,13 @@ function renderChk(){
 }
 
 var _chkTimer=null;
-function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk();clearTimeout(_chkTimer);_chkTimer=setTimeout(()=>SYNC.saveChecksToSheet(),10000)}
+function toggleChk(id){
+  const chk=getChk();
+  saveChk(id,!chk[id]);
+  renderChk();
+  clearTimeout(_chkTimer);
+  _chkTimer=setTimeout(()=>SYNC.scheduleChecksSave(),1200);
+}
 
 // ═══ Documents ═══
 function allDocs(){return L(K.docs)||[]}
@@ -700,6 +706,10 @@ const SYNC = {
   timer: null,
   queue: [], // 저장 대기열
   saving: false,
+  checksTimer: null,
+  checksSaving: false,
+  checksPending: false,
+  lastChecksPayload: '',
 
   setSyncStatus(text, type) {
     const el = document.getElementById('syncStatus');
@@ -727,17 +737,41 @@ const SYNC = {
     }
   },
 
-  // 루틴 체크를 구글 시트에 저장
+  // 루틴 체크 디바운스 + 직렬화
+  scheduleChecksSave() {
+    clearTimeout(this.checksTimer);
+    this.checksTimer = setTimeout(() => this.saveChecksToSheet(), 400);
+  },
+
   async saveChecksToSheet() {
     if (!GAS_URL) return;
+
+    const payload = {
+      action: 'save_routine',
+      date: today(),
+      checks: getChk()
+    };
+    const payloadKey = JSON.stringify(payload);
+
+    if (this.checksSaving) {
+      this.checksPending = true;
+      return;
+    }
+
+    if (payloadKey === this.lastChecksPayload) return;
+
+    this.checksSaving = true;
     try {
-      await this._post({
-        action: 'save_routine',
-        date: today(),
-        checks: getChk()
-      });
+      await this._post(payload);
+      this.lastChecksPayload = payloadKey;
     } catch (e) {
       console.error('GAS checks error:', e);
+    } finally {
+      this.checksSaving = false;
+      if (this.checksPending) {
+        this.checksPending = false;
+        this.scheduleChecksSave();
+      }
     }
   },
 
