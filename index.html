@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" href="image_f1649e.jpg.png">
+<link rel="icon" href="favicon_512.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, nofollow">
 <title>글방 대시보드</title>
@@ -23,7 +23,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .app{display:flex;height:100vh;display:flex;}
 
 /* 공통 헤더 */
-.col-header{height:60px;min-height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;}
+.col-header{height:60px;min-height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;}
 
 /* 모바일 전용 버튼 기본 숨김 */
 .mobile-nav-btn { display: none; background: none; border: none; cursor: pointer; margin-right: 12px; padding: 4px; border-radius: 4px; color: var(--tx-d); transition: .2s; }
@@ -37,13 +37,13 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .sync-status{font-size:11px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}.sync-status.ok{color:#6a9960}
 .sync-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-white);color:var(--tx-d);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:.15s}.sync-btn:hover{background:var(--bg-card)}
 
-/* 지오(고양이) 아바타 원형 보정 및 스타일 */
+/* 로고/아바타 스타일 */
 .cat-avatar {
   width: 38px;
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-  filter: brightness(1.2) contrast(1.05);
+  filter: brightness(1.05) contrast(1.05);
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   border: 1px solid var(--border);
 }
@@ -94,22 +94,40 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-item:hover{background:var(--bg-card)}
 .lp-item.on{background:var(--bg-white);box-shadow:inset 3px 0 0 var(--ac)}
 .lp-date-wrap{display:flex;flex-direction:column;align-items:center;min-width:34px;}
+.lp-date-dow{font-size:11px;color:var(--tx-m);font-weight:600;}
+.lp-date-day{font-size:20px;font-weight:700;color:var(--tx);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;}
+.lp-item.on .lp-date-day{color:var(--ac-d);}
 .lp-text-wrap{flex:1;min-width:0;}
-
-/* 2단 리스트 텍스트 색상 및 폰트 두께 조절 */
 .lp-item-title{font-size:15px;font-weight:600;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;letter-spacing:-.01em;padding-right:50px;}
-.lp-date-dow{font-size:11px;color:var(--tx-m);font-weight:500;}
-.lp-date-day{font-size:20px;font-weight:600;color:var(--tx-d);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;}
-.lp-item-preview{font-size:13px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
-
 .lp-item.on .lp-item-title{color:var(--tx); font-weight:700;}
-.lp-item.on .lp-date-day{color:var(--tx); font-weight:700;}
+.lp-item-preview{font-size:13px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
 .lp-item.on .lp-item-preview{color:var(--tx-d);}
 
 /* 액션 버튼 */
-.lp-item-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s; }
+.lp-item-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 .lp-item:hover .lp-item-actions { opacity: 1; }
-.lp-action-btn { background: none; border: none; padding: 4px; width: 26px; height: 26px; cursor: pointer; color: var(--border-l); display: flex; align-items: center; justify-content: center; transition: .15s; border-radius: 4px; }
+.lp-action-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  color: var(--border-l);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: .15s;
+  border-radius: 4px;
+}
 .lp-action-btn:hover { background: var(--bg-card-h); color: var(--tx-m); }
 .lp-action-btn.pin.on { opacity: 1; color: var(--ac); }
 .lp-action-btn.del:hover { color: var(--red); }
@@ -211,14 +229,14 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 <div class="side">
   <div class="col-header side-hdr">
-    <img src="image_f1649e.jpg.png" alt="지오" class="cat-avatar">
+    <img src="favicon_512.png" alt="로고" class="cat-avatar">
     <div class="sync-row"><span class="sync-status" id="syncStatus">초기화 중...</span><button class="sync-btn" onclick="SYNC.syncAll()">↻</button></div>
   </div>
   <div class="side-scroll">
     <div class="sec sec-border" style="padding-bottom: 24px;">
-      <div class="sec-t" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+      <div class="sec-t" style="margin-bottom:8px; display:flex; align-items:center; gap:6px;">
         <span>오늘의 어구</span>
-        <img src="image_f1641d.png.jpg" alt="Claude" style="height:14px; opacity:0.8; mix-blend-mode:multiply;">
+        <img src="클로드.png" alt="Claude" style="height:14px; opacity:0.8; mix-blend-mode:multiply;">
       </div>
       <div class="q-card" onclick="showRandomQuote()">
         <div class="q-content">
@@ -621,6 +639,13 @@ function switchTab(t){
   document.getElementById('editorMemo').style.display=t==='memo'?'flex':'none';
   document.getElementById('edToolbar').style.display=['book','quote'].includes(t)?'none':'flex';
   document.getElementById('edChars').parentElement.style.display=textTypes.includes(t)?'flex':'none';
+  
+  const saveBtn = document.getElementById('saveBtn');
+  if(['book', 'quote'].includes(t)){
+    saveBtn.style.display = 'block';
+  } else {
+    saveBtn.style.display = 'none';
+  }
   
   document.getElementById('lpHeadTitleText').textContent = TAB_META[t] || '목록';
 
