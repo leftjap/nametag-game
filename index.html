@@ -808,10 +808,9 @@ const SYNC = {
     }, 5000); // 5초 디바운스 (로컬 저장보다 느리게)
   },
 
-  // 수동 전체 동기화
+  // 수동 전체 동기화 (글만 저장 — 루틴/어구록은 각각 저장 시 자동)
   async syncAll() {
     this.setSyncStatus('전체 동기화 중...', 'syncing');
-    // 현재 편집 중인 문서 모두 저장
     for (const type of ['navi', 'fiction', 'blog']) {
       if (curIds[type]) {
         const doc = allDocs().find(d => d.id === curIds[type]);
@@ -820,11 +819,6 @@ const SYNC = {
         }
       }
     }
-    // 루틴 저장
-    await this.saveChecksToSheet();
-    // 최근 어구록 1개 저장
-    const quotes = getQuotes();
-    if (quotes.length) await this.saveQuotesToSheet(quotes[0].text, quotes[0].by);
     this.setSyncStatus('전체 동기화 완료', 'ok');
     setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
   }
