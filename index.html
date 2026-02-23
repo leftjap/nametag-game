@@ -185,7 +185,6 @@ async function tryUnlock(){
 }
 document.getElementById('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock()});
 function showApp(){document.getElementById('lockScreen').classList.add('hidden');document.getElementById('mainApp').style.display='flex';init()}
-if(sessionStorage.getItem('gb_auth')==='1')showApp();
 
 // ═══ Storage ═══
 const K={docs:'gb_docs',checks:'gb_chk',books:'gb_books',quotes:'gb_quotes',memos:'gb_memos'};
@@ -356,11 +355,15 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){
 
 // ═══ Init ═══
 function init(){
-  document.getElementById('sideDate').textContent=fmtDate(new Date().toISOString());
-  renderChk();renderBookMini();showRandomQuote();updateWritingStats();setupAutoSave();
-  const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id);else{const nd=newDoc('navi');loadDoc('navi',nd.id)}
-  if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
+  try{
+    document.getElementById('sideDate').textContent=fmtDate(new Date().toISOString());
+    renderChk();renderBookMini();showRandomQuote();updateWritingStats();setupAutoSave();
+    const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id);else{const nd=newDoc('navi');loadDoc('navi',nd.id)}
+    if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
+  }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
 }
+// Auto-login check (must be after all declarations)
+if(sessionStorage.getItem('gb_auth')==='1')showApp();
 </script>
 </body>
 </html>
