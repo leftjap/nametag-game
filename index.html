@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/x-icon;base64,AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, nofollow">
 <title>글방 대시보드</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -16,14 +16,19 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 #lockScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 #lockScreen.hidden{display:none}
 .lock-brand{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ac-d);margin-bottom:8px}
-.lock-input{width:240px;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-size:15px;font-family:'Pretendard',sans-serif;outline:none;text-align:center;background:var(--bg-white);color:var(--tx)}.lock-input:focus{border-color:var(--ac-light);box-shadow:0 0 0 3px rgba(176,137,104,.12)}
+.lock-input{width:240px;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-size:16px;font-family:'Pretendard',sans-serif;outline:none;text-align:center;background:var(--bg-white);color:var(--tx)}.lock-input:focus{border-color:var(--ac-light);box-shadow:0 0 0 3px rgba(176,137,104,.12)}
 .lock-btn{padding:10px 32px;font-size:14px;font-weight:600;color:white;background:var(--ac);border:none;border-radius:var(--r);cursor:pointer;font-family:'Pretendard',sans-serif}.lock-btn:hover{opacity:.85}
 .lock-err{font-size:12px;color:var(--red);min-height:18px}
 
-.app{display:flex;height:100vh;display:none}
+.app{display:flex;height:100vh;display:flex;}
 
 /* 공통 헤더 */
 .col-header{height:60px;min-height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;}
+
+/* 모바일 전용 버튼 기본 숨김 */
+.mobile-nav-btn { display: none; background: none; border: none; cursor: pointer; margin-right: 12px; padding: 4px; border-radius: 4px; color: var(--tx-d); transition: .2s; }
+.mobile-nav-btn:hover { background: var(--bg-card); color: var(--tx); }
+.mobile-nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
 /* 1단: SIDEBAR */
 .side{width:var(--side-w);min-width:var(--side-w);background:var(--bg-side);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
@@ -66,7 +71,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 /* 2단: LIST PANEL */
 .list-panel{width:var(--list-w);min-width:var(--list-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.lp-head{background:var(--bg-side);font-size:14px;font-weight:600;color:var(--tx-d);}
+.lp-head{background:var(--bg-side);font-size:14px;font-weight:600;color:var(--tx-d); display: flex; align-items: center;}
 .lp-list{flex:1;overflow-y:auto}
 
 .lp-item{display:flex;padding:16px 20px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;position:relative;gap:14px;align-items:flex-start;}
@@ -114,11 +119,11 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 /* 3단: EDITOR */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden}
 .ed-topbar{background:var(--bg);position:relative;justify-content:space-between;}
-.ed-topbar-left{display:flex;align-items:center;gap:12px;}
+.ed-topbar-left{display:flex;align-items:center;gap:8px;}
 .ed-save-status{font-size:12px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;}
 .ed-date-center{position:absolute;left:50%;transform:translateX(-50%);font-size:13px;font-weight:500;color:var(--tx-d);font-family:'Pretendard',sans-serif;}
 .ed-topbar-right{display:flex;gap:8px}
-.ed-top-btn{padding:7px 16px;font-size:13px;font-weight:600;color:white;background:var(--ac);border:none;border-radius:var(--r-sm);cursor:pointer;font-family:'Pretendard',sans-serif;transition:.15s}.ed-top-btn:hover{opacity:.85}.ed-top-btn.secondary{color:var(--ac-d);background:var(--bg-white);border:1px solid var(--border)}.ed-top-btn.secondary:hover{background:var(--bg-card)}
+.ed-top-btn{padding:7px 16px;font-size:13px;font-weight:600;color:white;background:var(--ac);border:none;border-radius:var(--r-sm);cursor:pointer;font-family:'Pretendard',sans-serif;transition:.15s; white-space:nowrap;}.ed-top-btn:hover{opacity:.85}.ed-top-btn.secondary{color:var(--ac-d);background:var(--bg-white);border:1px solid var(--border)}.ed-top-btn.secondary:hover{background:var(--bg-card)}
 
 .toolbar{display:flex;align-items:center;padding:6px 20px;border-bottom:1px solid var(--border);background:var(--bg);gap:4px;flex-wrap:wrap;}
 .tb-btn{width:34px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:var(--r-sm);cursor:pointer;color:var(--tx-d);font-size:15px;font-weight:600;transition:.15s;font-family:'Pretendard',sans-serif}.tb-btn:hover{background:var(--bg-card);border-color:var(--border)}.tb-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
@@ -135,7 +140,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .ed-body hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 .ed-body ul, .ed-body ol{padding-left:24px;margin:12px 0;}
 
-/* 이미지 마우스 포인터 추가 및 선택 용이하게 수정 */
 .ed-body img {
   max-width: 100%;
   height: auto;
@@ -152,10 +156,59 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .special-form{padding:20px 0;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--border);margin-bottom:20px;}
 .sf-field{display:flex;flex-direction:column;gap:6px}.sf-row{display:flex;gap:16px}
 .sf-label{font-size:11px;font-weight:600;color:var(--tx-m);letter-spacing:.5px}
-.sf-input{width:100%;background:var(--bg-white);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:14px;color:var(--tx);font-family:'Pretendard',sans-serif;outline:none}.sf-input::placeholder{color:var(--border-l)}.sf-input:focus{border-color:var(--ac-light);box-shadow:0 0 0 2px rgba(176,137,104,.1)}
+.sf-input{width:100%;background:var(--bg-white);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:16px;color:var(--tx);font-family:'Pretendard',sans-serif;outline:none}.sf-input::placeholder{color:var(--border-l)}.sf-input:focus{border-color:var(--ac-light);box-shadow:0 0 0 2px rgba(176,137,104,.1)}
 
 ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-l);border-radius:4px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ========================================================= */
+/* 반응형 모바일 레이아웃 (768px 이하 스마트폰 화면)         */
+/* ========================================================= */
+@media (max-width: 768px) {
+  .app { position: relative; display: block; height: 100vh; height: 100dvh; overflow: hidden; width: 100vw; }
+  
+  .side, .list-panel, .editor {
+    position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+    width: 100%; height: 100%; min-width: 100%; border-right: none;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease;
+    background: var(--bg-white);
+    box-shadow: -4px 0 15px rgba(0,0,0,0.05);
+  }
+  
+  .side { background: var(--bg-side); z-index: 30; }
+  .list-panel { background: var(--bg); z-index: 20; }
+  .editor { z-index: 40; }
+
+  /* 뷰 상태별 레이아웃 애니메이션 */
+  .app.view-side .side { transform: translateX(0); opacity: 1; }
+  .app.view-side .list-panel { transform: translateX(30%); opacity: 0.3; pointer-events: none; }
+  .app.view-side .editor { transform: translateX(100%); }
+
+  .app.view-list .side { transform: translateX(-100%); }
+  .app.view-list .list-panel { transform: translateX(0); opacity: 1; pointer-events: auto; }
+  .app.view-list .editor { transform: translateX(100%); }
+
+  .app.view-editor .side { transform: translateX(-100%); }
+  .app.view-editor .list-panel { transform: translateX(-30%); opacity: 0.3; pointer-events: none; }
+  .app.view-editor .editor { transform: translateX(0); opacity: 1; }
+
+  .mobile-nav-btn { display: flex; align-items: center; justify-content: center; }
+  
+  /* 모바일 UI 밸런스 조정 */
+  .ed-date-center { display: none; } /* 공간 부족 방지 */
+  .ed-topbar { padding: 0 16px; }
+  
+  .ed-title { font-size: 22px; padding-bottom: 5px; margin-bottom: 15px; }
+  .ed-body { font-size: 16px; line-height: 1.8; }
+  .editor-content-wrap { padding: 20px 20px 80px 20px; }
+  
+  /* 툴바 가로 스크롤 설정 */
+  .toolbar { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding: 8px 12px; }
+  .tb-btn { flex-shrink: 0; width: 38px; height: 36px; }
+  
+  .sf-row { flex-direction: column; gap: 10px; }
+  .special-form { padding: 16px 20px; gap: 10px; }
+}
 </style>
 </head>
 <body>
@@ -169,7 +222,8 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   <div class="lock-err" id="lockErr"></div>
 </div>
 
-<div class="app" id="mainApp">
+<div class="app view-list" id="mainApp">
+
 <div class="side">
   <div class="col-header side-hdr">
     <div class="sync-row"><span class="sync-status" id="syncStatus">초기화 중...</span><button class="sync-btn" onclick="SYNC.syncAll()">↻</button></div>
@@ -201,7 +255,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
         <div class="st-bar"><div class="st-bar-f" id="wBar" style="width:0"></div></div>
       </div>
       <div class="st-card">
-        <div class="st-row"><span class="st-lb">오늘 읽은 책</span><button class="more-btn" onclick="switchTab('book')">더보기 →</button></div>
+        <div class="st-row"><span class="st-lb">오늘 읽은 책</span><button class="more-btn" onclick="switchTab('book'); setMobileView('list');">더보기 →</button></div>
         <div class="st-sub"><span>오늘 <b id="bToday">0</b>p</span><span>월간 <b id="bMonth">0</b>p</span><span>연간 <b id="bYear">0</b>p</span></div>
         <div class="st-bar" style="margin-bottom:12px"><div class="st-bar-f" id="bBar" style="width:0"></div></div>
         <div id="bookMiniList" style="padding-top:12px; border-top:1px solid var(--border)"></div>
@@ -211,15 +265,28 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 </div>
 
 <div class="list-panel">
-  <div class="col-header lp-head" id="lpHeadTitle">글 목록</div>
+  <div class="col-header lp-head">
+    <button class="mobile-nav-btn" onclick="setMobileView('side')" title="메뉴 열기">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <span id="lpHeadTitleText" style="font-weight: 600;">글 목록</span>
+  </div>
   <div class="lp-list" id="lpList"></div>
 </div>
 
 <div class="editor">
   <div class="col-header ed-topbar">
-    <div class="ed-topbar-left"><span class="ed-save-status" id="edSaveStatus">저장됨</span></div>
+    <div class="ed-topbar-left">
+      <button class="mobile-nav-btn" onclick="setMobileView('list')" title="목록으로 가기">
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
+      <span class="ed-save-status" id="edSaveStatus">저장됨</span>
+    </div>
     <div class="ed-date-center" id="edDate"></div>
-    <div class="ed-topbar-right"><button class="ed-top-btn secondary" id="saveBtn" style="display:none;" onclick="handleSave()">등록</button><button class="ed-top-btn" onclick="handleNew()">+ 새 글</button></div>
+    <div class="ed-topbar-right">
+      <button class="ed-top-btn secondary" id="saveBtn" style="display:none;" onclick="handleSave()">등록</button>
+      <button class="ed-top-btn" onclick="handleNew()">+ 새 글</button>
+    </div>
   </div>
   <div class="toolbar" id="edToolbar">
     <button class="tb-btn" title="굵게" onclick="execCmd('bold')"><b>B</b></button>
@@ -345,11 +412,18 @@ function fixDriveImageUrls(html) {
   return html.replace(/https:\/\/drive\.google\.com\/uc\?export=view(&amp;|&)id=([a-zA-Z0-9_-]+)/g, 'https://drive.google.com/thumbnail?id=$2&sz=w1000');
 }
 
-// ═══ State ═══
+// ═══ State & Mobile View ═══
 let activeTab='navi';
 const textTypes=['navi','fiction','blog'];
 const TAB_META={navi:'오늘의 네비',fiction:'500자 습작',blog:'블로그',book:'서재',quote:'어구',memo:'메모'};
 const curIds={};
+
+// 모바일 화면 단위 전환 함수
+function setMobileView(view) {
+  const app = document.getElementById('mainApp');
+  app.classList.remove('view-side', 'view-list', 'view-editor');
+  app.classList.add('view-' + view);
+}
 
 // ═══ Checks ═══
 const CHECKS=[{id:'exercise',label:'운동'},{id:'vitamin',label:'영양제'},{id:'english',label:'영어'},{id:'japanese',label:'일본어'},{id:'drawing',label:'드로잉'},{id:'ukulele',label:'우쿨렐레'},{id:'nodrink',label:'금주'}];
@@ -463,7 +537,7 @@ function renderSideMenu(){
   const nav=document.getElementById('sideNav');
   if(!nav)return;
   const menu=['navi','fiction','blog','book','quote','memo'].map(t=>`
-    <button class="side-menu ${activeTab===t?'on':''}" data-t="${t}" onclick="switchTab('${t}')">
+    <button class="side-menu ${activeTab===t?'on':''}" data-t="${t}" onclick="switchTab('${t}'); setMobileView('list');">
       <span class="side-menu-l">${TAB_META[t]}</span>
       <span class="side-menu-c">${getTabCount(t)}</span>
     </button>
@@ -510,7 +584,7 @@ function switchTab(t){
     saveBtn.style.display = 'none';
   }
   
-  document.getElementById('lpHeadTitle').textContent = TAB_META[t] || '목록';
+  document.getElementById('lpHeadTitleText').textContent = TAB_META[t] || '목록';
 
   if(textTypes.includes(t)){const docs=getDocs(t);if(curIds[t])loadDoc(t,curIds[t]);else if(docs.length)loadDoc(t,docs[0].id);else{const nd=newDoc(t);loadDoc(t,nd.id)}}
   if(t==='book'){if(curBookId)loadBook(curBookId);else{const b=getBooks();if(b.length)loadBook(b[0].id);else newBook()}}
@@ -534,7 +608,7 @@ function renderListPanel(){
       const day=dt.getDate();
       const dow=weekdays[dt.getDay()];
       const preview=stripHtml(d.content).slice(0,80) || '';
-      return `<div class="lp-item ${curIds[t]===d.id?'on':''}" onclick="loadDoc('${t}','${d.id}')">
+      return `<div class="lp-item ${curIds[t]===d.id?'on':''}" onclick="loadDoc('${t}','${d.id}'); setMobileView('editor');">
         <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
         <div class="lp-text-wrap">
           <div class="lp-item-title">${d.title||'제목 없음'}</div>
@@ -558,7 +632,7 @@ function renderListPanel(){
       const dt=new Date(b.date || Date.now());
       const day=dt.getDate();
       const dow=weekdays[dt.getDay()];
-      return `<div class="lp-item ${curBookId===b.id?'on':''}" onclick="loadBook('${b.id}')">
+      return `<div class="lp-item ${curBookId===b.id?'on':''}" onclick="loadBook('${b.id}'); setMobileView('editor');">
         <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
         <div class="lp-text-wrap">
           <div class="lp-item-title">${b.title}</div>
@@ -582,7 +656,7 @@ function renderListPanel(){
       const dt=new Date(q.created);
       const day=dt.getDate();
       const dow=weekdays[dt.getDay()];
-      return `<div class="lp-item" onclick="loadQuote('${q.id}')">
+      return `<div class="lp-item" onclick="loadQuote('${q.id}'); setMobileView('editor');">
         <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
         <div class="lp-text-wrap">
           <div class="lp-item-preview" style="-webkit-line-clamp:3;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx)">${q.text}</div>
@@ -607,7 +681,7 @@ function renderListPanel(){
       const day=dt.getDate();
       const dow=weekdays[dt.getDay()];
       const preview=stripHtml(m.content).slice(0,80) || '';
-      return `<div class="lp-item ${curMemoId===m.id?'on':''}" onclick="loadMemo('${m.id}')">
+      return `<div class="lp-item ${curMemoId===m.id?'on':''}" onclick="loadMemo('${m.id}'); setMobileView('editor');">
         <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
         <div class="lp-text-wrap">
           <div class="lp-item-title">${m.title||'제목 없음'}</div>
@@ -634,7 +708,7 @@ function insertChecklist(){
   document.execCommand('insertHTML', false, '<ul style="list-style:none;padding-left:0;"><li><input type="checkbox" style="margin-right:8px;"> </li></ul>');
 }
 
-// ═══ ★ 핵심 업데이트: 이미지 삽입 후 커서 제어 및 스토리지 해결 ★ ═══
+// ═══ Image Paste Handler ═══
 async function handlePaste(e) {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   for (let item of items) {
@@ -647,7 +721,7 @@ async function handlePaste(e) {
       const filename = 'img_' + Date.now() + (mimeType === 'image/png' ? '.png' : '.jpg');
       const tempId = 'img_' + Date.now();
       
-      // 줄바꿈(<br>) 한 번만 추가하여 이미지를 삽입한 다음 줄에서 바로 글쓰기를 이어나갈 수 있게 함
+      // 싱글 줄바꿈 적용 (<br> 한 번만 사용)
       const imgHtml = `<img src="${tempBlobUrl}" id="${tempId}" alt="첨부이미지" style="box-sizing: border-box; border: 3px solid var(--ac-light); transition: border-color 0.3s; opacity: 1;">`;
       document.execCommand('insertHTML', false, imgHtml + '<br>');
       updateWC();
@@ -702,14 +776,20 @@ function setupEditorImageSelection() {
       sel.addRange(range);
     }
   };
-  // 네비, 블로그, 습작 등 메인 에디터
   document.getElementById('edBody').addEventListener('click', onImageClick);
-  // 메모 전용 에디터
   document.getElementById('memo-body').addEventListener('click', onImageClick);
 }
 
 // ═══ Actions ═══
-function handleNew(){const t=activeTab;if(textTypes.includes(t)){const nd=newDoc(t);loadDoc(t,nd.id)}else if(t==='book')newBook();else if(t==='quote')newQuoteForm();else if(t==='memo')newMemoForm();renderListPanel()}
+function handleNew(){
+  const t=activeTab;
+  if(textTypes.includes(t)){const nd=newDoc(t);loadDoc(t,nd.id)}
+  else if(t==='book')newBook();
+  else if(t==='quote')newQuoteForm();
+  else if(t==='memo')newMemoForm();
+  renderListPanel();
+  setMobileView('editor');
+}
 function handleSave(){const t=activeTab;if(textTypes.includes(t)){saveCurDoc(t);SYNC.scheduleDocSave(t)}else if(t==='book')saveBook();else if(t==='quote')saveQuote();else if(t==='memo')saveMemo()}
 
 // ═══ GAS Sync ═══
@@ -728,7 +808,7 @@ const SYNC={
   },
   async uploadImage(base64, filename, mimeType) {
     if(!GAS_URL) throw new Error("No GAS URL");
-    this.setSyncStatus('이미지 백그라운드 업로드 중...','syncing');
+    this.setSyncStatus('이미지 업로드 중...','syncing');
     try {
       const res = await this._post({
         action: 'upload_image',
@@ -795,16 +875,17 @@ function init(){
   try{
     renderChk();updateBookStats();showRandomQuote();updateWritingStats();setupAutoSave();
     
-    // 이미지 붙여넣기 이벤트 리스너 등록
+    // 복사 붙여넣기 이벤트 리스너
     document.getElementById('edBody').addEventListener('paste', handlePaste);
     document.getElementById('memo-body').addEventListener('paste', handlePaste);
-    
-    // 이미지 자동 선택 기능 활성화
     setupEditorImageSelection();
     
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id);else{const nd=newDoc('navi');loadDoc('navi',nd.id)}
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
-    document.getElementById('lpHeadTitle').textContent = TAB_META[activeTab] || '목록';
+    document.getElementById('lpHeadTitleText').textContent = TAB_META[activeTab] || '목록';
+    
+    // 모바일 초기 진입 화면을 글 목록(list)으로 설정
+    setMobileView('list');
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
 }
 // Auto-login check (must be after all declarations)
