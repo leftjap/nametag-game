@@ -1,305 +1,84 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/index.html b/index.html
-index 7566294cb1187e7ce3113731db5e9cccfdf27ae9..496b8bd38ebc1f44c7230989a1dd2cdfd443f29f 100644
---- a/index.html
-+++ b/index.html
-@@ -348,51 +348,51 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
-   </div>
- 
-   <!-- 메모 -->
-   <div class="view-pane" id="pane-memo">
-     <div class="view-toggle">
-       <button class="vt-btn on" onclick="setSubView('memo','edit')">입력</button>
-       <button class="vt-btn" onclick="setSubView('memo','list')">목록</button>
-       <div class="vt-sp"></div>
-       <button class="new-btn" onclick="newMemo()">+ 새 메모</button>
-       <button class="new-btn" onclick="saveMemo()">저장</button>
-     </div>
-     <div class="sub-edit" data-g="memo">
-       <div class="ed-hdr"><input class="ed-title" id="memo-title" placeholder="메모 제목"><div class="ed-meta"><span class="ed-date" id="memo-date"></span></div></div>
-       <div class="ed-wrap"><textarea class="ed-body" id="memo-body" placeholder="메모를 작성하세요..."></textarea></div>
-     </div>
-     <div class="sub-list" data-g="memo" style="display:none"><div class="list-view" id="memo-list"></div></div>
-   </div>
- </div>
- </div>
- 
- <script>
- const K={docs:'gb_docs',checks:'gb_chk',books:'gb_books',quotes:'gb_quotes',memos:'gb_memos'};
- const L=k=>{try{return JSON.parse(localStorage.getItem(k))||null}catch{return null}};
- const S=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
- 
--const today=()=>new Date().toISOString().slice(0,10);
-+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
- const weekdays=['일','월','화','수','목','금','토'];
- const fmtDate=iso=>{const d=new Date(iso);return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${weekdays[d.getDay()]})`};
- 
- function getWeekDates(){
-   const d=new Date();const day=d.getDay();
-   // 일요일 시작: 일(0)~토(6)
-   const sun=new Date(d);sun.setDate(d.getDate()-day);
-   return Array.from({length:7},(_,i)=>{const x=new Date(sun);x.setDate(sun.getDate()+i);return x.toISOString().slice(0,10)});
- }
- const isThisWeek=iso=>getWeekDates().includes(iso?.slice(0,10));
- 
- document.getElementById('sideDate').textContent=fmtDate(new Date().toISOString());
- 
- // ═══ Daily Checks ═══
- const CHECKS=[
-   {id:'exercise',label:'운동'},
-   {id:'vitamin',label:'영양제'},
-   {id:'english',label:'영어'},
-   {id:'japanese',label:'일본어'},
-   {id:'drawing',label:'드로잉'},
-   {id:'ukulele',label:'우쿨렐레'},
-   {id:'nodrink',label:'금주'},
- ];
- 
- function getChk(){const d=L(K.checks)||{};return d[today()]||{}}
-@@ -405,51 +405,57 @@ function renderChk(){
-   const week=getWeekDates();
-   const todayS=today();
-   const dayLabels=['일','월','화','수','목','금','토'];
- 
-   let html=`<div class="chk-week-hdr"><div class="chk-lb-space"></div><div class="day-labels">`;
-   dayLabels.forEach(d=>{html+=`<div class="day-lbl">${d}</div>`});
-   html+=`</div></div>`;
- 
-   CHECKS.forEach(c=>{
-     const checked=chk[c.id];
-     html+=`<div class="chk-row ${checked?'on':''}" onclick="toggleChk('${c.id}')">
-       <div class="chk-box"><svg viewBox="0 0 16 16"><polyline points="3,8 7,12 13,4"/></svg></div>
-       <span class="chk-lb">${c.label}</span>
-       <div class="chk-dots">`;
-     week.forEach(dt=>{
-       const done=allChk[dt]&&allChk[dt][c.id];
-       html+=`<div class="chk-dot ${done?'done':''} ${dt===todayS?'today':''}"></div>`;
-     });
-     html+=`</div></div>`;
-   });
- 
-   document.getElementById('chkTable').innerHTML=html;
- }
- 
- var _chkTimer=null;
--function toggleChk(id){const chk=getChk();saveChk(id,!chk[id]);renderChk();clearTimeout(_chkTimer);_chkTimer=setTimeout(()=>SYNC.saveChecksToSheet(),10000)}
-+function toggleChk(id){
-+  const chk=getChk();
-+  saveChk(id,!chk[id]);
-+  renderChk();
-+  clearTimeout(_chkTimer);
-+  _chkTimer=setTimeout(()=>SYNC.scheduleChecksSave(),1200);
-+}
- 
- // ═══ Documents ═══
- function allDocs(){return L(K.docs)||[]}
- function getDocs(type){return allDocs().filter(d=>d.type===type)}
- function saveDocs(docs){S(K.docs,docs)}
- const curIds={};
- 
- function newDoc(type){
-   const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString()};
-   const docs=allDocs();docs.unshift(doc);saveDocs(docs);
-   loadDoc(type,doc.id);setSubView(type,'edit');
- }
- 
- function loadDoc(type,id){
-   const doc=allDocs().find(d=>d.id===id);if(!doc)return;
-   curIds[type]=id;
-   document.getElementById(`${type}-title`).value=doc.title;
-   document.getElementById(`${type}-body`).value=doc.content;
-   document.getElementById(`${type}-date`).textContent=fmtDate(doc.created);
-   updateWC(type);setSubView(type,'edit');
- }
- 
- function saveCurDoc(type){
-   if(!curIds[type])return;
-   const docs=allDocs();const idx=docs.findIndex(d=>d.id===curIds[type]);if(idx===-1)return;
-@@ -678,145 +684,174 @@ function loadMemo(id){
-   setSubView('memo','edit');
- }
- 
- function delMemo(id,e){
-   e.stopPropagation();if(!confirm('삭제할까요?'))return;
-   saveMemos(getMemos().filter(m=>m.id!==id));renderMemoList();
- }
- 
- function renderMemoList(){
-   const memos=getMemos();const el=document.getElementById('memo-list');
-   if(!memos.length){el.innerHTML='<div style="text-align:center;padding:50px;color:var(--tx-m)">메모가 없습니다</div>';return}
-   el.innerHTML=memos.map(m=>`
-     <div class="list-item" onclick="loadMemo('${m.id}')">
-       <div class="list-tag" style="background:#a09080"></div>
-       <div class="list-info"><div class="list-title">${m.title||'제목 없음'}</div><div class="list-date">${fmtDate(m.created)}</div>${m.content?`<div class="list-preview">${m.content.replace(/\n/g,' ').slice(0,60)}</div>`:''}</div>
-       <button class="list-del" onclick="delMemo('${m.id}',event)">✕</button></div>`).join('');
- }
- 
- // ═══ Google Apps Script 연동 ═══
- const GAS_URL = 'https://script.google.com/macros/s/AKfycbysOb_XZi1k1FkhGhki9XqKraC-I5YMvpdSIBpcfUxDXtq7J9Nd-JcodVk5fM_78z4/exec';
- 
- const SYNC = {
-   timer: null,
-   queue: [], // 저장 대기열
-   saving: false,
-+  checksTimer: null,
-+  checksSaving: false,
-+  checksPending: false,
-+  lastChecksPayload: '',
- 
-   setSyncStatus(text, type) {
-     const el = document.getElementById('syncStatus');
-     if (el) { el.textContent = text; el.className = 'sync-status ' + (type || ''); }
-   },
- 
-   // 글(navi, fiction, blog)을 구글 문서로 저장
-   async saveDocToGDrive(type, title, content) {
-     if (!GAS_URL || !content.trim()) return;
-     const fileName = title || today();
- 
-     try {
-       this.setSyncStatus('동기화 중...', 'syncing');
-       await this._post({
-         action: 'save_doc',
-         type: type,
-         title: fileName,
-         content: content
-       });
-       this.setSyncStatus('Drive 저장 완료', 'ok');
-       setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
-     } catch (e) {
-       console.error('GAS save error:', e);
-       this.setSyncStatus('저장 실패', 'error');
-     }
-   },
- 
--  // 루틴 체크를 구글 시트에 저장
-+  // 루틴 체크를 구글 시트에 저장 (디바운스 + 직렬화)
-+  scheduleChecksSave() {
-+    clearTimeout(this.checksTimer);
-+    this.checksTimer = setTimeout(() => this.saveChecksToSheet(), 400);
-+  },
+diff --git a/docs/google-sheet-duplicate-fix.md b/docs/google-sheet-duplicate-fix.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..63e362477f0ebce0687a2c8a5346fd87c6fb8acb
+--- /dev/null
++++ b/docs/google-sheet-duplicate-fix.md
+@@ -0,0 +1,74 @@
++# 루틴 중복 행(같은 날짜 여러 줄) 근본 해결 가이드
 +
-   async saveChecksToSheet() {
-     if (!GAS_URL) return;
++현재 프론트엔드에서 요청을 줄여도, **Apps Script 쪽에서 동시에 2개 요청이 들어오면** `appendRow`가 중복 실행될 수 있습니다.
 +
-+    const payload = {
-+      action: 'save_routine',
-+      date: today(),
-+      checks: getChk()
-+    };
-+    const payloadKey = JSON.stringify(payload);
++가장 안전한 방법은 아래 2가지입니다.
 +
-+    if (this.checksSaving) {
-+      this.checksPending = true;
-+      return;
++1. `LockService`로 동시 실행 잠금
++2. `appendRow` 대신 **날짜 기준 upsert(있으면 수정, 없으면 추가)**
++
++---
++
++## 교체할 Apps Script 함수
++
++아래 함수로 `saveRoutineToSheet`를 교체하세요.
++
++```javascript
++function saveRoutineToSheet(dateStr, checks) {
++  var lock = LockService.getScriptLock();
++  lock.waitLock(30000);
++
++  try {
++    var ss = SpreadsheetApp.openById('17D4UIrkBSFOxF2bwoaoOXo6aYfemPEtv2WeSz07Ei1M');
++    var sheet = ss.getActiveSheet();
++
++    var items = ['exercise', 'vitamin', 'english', 'japanese', 'drawing', 'ukulele', 'nodrink'];
++    var rowValues = [dateStr].concat(items.map(function(id) {
++      return checks && checks[id] ? 'O' : '';
++    }));
++
++    // 날짜 문자열 비교는 표시값으로 고정 (Date/문자열 혼합 방지)
++    var lastRow = sheet.getLastRow();
++    var targetRow = -1;
++
++    if (lastRow >= 2) {
++      var dateDisplayValues = sheet.getRange(2, 1, lastRow - 1, 1).getDisplayValues();
++      for (var i = 0; i < dateDisplayValues.length; i++) {
++        if (dateDisplayValues[i][0] === dateStr) {
++          targetRow = i + 2;
++          break;
++        }
++      }
 +    }
 +
-+    if (payloadKey === this.lastChecksPayload) return;
++    if (targetRow === -1) {
++      sheet.appendRow(rowValues);
++      targetRow = sheet.getLastRow();
++    } else {
++      sheet.getRange(targetRow, 1, 1, rowValues.length).setValues([rowValues]);
++    }
 +
-+    this.checksSaving = true;
-     try {
--      await this._post({
--        action: 'save_routine',
--        date: today(),
--        checks: getChk()
--      });
-+      await this._post(payload);
-+      this.lastChecksPayload = payloadKey;
-     } catch (e) {
-       console.error('GAS checks error:', e);
-+    } finally {
-+      this.checksSaving = false;
-+      if (this.checksPending) {
-+        this.checksPending = false;
-+        this.scheduleChecksSave();
-+      }
-     }
-   },
- 
-   // 어구록을 구글 시트에 저장 (최신 1개)
-   async saveQuotesToSheet(text, by) {
-     if (!GAS_URL) return;
-     try {
-       await this._post({
-         action: 'save_quote',
-         text: text || '',
-         by: by || ''
-       });
-     } catch (e) {
-       console.error('GAS quotes error:', e);
-     }
-   },
- 
-   // 서재를 구글 문서로 저장
-   async saveBooksToSheet(book) {
-     if (!GAS_URL || !book) return;
-     try {
-       await this._post({
-         action: 'save_doc',
-         type: 'book',
-         title: book.title,
-         content: `저자: ${book.author||''}\n출판사: ${book.publisher||''}\n읽은 양: ${book.pages||0}p\n\n${book.memo||''}`
-       });
-     } catch (e) {
-       console.error('GAS books error:', e);
-     }
-   },
- 
-   // 메모를 구글 문서로 저장
-   async saveMemosToSheet(memo) {
-     if (!GAS_URL || !memo) return;
-     try {
-       await this._post({
-         action: 'save_doc',
-         type: 'memo',
-         title: memo.title || '메모',
-         content: memo.content || ''
-       });
-     } catch (e) {
-       console.error('GAS memos error:', e);
-     }
-   },
- 
-   // Apps Script 웹앱에 POST 전송 (공통)
-+  // no-cors로 전송 성공/실패만 판단해 CORS/리다이렉트 파싱 문제로 인한 중복 재시도를 줄인다.
-   async _post(data) {
--    const resp = await fetch(GAS_URL, {
-+    await fetch(GAS_URL, {
-       method: 'POST',
--      redirect: 'follow',
-+      mode: 'no-cors',
-+      cache: 'no-store',
-       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-       body: JSON.stringify(data)
-     });
--    // Apps Script는 리다이렉트 후 opaque response를 줄 수 있음
--    try { return await resp.json(); } catch { return { status: 'sent' }; }
-+    return { status: 'sent' };
-   },
- 
-   // 디바운스된 문서 저장
-   scheduleDocSave(type) {
-     clearTimeout(this.timer);
-     this.timer = setTimeout(() => {
-       if (!curIds[type]) return;
-       const doc = allDocs().find(d => d.id === curIds[type]);
-       if (doc && doc.content.trim()) {
-         this.saveDocToGDrive(type, doc.title, doc.content);
-       }
-     }, 5000); // 5초 디바운스 (로컬 저장보다 느리게)
-   },
- 
-   // 수동 전체 동기화 (글만 저장 — 루틴/어구록은 각각 저장 시 자동)
-   async syncAll() {
-     this.setSyncStatus('전체 동기화 중...', 'syncing');
-     for (const type of ['navi', 'fiction', 'blog']) {
-       if (curIds[type]) {
-         const doc = allDocs().find(d => d.id === curIds[type]);
-         if (doc && doc.content.trim()) {
-           await this.saveDocToGDrive(type, doc.title, doc.content);
-         }
-       }
-     }
++    return { status: 'updated', date: dateStr, row: targetRow };
++  } finally {
++    lock.releaseLock();
++  }
++}
++```
++
++---
++
++## 왜 이 방식이 안전한가?
++
++- 기존 방식: 같은 날짜 기존 행을 지우고 `appendRow` → 동시 요청 시 둘 다 append할 수 있음
++- 변경 방식: 잠금 + 한 행에 `setValues`로 덮어쓰기 → 같은 날짜는 항상 한 줄 유지
++
++---
++
++## 적용 순서
++
++1. Apps Script 편집기에서 함수 교체
++2. `doPost`는 그대로 유지 (`save_routine` 분기 사용)
++3. 배포(웹 앱)에서 **새 버전 배포**
++4. 사이트에서 체크 2~3번 연속 후 시트 확인
++
++필요하면 이 저장소의 프론트엔드 디바운스/직렬화 로직과 함께 사용하세요.
  
 EOF
 )
