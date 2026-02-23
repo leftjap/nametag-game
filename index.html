@@ -633,35 +633,39 @@ function insertChecklist(){
 }
 
 // ═══ ★ 핵심 업데이트: 딜레이 없이 100% 화질 표시 및 백그라운드 업로드 ★ ═══
+// ═══ Image Paste Handler ═══
 async function handlePaste(e) {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   for (let item of items) {
     if (item.type.indexOf('image/') === 0) {
       e.preventDefault();
       const file = item.getAsFile();
-      const reader = new FileReader();
       
+      // 1. 거대한 텍스트 대신 '가상 링크(Blob URL)' 생성 (로컬 스토리지 에러 완벽 차단)
+      const tempBlobUrl = URL.createObjectURL(file);
+      const mimeType = file.type;
+      const filename = 'img_' + Date.now() + (mimeType === 'image/png' ? '.png' : '.jpg');
+      const tempId = 'img_' + Date.now();
+      
+      // 2. 에디터에 '즉시' 원본 화질로 렌더링. 테두리로 업로드 중임을 표시
+      const imgHtml = `<img src="${tempBlobUrl}" id="${tempId}" alt="첨부이미지" style="box-sizing: border-box; border: 3px solid var(--ac-light); transition: border-color 0.3s; opacity: 1;">`;
+      document.execCommand('insertHTML', false, imgHtml);
+      updateWC();
+      
+      // 가상 링크는 길이가 매우 짧으므로 1차 자동저장을 해도 용량 에러가 발생하지 않습니다.
+      if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
+      
+      // 3. 백그라운드에서 구글 드라이브 업로드를 위해 Base64로 읽기
+      const reader = new FileReader();
       reader.onload = async function(ev) {
-        const dataUrl = ev.target.result; // 로컬 원본 Base64 데이터 (화질 100%)
-        const base64Data = dataUrl.split(',')[1];
-        const mimeType = file.type;
-        const filename = 'img_' + Date.now() + (mimeType === 'image/png' ? '.png' : '.jpg');
-        const tempId = 'img_' + Date.now();
-        
-        // 1. 에디터에 '즉시' 100% 화질로 렌더링. 테두리로 업로드 중임을 표시
-        const imgHtml = `<img src="${dataUrl}" id="${tempId}" alt="첨부이미지" style="box-sizing: border-box; border: 3px solid var(--ac-light); transition: border-color 0.3s; opacity: 1;">`;
-        document.execCommand('insertHTML', false, imgHtml);
-        updateWC();
-        
-        // 2. 이미 로컬에 렌더링되었으므로 우선 1차 저장 수행 (새로고침해도 이미지가 보이도록)
-        if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
+        const base64Data = ev.target.result.split(',')[1];
         
         try {
-          // 3. 구글 드라이브 업로드 시도
+          // 구글 드라이브 업로드 시도
           const res = await SYNC.uploadImage(base64Data, filename, mimeType);
           const directUrl = `https://drive.google.com/thumbnail?id=${res.id}&sz=w1000`;
           
-          // 업로드 성공 시, 기존 이미지를 찾아 주소를 교체하고 테두리를 기본 테두리로 복구
+          // 4. 업로드 성공 시, 기존 이미지를 찾아 진짜 드라이브 주소로 교체하고 테두리 정상화
           const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
           const imgEl = editor.querySelector(`#${tempId}`);
           if (imgEl) {
@@ -670,12 +674,11 @@ async function handlePaste(e) {
               imgEl.removeAttribute('id');
           }
           
+          // 진짜 주소가 박힌 상태로 최종 저장
           if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
           
         } catch(err) {
           console.error('Image upload failed:', err);
-          // 업로드에 실패하더라도 이미지는 100% 화질로 에디터(로컬)에 남아있습니다.
-          // 단, 구글 드라이브에 안 올라갔다는 것을 빨간 테두리로 알려줍니다.
           const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
           const imgEl = editor.querySelector(`#${tempId}`);
           if (imgEl) {
@@ -683,7 +686,7 @@ async function handlePaste(e) {
               imgEl.title = '업로드 실패 (구글 앱스 스크립트 권한 확인 필요)';
               imgEl.removeAttribute('id');
           }
-          alert("이미지 업로드에 실패했습니다.\n현재 기기에만 저장되었습니다.\n\n해결법: 구글 앱스 스크립트에서 [배포]->[새 배포] 시 '액세스 권한'을 반드시 '모든 사용자(Anyone)'로 지정했는지 확인해 주세요.");
+          alert("이미지 업로드에 실패했습니다.\n\n구글 앱스 스크립트에서 [새 배포] 시 '액세스 권한'이 '모든 사용자(Anyone)'로 되어 있는지 확인해 주세요.");
           if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
         }
       };
