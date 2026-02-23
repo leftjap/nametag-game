@@ -1,9 +1,9 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/index.html b/index.html
-index 662c9bccfe302803e062e52d72da9f29997ccede..bfc3300f6aab4296767675dd44f2f3d8e4730f46 100644
+index 662c9bccfe302803e062e52d72da9f29997ccede..cf3bd071f40060732562f255db0de2b1eb57787a 100644
 --- a/index.html
 +++ b/index.html
-@@ -1,227 +1,247 @@
+@@ -1,227 +1,263 @@
  <!DOCTYPE html>
  <html lang="ko">
  <head>
@@ -119,12 +119,28 @@ index 662c9bccfe302803e062e52d72da9f29997ccede..bfc3300f6aab4296767675dd44f2f3d8
  </head>
  <body>
  
++<script>
++(function sanitizeUnexpectedBodyNodes(){
++  const allowedIds=new Set(['lockScreen','mainApp']);
++  const nodes=[...document.body.childNodes];
++  for(const n of nodes){
++    if(n.nodeType===Node.TEXT_NODE&&n.textContent.trim()){
++      n.remove();
++      continue;
++    }
++    if(n.nodeType===Node.ELEMENT_NODE&&n.tagName!=='SCRIPT'&&!allowedIds.has(n.id)){
++      n.remove();
++    }
++  }
++})();
++</script>
++
  <!-- LOCK SCREEN -->
  <div id="lockScreen">
    <div class="lock-brand">이름표 붙이기 게임</div>
 -  <input class="lock-input" id="lockPw" type="password" placeholder="비밀번호" autofocus>
 -  <button class="lock-btn" onclick="tryUnlock()">입장</button>
-+  <form id="lockForm" onsubmit="event.preventDefault();tryUnlock();" style="display:flex;flex-direction:column;align-items:center;gap:12px">
++  <form id="lockForm" onsubmit="event.preventDefault();tryUnlock();return false;" style="display:flex;flex-direction:column;align-items:center;gap:12px">
 +    <input class="lock-input" id="lockPw" type="password" placeholder="비밀번호" autofocus>
 +    <button class="lock-btn" type="submit">입장</button>
 +  </form>
@@ -282,7 +298,7 @@ index 662c9bccfe302803e062e52d72da9f29997ccede..bfc3300f6aab4296767675dd44f2f3d8
    const doc=allDocs().find(d=>d.id===id);if(!doc)return;curIds[type]=id;
    document.getElementById('edTitle').value=doc.title;document.getElementById('edBody').innerHTML=doc.content;
    document.getElementById('edDate').textContent=fmtDate(doc.created);updateWC();renderListPanel();
-@@ -259,111 +279,135 @@ function renderBookMini(){const books=getBooks().filter(b=>b.date&&(b.date===tod
+@@ -259,111 +295,135 @@ function renderBookMini(){const books=getBooks().filter(b=>b.date&&(b.date===tod
  // ═══ Quotes ═══
  function getQuotes(){return L(K.quotes)||[]}
  function saveQuotes(q){S(K.quotes,q)}
