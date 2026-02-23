@@ -38,7 +38,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .side-menu:hover{background:var(--bg-card)}
 .side-menu.on{background:var(--bg-white);color:var(--tx);box-shadow:0 1px 2px rgba(0,0,0,0.02)}
 .side-menu-l{font-size:14px;font-weight:500;letter-spacing:-.01em}
-/* 메뉴 개수(뱃지) 변경사항: 배경 제거, 숫자 폰트 크기 조절 */
 .side-menu-c{font-size:13px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;}
 .side-menu.on .side-menu-c{color:var(--ac-d);font-weight:600;}
 
@@ -59,7 +58,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .st-sub{display:flex;gap:12px;margin-top:10px}.st-sub span{font-size:11px;color:var(--tx-d);font-family:'JetBrains Mono',monospace}.st-sub b{color:var(--ac-d);font-size:14px;font-weight:600}
 .st-bar{height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}.st-bar-f{height:100%;background:linear-gradient(90deg,var(--ac-light),var(--ac));border-radius:2px;transition:width .5s}
 .more-btn{font-size:11px;color:var(--tx-m);background:none;border:none;cursor:pointer;font-family:'Pretendard',sans-serif}.more-btn:hover{color:var(--ac)}
-.book-mini{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}.book-mini-t{color:var(--tx-d);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.book-mini-p{color:var(--ac);font-family:'JetBrains Mono',monospace;font-size:11px;margin-left:8px}
+.book-mini{display:flex;justify-content:space-between;padding:5px 0;font-size:12px}.book-mini-t{color:var(--tx-d);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.book-mini-p{color:var(--ac);font-family:'JetBrains Mono',monospace;font-size:11px;margin-left:8px}
 
 /* 2단: LIST PANEL */
 .list-panel{width:var(--list-w);min-width:var(--list-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
@@ -74,14 +73,23 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-date-day{font-size:20px;font-weight:700;color:var(--tx);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;}
 .lp-item.on .lp-date-day{color:var(--ac-d);}
 .lp-text-wrap{flex:1;min-width:0;}
-.lp-item-title{font-size:15px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;letter-spacing:-.01em}
+.lp-item-title{font-size:15px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;letter-spacing:-.01em;padding-right:45px;}
 .lp-item.on .lp-item-title{color:var(--ac-d);}
 .lp-item-preview{font-size:13px;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
-.lp-item-del{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--border-l);cursor:pointer;font-size:16px;opacity:0;transition:.2s;padding:2px}.lp-item:hover .lp-item-del{opacity:1}.lp-item-del:hover{color:var(--red)}
+
+/* 고정(Pin) & 삭제 버튼 */
+.lp-item-del{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--border-l);cursor:pointer;font-size:16px;opacity:0;transition:.2s;padding:2px}
+.lp-item:hover .lp-item-del{opacity:1}.lp-item-del:hover{color:var(--red)}
+
+.lp-item-pin{position:absolute;top:17px;right:40px;background:none;border:none;color:var(--border-l);cursor:pointer;opacity:0;transition:.2s;padding:2px;display:flex;align-items:center;justify-content:center}
+.lp-item:hover .lp-item-pin{opacity:1}
+.lp-item-pin:hover{color:var(--ac)}
+.lp-item-pin.on{opacity:1;color:var(--ac-light)}
+.lp-item-pin svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lp-item-pin.on svg{fill:currentColor}
 
 /* 3단: EDITOR */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden}
-/* 3단 상단바 (중앙 정렬 날짜 적용) */
 .ed-topbar{background:var(--bg);position:relative;justify-content:space-between;}
 .ed-topbar-left{display:flex;align-items:center;gap:12px;}
 .ed-save-status{font-size:12px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;}
@@ -96,7 +104,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .editor-scroll-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;}
 .editor-content-wrap{width:100%;max-width:800px;padding:40px 40px 80px 40px;display:flex;flex-direction:column;flex:1;}
 
-/* 제목 폰트 크기 감소 */
 .ed-title{width:100%;background:none;border:none;font-family:'Pretendard',sans-serif;font-size:24px;font-weight:700;color:var(--tx);outline:none;letter-spacing:-0.02em;margin-bottom:20px;line-height:1.3;}.ed-title::placeholder{color:var(--border-l)}
 .ed-body{width:100%;min-height:100%;outline:none;font-family:'Pretendard',sans-serif;font-size:16px;line-height:2.05;letter-spacing:-0.008em;color:var(--tx);flex:1;}.ed-body:empty::before{content:attr(data-placeholder);color:var(--border-l)}
 
@@ -151,16 +158,18 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
       <div class="chk-table" id="chkTable"></div>
     </div>
     
-    <div class="sec sec-border">
+    <div class="sec sec-border" style="padding-bottom:30px;">
       <div class="sec-t">기록</div>
-      <div class="st-card" style="margin-bottom:12px">
+      <div class="st-card" style="margin-bottom:16px">
         <div class="st-row"><span class="st-lb">오늘 쓴 글</span></div>
         <div class="st-sub"><span>오늘 <b id="wToday">0</b>매</span><span>주간 <b id="wWeek">0</b>매</span><span>누적 <b id="wTotal">0</b>매</span></div>
         <div class="st-bar"><div class="st-bar-f" id="wBar" style="width:0"></div></div>
       </div>
       <div class="st-card">
         <div class="st-row"><span class="st-lb">오늘 읽은 책</span><button class="more-btn" onclick="switchTab('book')">더보기 →</button></div>
-        <div id="bookMiniList" style="margin-top:8px"></div>
+        <div class="st-sub"><span>오늘 <b id="bToday">0</b>p</span><span>월간 <b id="bMonth">0</b>p</span><span>연간 <b id="bYear">0</b>p</span></div>
+        <div class="st-bar" style="margin-bottom:12px"><div class="st-bar-f" id="bBar" style="width:0"></div></div>
+        <div id="bookMiniList" style="padding-top:12px; border-top:1px solid var(--border)"></div>
       </div>
     </div>
   </div>
@@ -175,7 +184,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   <div class="col-header ed-topbar">
     <div class="ed-topbar-left"><span class="ed-save-status" id="edSaveStatus">저장됨</span></div>
     <div class="ed-date-center" id="edDate"></div>
-    <div class="ed-topbar-right"><button class="ed-top-btn secondary" onclick="handleSave()">저장</button><button class="ed-top-btn" onclick="handleNew()">+ 새 글</button></div>
+    <div class="ed-topbar-right"><button class="ed-top-btn secondary" id="saveBtn" style="display:none;" onclick="handleSave()">등록</button><button class="ed-top-btn" onclick="handleNew()">+ 새 글</button></div>
   </div>
   <div class="toolbar" id="edToolbar">
     <button class="tb-btn" title="굵게" onclick="execCmd('bold')"><b>B</b></button>
@@ -215,7 +224,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
       <div class="editor-content-wrap">
         <div class="special-form">
           <div class="sf-field"><span class="sf-label">제목</span><input class="sf-input" id="book-title" placeholder="책 제목"></div>
-          <div class="sf-row"><div class="sf-field" style="flex:2"><span class="sf-label">저자</span><input class="sf-input" id="book-author" placeholder="저자명"></div><div class="sf-field" style="flex:2"><span class="sf-label">출판사</span><input class="sf-input" id="book-publisher" placeholder="출판사명"></div><div class="sf-field" style="flex:1"><span class="sf-label">읽은 양</span><input class="sf-input" id="book-pages" placeholder="p" type="number"></div></div>
+          <div class="sf-row"><div class="sf-field" style="flex:2"><span class="sf-label">저자</span><input class="sf-input" id="book-author" placeholder="저자명"></div><div class="sf-field" style="flex:2"><span class="sf-label">출판사</span><input class="sf-input" id="book-publisher" placeholder="출판사명"></div><div class="sf-field" style="flex:1"><span class="sf-label">읽은 양 (p)</span><input class="sf-input" id="book-pages" placeholder="숫자만" type="number"></div></div>
         </div>
         <div class="ed-body" id="book-body" contenteditable="true" data-placeholder="책에 대한 메모..."></div>
       </div>
@@ -270,14 +279,12 @@ const K={docs:'gb_docs',checks:'gb_chk',books:'gb_books',quotes:'gb_quotes',memo
 const L=k=>{try{return JSON.parse(localStorage.getItem(k))||null}catch{return null}};
 const S=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 
-// 시간을 로컬 타임존 기준으로 강제 포맷팅 (UTC 시차로 인한 날짜 밀림 방지)
 const getLocalYMD=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const today=()=>getLocalYMD(new Date());
 
 const weekdays=['일','월','화','수','목','금','토'];
 const fmtDate=iso=>{const d=new Date(iso);return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${weekdays[d.getDay()]})`};
 
-// 이번주 날짜 배열 생성 (시차 방지를 위해 로컬 Date 조작 후 변환)
 function getWeekDates(){
   const d=new Date(),day=d.getDay(),sun=new Date(d);
   sun.setDate(d.getDate()-day);
@@ -291,7 +298,6 @@ function getWeekDates(){
 const isThisWeek=iso=>getWeekDates().includes(iso?.slice(0,10));
 const stripHtml=s=>(s||'').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ');
 
-// 데이원 스타일 상단 중앙 날짜 포맷팅 (예: 2026년 2월 23일 오후 3:40)
 const formatTopDate=iso=>{
   const d=new Date(iso);
   let h=d.getHours(), m=d.getMinutes(), ampm=h>=12?'오후':'오전';
@@ -302,7 +308,7 @@ const formatTopDate=iso=>{
 // ═══ State ═══
 let activeTab='navi';
 const textTypes=['navi','fiction','blog'];
-const TAB_META={navi:'네비',fiction:'500자',blog:'블로그',book:'서재',quote:'어구',memo:'메모'};
+const TAB_META={navi:'오늘의 네비',fiction:'500자 습작',blog:'블로그',book:'서재',quote:'어구',memo:'메모'};
 const curIds={};
 
 // ═══ Checks ═══
@@ -323,7 +329,7 @@ function toggleChk(id){saveChk(id,!getChk()[id]);renderChk();clearTimeout(_chkT)
 function allDocs(){return L(K.docs)||[]}
 function getDocs(type){return allDocs().filter(d=>d.type===type)}
 function saveDocs(docs){S(K.docs,docs)}
-function newDoc(type){const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString()};const docs=allDocs();docs.unshift(doc);saveDocs(docs);return doc}
+function newDoc(type){const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};const docs=allDocs();docs.unshift(doc);saveDocs(docs);return doc}
 function loadDoc(type,id){
   const doc=allDocs().find(d=>d.id===id);if(!doc)return;curIds[type]=id;
   document.getElementById('edTitle').value=doc.title;document.getElementById('edBody').innerHTML=doc.content;
@@ -350,11 +356,31 @@ function saveBook(){
   const title=document.getElementById('book-title').value.trim();if(!title)return;
   const b={id:curBookId||Date.now().toString(),title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').innerHTML,date:today()};
   const books=getBooks();if(curBookId){const idx=books.findIndex(x=>x.id===curBookId);if(idx!==-1)books[idx]=b}else books.unshift(b);
-  curBookId=b.id;saveBooks(books);renderListPanel();renderBookMini();SYNC.saveBooksToSheet(b);
+  curBookId=b.id;saveBooks(books);renderListPanel();updateBookStats();SYNC.saveBooksToSheet(b);
 }
 function loadBook(id){const b=getBooks().find(x=>x.id===id);if(!b)return;curBookId=id;document.getElementById('book-title').value=b.title;document.getElementById('book-author').value=b.author||'';document.getElementById('book-publisher').value=b.publisher||'';document.getElementById('book-pages').value=b.pages||'';document.getElementById('book-body').innerHTML=b.memo||'';renderListPanel()}
-function delBook(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveBooks(getBooks().filter(b=>b.id!==id));curBookId=null;renderListPanel();renderBookMini()}
-function renderBookMini(){const books=getBooks().filter(b=>b.date&&(b.date===today()||isThisWeek(b.date))).slice(0,3);document.getElementById('bookMiniList').innerHTML=books.length?books.map(b=>`<div class="book-mini"><div class="book-mini-t">${b.title}</div><div class="book-mini-p">${b.pages}p</div></div>`).join(''):'<div style="font-size:12px;color:var(--tx-m);text-align:center;padding:10px 0">기록이 없습니다</div>'}
+function delBook(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveBooks(getBooks().filter(b=>b.id!==id));curBookId=null;renderListPanel();updateBookStats()}
+
+function updateBookStats(){
+  const books=getBooks();
+  const td=today(), tm=td.slice(0,7), ty=td.slice(0,4);
+  let pT=0, pM=0, pY=0;
+  books.forEach(b=>{
+    const p=parseInt(b.pages)||0;
+    const d=b.date; 
+    if(!d) return;
+    if(d===td) pT+=p;
+    if(d.startsWith(tm)) pM+=p;
+    if(d.startsWith(ty)) pY+=p;
+  });
+  document.getElementById('bToday').textContent=pT;
+  document.getElementById('bMonth').textContent=pM;
+  document.getElementById('bYear').textContent=pY;
+  document.getElementById('bBar').style.width=Math.min(100,(pT/50)*100)+'%'; // 50페이지 기준 바 채움
+  
+  const recentBooks = books.slice(0,5);
+  document.getElementById('bookMiniList').innerHTML=recentBooks.length?recentBooks.map(b=>`<div class="book-mini"><div class="book-mini-t">${b.title}</div><div class="book-mini-p">${b.pages}p</div></div>`).join(''):'<div style="font-size:12px;color:var(--tx-m);text-align:center;padding:10px 0">기록이 없습니다</div>';
+}
 
 // ═══ Quotes ═══
 function getQuotes(){return L(K.quotes)||[]}
@@ -369,7 +395,7 @@ function showRandomQuote(){const quotes=getQuotes();if(!quotes.length){document.
 let curMemoId=null;
 function getMemos(){return L(K.memos)||[]}
 function saveMemos(m){S(K.memos,m)}
-function saveMemo(){const title=document.getElementById('memo-title').value.trim();const body=document.getElementById('memo-body').innerHTML;if(!title&&!stripHtml(body).trim())return;const memos=getMemos();if(curMemoId){const idx=memos.findIndex(m=>m.id===curMemoId);if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}}else{const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString()};memos.unshift(memo);curMemoId=memo.id}saveMemos(memos);renderListPanel();SYNC.saveMemosToSheet({title,content:stripHtml(body)})}
+function saveMemo(){const title=document.getElementById('memo-title').value.trim();const body=document.getElementById('memo-body').innerHTML;if(!title&&!stripHtml(body).trim())return;const memos=getMemos();if(curMemoId){const idx=memos.findIndex(m=>m.id===curMemoId);if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}}else{const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};memos.unshift(memo);curMemoId=memo.id}saveMemos(memos);renderListPanel();SYNC.saveMemosToSheet({title,content:stripHtml(body)})}
 function loadMemo(id){const m=getMemos().find(x=>x.id===id);if(!m)return;curMemoId=id;document.getElementById('memo-title').value=m.title||'';document.getElementById('memo-body').innerHTML=m.content||'';renderListPanel()}
 function newMemoForm(){curMemoId=null;document.getElementById('memo-title').value='';document.getElementById('memo-body').innerHTML=''}
 function delMemo(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveMemos(getMemos().filter(m=>m.id!==id));renderListPanel()}
@@ -401,6 +427,19 @@ function renderSideMenu(){
   nav.innerHTML=menu;
 }
 
+function togglePin(type, id, e) {
+  e.stopPropagation();
+  if (type === 'memo') {
+    const memos = getMemos();
+    const idx = memos.findIndex(m => m.id === id);
+    if (idx !== -1) { memos[idx].pinned = !memos[idx].pinned; saveMemos(memos); renderListPanel(); }
+  } else {
+    const docs = allDocs();
+    const idx = docs.findIndex(d => d.id === id);
+    if (idx !== -1) { docs[idx].pinned = !docs[idx].pinned; saveDocs(docs); renderListPanel(); }
+  }
+}
+
 // ═══ Tab Switch ═══
 function switchTab(t){
   if(textTypes.includes(activeTab))saveCurDoc(activeTab);activeTab=t;
@@ -411,6 +450,13 @@ function switchTab(t){
   document.getElementById('editorMemo').style.display=t==='memo'?'flex':'none';
   document.getElementById('edToolbar').style.display=['book','quote'].includes(t)?'none':'flex';
   document.getElementById('edChars').parentElement.style.display=textTypes.includes(t)?'flex':'none';
+  
+  const saveBtn = document.getElementById('saveBtn');
+  if(['book', 'quote'].includes(t)){
+    saveBtn.style.display = 'block';
+  } else {
+    saveBtn.style.display = 'none';
+  }
   
   document.getElementById('lpHeadTitle').textContent = TAB_META[t] || '목록';
 
@@ -428,7 +474,13 @@ function renderListPanel(){
   const emptyState = '<div style="text-align:center;padding:60px 20px;color:var(--tx-m);font-size:14px">기록이 없습니다</div>';
 
   if(textTypes.includes(t)){
-    const docs=getDocs(t);if(!docs.length){el.innerHTML=emptyState;return}
+    let docs=getDocs(t);
+    if(!docs.length){el.innerHTML=emptyState;return}
+    docs.sort((a,b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return new Date(b.created) - new Date(a.created);
+    });
     el.innerHTML=docs.map(d=>{
       const dt=new Date(d.created);
       const day=dt.getDate();
@@ -440,7 +492,10 @@ function renderListPanel(){
           <div class="lp-item-title">${d.title||'제목 없음'}</div>
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
         </div>
-        <button class="lp-item-del" onclick="delDoc('${t}','${d.id}',event)">✕</button>
+        <button class="lp-item-pin ${d.pinned?'on':''}" onclick="togglePin('${t}','${d.id}',event)" title="상단 고정">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+        </button>
+        <button class="lp-item-del" onclick="delDoc('${t}','${d.id}',event)" title="삭제">✕</button>
       </div>`;
     }).join('');
   } else if(t==='book'){
@@ -455,7 +510,7 @@ function renderListPanel(){
           <div class="lp-item-title">${b.title}</div>
           <div class="lp-item-preview">${b.author||''} ${b.publisher?' · '+b.publisher:''}</div>
         </div>
-        <button class="lp-item-del" onclick="delBook('${b.id}',event)">✕</button>
+        <button class="lp-item-del" onclick="delBook('${b.id}',event)" title="삭제">✕</button>
       </div>`;
     }).join('');
   } else if(t==='quote'){
@@ -470,11 +525,17 @@ function renderListPanel(){
           <div class="lp-item-preview" style="-webkit-line-clamp:3;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx)">${q.text}</div>
           ${q.by ? `<div class="lp-item-preview" style="margin-top:6px;font-size:12px">${q.by}</div>` : ''}
         </div>
-        <button class="lp-item-del" onclick="delQuote('${q.id}',event)">✕</button>
+        <button class="lp-item-del" onclick="delQuote('${q.id}',event)" title="삭제">✕</button>
       </div>`;
     }).join('');
   } else if(t==='memo'){
-    const memos=getMemos();if(!memos.length){el.innerHTML=emptyState;return}
+    let memos=getMemos();
+    if(!memos.length){el.innerHTML=emptyState;return}
+    memos.sort((a,b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return new Date(b.created) - new Date(a.created);
+    });
     el.innerHTML=memos.map(m=>{
       const dt=new Date(m.created);
       const day=dt.getDate();
@@ -486,7 +547,10 @@ function renderListPanel(){
           <div class="lp-item-title">${m.title||'제목 없음'}</div>
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
         </div>
-        <button class="lp-item-del" onclick="delMemo('${m.id}',event)">✕</button>
+        <button class="lp-item-pin ${m.pinned?'on':''}" onclick="togglePin('${t}','${m.id}',event)" title="상단 고정">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+        </button>
+        <button class="lp-item-del" onclick="delMemo('${m.id}',event)" title="삭제">✕</button>
       </div>`;
     }).join('');
   }
@@ -527,10 +591,31 @@ const SYNC={
 let _at=null;
 function setupAutoSave(){
   const body=document.getElementById('edBody'),title=document.getElementById('edTitle');
-  const onInput=()=>{document.getElementById('edSaveStatus').textContent='저장 중...';clearTimeout(_at);_at=setTimeout(()=>{if(textTypes.includes(activeTab)){saveCurDoc(activeTab);SYNC.scheduleDocSave(activeTab)}},800);updateWC()};
+  const onInput=()=>{
+    document.getElementById('edSaveStatus').textContent='저장 중...';
+    clearTimeout(_at);
+    _at=setTimeout(()=>{
+      if(textTypes.includes(activeTab)){
+        saveCurDoc(activeTab);
+        SYNC.scheduleDocSave(activeTab);
+        document.getElementById('edSaveStatus').textContent='저장됨';
+      }
+    },800);
+    updateWC();
+  };
   body.addEventListener('input',onInput);title.addEventListener('input',onInput);
+  
   const mb=document.getElementById('memo-body'),mt=document.getElementById('memo-title');
-  const memoInput=()=>{clearTimeout(_at);_at=setTimeout(()=>{if(activeTab==='memo')saveMemo()},1500)};
+  const memoInput=()=>{
+    document.getElementById('edSaveStatus').textContent='저장 중...';
+    clearTimeout(_at);
+    _at=setTimeout(()=>{
+      if(activeTab==='memo'){
+        saveMemo();
+        document.getElementById('edSaveStatus').textContent='저장됨';
+      }
+    },1500);
+  };
   mb.addEventListener('input',memoInput);mt.addEventListener('input',memoInput);
 }
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();handleSave()}});
@@ -538,7 +623,7 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){
 // ═══ Init ═══
 function init(){
   try{
-    renderChk();renderBookMini();showRandomQuote();updateWritingStats();setupAutoSave();
+    renderChk();updateBookStats();showRandomQuote();updateWritingStats();setupAutoSave();
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id);else{const nd=newDoc('navi');loadDoc('navi',nd.id)}
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
     document.getElementById('lpHeadTitle').textContent = TAB_META[activeTab] || '목록';
