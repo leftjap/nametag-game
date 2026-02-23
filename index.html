@@ -33,18 +33,19 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .sync-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-white);color:var(--tx-d);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:.15s}.sync-btn:hover{background:var(--bg-card)}
 
 .side-scroll{flex:1;overflow-y:auto;}
-.side-nav{padding:4px 16px 16px;}
+.side-nav{padding:16px 16px 8px;}
 .side-menu{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;margin-bottom:2px;border:none;border-radius:var(--r);background:none;cursor:pointer;transition:.15s;font-size:14px;font-family:'Pretendard',sans-serif;color:var(--tx-d)}
 .side-menu:hover{background:var(--bg-card)}
 .side-menu.on{background:var(--bg-white);color:var(--tx);box-shadow:0 1px 2px rgba(0,0,0,0.02)}
 .side-menu-l{font-size:14px;font-weight:500;letter-spacing:-.01em}
 .side-menu-c{font-size:13px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;}
 .side-menu.on .side-menu-c{color:var(--ac-d);font-weight:600;}
+.routine-jump{margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
 
 .sec{padding:16px 20px}.sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx-m);margin-bottom:12px}
 .chk-table{display:flex;flex-direction:column}
-.chk-week-hdr{display:flex;align-items:center;padding:0 0 4px;margin-bottom:4px;} /* 구분선 제거됨 */
+.chk-week-hdr{display:flex;align-items:center;padding:0 0 4px;margin-bottom:4px;} 
 .chk-week-hdr .chk-lb-space{flex:1;min-width:60px}
 .chk-week-hdr .day-labels{display:flex;gap:2px}
 .chk-week-hdr .day-lbl{width:16px;text-align:center;font-size:10px;color:var(--tx-d);font-family:'JetBrains Mono',monospace}
@@ -76,11 +77,11 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-date-day{font-size:20px;font-weight:700;color:var(--tx);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;}
 .lp-item.on .lp-date-day{color:var(--ac-d);}
 .lp-text-wrap{flex:1;min-width:0;}
-.lp-item-title{font-size:15px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;letter-spacing:-.01em;padding-right:45px;}
+.lp-item-title{font-size:15px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;letter-spacing:-.01em;padding-right:50px;}
 .lp-item.on .lp-item-title{color:var(--ac-d);}
 .lp-item-preview{font-size:13px;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
 
-/* 액션 버튼 (고정 & 삭제) 그룹화 및 정렬 */
+/* 액션 버튼 (고정 & 삭제) 정렬 */
 .lp-item-actions {
   position: absolute;
   top: 14px;
@@ -95,6 +96,8 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   background: none;
   border: none;
   padding: 4px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
   color: var(--border-l);
   display: flex;
@@ -134,7 +137,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .ed-body hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 .ed-body ul, .ed-body ol{padding-left:24px;margin:12px 0;}
 
-/* 에디터 내 이미지 붙여넣기 스타일 지원 */
+/* 삽입된 이미지가 깨지지 않도록 하는 반응형 스타일 */
 .ed-body img {
   max-width: 100%;
   height: auto;
@@ -173,7 +176,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="sync-row"><span class="sync-status" id="syncStatus">초기화 중...</span><button class="sync-btn" onclick="SYNC.syncAll()">↻</button></div>
   </div>
   <div class="side-scroll">
-    <div class="sec sec-border" style="padding-bottom: 12px;">
+    <div class="sec sec-border" style="padding-bottom: 16px;">
       <div class="sec-t" style="margin-bottom:8px;">오늘의 어구</div>
       <div class="q-card" onclick="showRandomQuote()">
         <div class="q-content">
@@ -246,7 +249,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <input class="ed-title" id="edTitle" placeholder="제목">
-        <div class="ed-body" id="edBody" contenteditable="true" data-placeholder="여기에 글을 쓰세요..."></div>
+        <div class="ed-body" id="edBody" contenteditable="true" data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
     </div>
     <div class="ed-foot"><span id="edChars">0자</span><span id="edWords">0단어</span><span id="edPages">0매</span></div>
@@ -277,7 +280,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <input class="ed-title" id="memo-title" placeholder="메모 제목">
-        <div class="ed-body" id="memo-body" contenteditable="true" data-placeholder="메모를 작성하세요..."></div>
+        <div class="ed-body" id="memo-body" contenteditable="true" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
     </div>
   </div>
@@ -457,7 +460,7 @@ function renderSideMenu(){
       <span class="side-menu-c">${getTabCount(t)}</span>
     </button>
   `).join('');
-  nav.innerHTML=menu;
+  nav.innerHTML=menu + `<div class="routine-jump"></div>`;
 }
 
 // 모든 탭 항목에 대한 고정(Pin) 기능 지원
@@ -624,16 +627,91 @@ function insertChecklist(){
   document.execCommand('insertHTML', false, '<ul style="list-style:none;padding-left:0;"><li><input type="checkbox" style="margin-right:8px;"> </li></ul>');
 }
 
+// ═══ Image Paste Handler ═══
+async function handlePaste(e) {
+  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for (let item of items) {
+    if (item.type.indexOf('image/') === 0) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      const reader = new FileReader();
+      
+      reader.onload = async function(ev) {
+        const base64Data = ev.target.result.split(',')[1];
+        const mimeType = file.type;
+        const filename = 'img_' + Date.now() + (mimeType === 'image/png' ? '.png' : '.jpg');
+        
+        // 에디터에 임시 로딩 플레이스홀더 삽입
+        const tempId = 'img_temp_' + Date.now();
+        document.execCommand('insertHTML', false, `<div id="${tempId}" style="color:var(--ac);font-size:12px;padding:15px;text-align:center;border:1px dashed var(--border);border-radius:6px;margin:15px 0;">이미지를 구글 드라이브에 업로드 중입니다...</div>`);
+        
+        try {
+          // 구글 드라이브에 이미지 업로드 요청
+          const res = await SYNC.uploadImage(base64Data, filename, mimeType);
+          const imgHtml = `<img src="${res.url}" alt="첨부이미지">`;
+          
+          // 로딩 플레이스홀더를 실제 구글 드라이브 이미지 태그로 교체
+          const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
+          const placeholder = editor.querySelector(`#${tempId}`);
+          if(placeholder) {
+              placeholder.outerHTML = imgHtml;
+          } else {
+              document.execCommand('insertHTML', false, imgHtml);
+          }
+          
+          updateWC();
+          if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
+          
+        } catch(err) {
+          console.error('Image upload failed:', err);
+          const editor = activeTab === 'memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
+          const placeholder = editor.querySelector(`#${tempId}`);
+          if(placeholder) placeholder.textContent = '이미지 업로드 실패. 구글 스크립트 연결을 확인하세요.';
+        }
+      };
+      reader.readAsDataURL(file);
+      break; 
+    }
+  }
+}
+
 // ═══ Actions ═══
 function handleNew(){const t=activeTab;if(textTypes.includes(t)){const nd=newDoc(t);loadDoc(t,nd.id)}else if(t==='book')newBook();else if(t==='quote')newQuoteForm();else if(t==='memo')newMemoForm();renderListPanel()}
 function handleSave(){const t=activeTab;if(textTypes.includes(t)){saveCurDoc(t);SYNC.scheduleDocSave(t)}else if(t==='book')saveBook();else if(t==='quote')saveQuote();else if(t==='memo')saveMemo()}
 
 // ═══ GAS Sync ═══
-const GAS_URL='https://script.google.com/macros/s/AKfycbysOb_XZi1k1FkhGhki9XqKraC-I5YMvpdSIBpcfUxDXtq7J9Nd-JcodVk5fM_78z4/exec';
+const GAS_URL='https://script.google.com/macros/s/AKfycbxnAnSWEg-F5Jd4AYj5DRaQNHEZpzQKNmHnwJEulvpFlErBNaXcCm9GFNyf8arY3z_Z/exec';
 const SYNC={
   timer:null,checksTimer:null,checksSaving:false,checksPending:false,lastChecksPayload:'',
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
-  async _post(data){data.token=APP_TOKEN;await fetch(GAS_URL,{method:'POST',mode:'no-cors',cache:'no-store',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});return{status:'sent'}},
+  // 주의: no-cors 모드를 제거하여 백엔드의 응답(JSON)을 읽을 수 있도록 수정함.
+  async _post(data){
+    data.token=APP_TOKEN;
+    const res = await fetch(GAS_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(data)
+    });
+    return await res.json();
+  },
+  async uploadImage(base64, filename, mimeType) {
+    if(!GAS_URL) throw new Error("No GAS URL");
+    this.setSyncStatus('이미지 업로드 중...','syncing');
+    try {
+      const res = await this._post({
+        action: 'upload_image',
+        bytes: base64,
+        filename: filename,
+        mimeType: mimeType
+      });
+      if(res.status === 'error') throw new Error(res.message);
+      this.setSyncStatus('업로드 완료','ok');
+      return res;
+    } catch(e) {
+      this.setSyncStatus('업로드 실패','error');
+      throw e;
+    }
+  },
   async saveDocToGDrive(type,title,content){
     if(!GAS_URL||!stripHtml(content).trim())return;
     try{this.setSyncStatus('동기화 중...','syncing');await this._post({action:'save_doc',type,title:title||today(),content:stripHtml(content)});this.setSyncStatus('Drive 저장 완료','ok');setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)}catch(e){console.error(e);this.setSyncStatus('저장 실패','error')}
@@ -684,6 +762,11 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){
 function init(){
   try{
     renderChk();updateBookStats();showRandomQuote();updateWritingStats();setupAutoSave();
+    
+    // 이미지 붙여넣기 이벤트 리스너 등록
+    document.getElementById('edBody').addEventListener('paste', handlePaste);
+    document.getElementById('memo-body').addEventListener('paste', handlePaste);
+    
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id);else{const nd=newDoc('navi');loadDoc('navi',nd.id)}
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
     document.getElementById('lpHeadTitle').textContent = TAB_META[activeTab] || '목록';
