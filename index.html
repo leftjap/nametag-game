@@ -506,7 +506,7 @@ function saveBook(){
   const data={title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').value,date:today(),updated:new Date().toISOString()};
   if(curBookId){const idx=books.findIndex(b=>b.id===curBookId);if(idx!==-1)Object.assign(books[idx],data)}
   else{data.id=Date.now().toString();data.created=new Date().toISOString();books.unshift(data);curBookId=data.id}
-  saveBooks(books);renderBookList();renderBookMini();setSubView('book','list');SYNC.saveBooksToSheet();
+  saveBooks(books);renderBookList();renderBookMini();setSubView('book','list');SYNC.saveBooksToSheet(data);
 }
 
 function loadBook(id){
@@ -551,7 +551,7 @@ function saveQuote(){
   const by=document.getElementById('quote-by').value.trim();
   const quotes=getQuotes();quotes.unshift({id:Date.now().toString(),text,by,created:new Date().toISOString()});
   saveQuotes(quotes);
-  newQuote();renderQuoteList();showRandomQuote();SYNC.saveQuotesToSheet();
+  newQuote();renderQuoteList();showRandomQuote();SYNC.saveQuotesToSheet(text, by);
 }
 
 function newQuote(){
@@ -666,7 +666,7 @@ function saveMemo(){
     const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString()};
     memos.unshift(memo);curMemoId=memo.id;
   }
-  saveMemos(memos);renderMemoList();setSubView('memo','list');SYNC.saveMemosToSheet();
+  saveMemos(memos);renderMemoList();setSubView('memo','list');SYNC.saveMemosToSheet({title, content:body});
 }
 
 function loadMemo(id){
@@ -693,7 +693,7 @@ function renderMemoList(){
 }
 
 // ═══ Google Apps Script 연동 ═══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxl7cngj-9vbC-FH2zgZGhYz7IkTAgSTYDCbvu_6Yqz4CyBH0zvwEhjhZqlpjRiJZwl/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbysOb_XZi1k1FkhGhki9XqKraC-I5YMvpdSIBpcfUxDXtq7J9Nd-JcodVk5fM_78z4/exec';
 
 const SYNC = {
   timer: null,
@@ -708,10 +708,6 @@ const SYNC = {
   // 글(navi, fiction, blog)을 구글 문서로 저장
   async saveDocToGDrive(type, title, content) {
     if (!GAS_URL || !content.trim()) return;
-    const folderMap = { navi: '오늘의 네비', fiction: '500자 습작', blog: '블로그' };
-    const folderName = folderMap[type];
-    if (!folderName) return;
-
     const fileName = title || today();
 
     try {
@@ -720,8 +716,8 @@ const SYNC = {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
-          action: 'saveDocument',
-          folder: folderName,
+          action: 'save_doc',
+          type: type,
           title: fileName,
           content: content
         })
@@ -743,14 +739,15 @@ const SYNC = {
   // 루틴 체크를 구글 시트에 저장
   async saveChecksToSheet() {
     if (!GAS_URL) return;
-    const checks = L(K.checks) || {};
+    const todayChecks = getChk();
     try {
       await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
-          action: 'saveChecks',
-          data: checks
+          action: 'save_routine',
+          date: today(),
+          checks: todayChecks
         })
       });
     } catch (e) {
@@ -758,17 +755,17 @@ const SYNC = {
     }
   },
 
-  // 어구록을 구글 시트에 저장
-  async saveQuotesToSheet() {
+  // 어구록을 구글 시트에 저장 (최신 1개)
+  async saveQuotesToSheet(text, by) {
     if (!GAS_URL) return;
-    const quotes = L(K.quotes) || [];
     try {
       await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
-          action: 'saveQuotes',
-          data: quotes
+          action: 'save_quote',
+          text: text || '',
+          by: by || ''
         })
       });
     } catch (e) {
@@ -776,17 +773,18 @@ const SYNC = {
     }
   },
 
-  // 서재를 구글 시트에 저장
-  async saveBooksToSheet() {
-    if (!GAS_URL) return;
-    const books = L(K.books) || [];
+  // 서재를 구글 문서로 저장 (최근 저장된 책)
+  async saveBooksToSheet(book) {
+    if (!GAS_URL || !book) return;
     try {
       await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
-          action: 'saveBooks',
-          data: books
+          action: 'save_doc',
+          type: 'book',
+          title: book.title,
+          content: `저자: ${book.author||''}\n출판사: ${book.publisher||''}\n읽은 양: ${book.pages||0}p\n\n${book.memo||''}`
         })
       });
     } catch (e) {
@@ -794,17 +792,18 @@ const SYNC = {
     }
   },
 
-  // 메모를 구글 시트에 저장
-  async saveMemosToSheet() {
-    if (!GAS_URL) return;
-    const memos = L(K.memos) || [];
+  // 메모를 구글 문서로 저장
+  async saveMemosToSheet(memo) {
+    if (!GAS_URL || !memo) return;
     try {
       await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
-          action: 'saveMemos',
-          data: memos
+          action: 'save_doc',
+          type: 'memo',
+          title: memo.title || '메모',
+          content: memo.content || ''
         })
       });
     } catch (e) {
@@ -836,10 +835,11 @@ const SYNC = {
         }
       }
     }
+    // 루틴 저장
     await this.saveChecksToSheet();
-    await this.saveQuotesToSheet();
-    await this.saveBooksToSheet();
-    await this.saveMemosToSheet();
+    // 최근 어구록 1개 저장
+    const quotes = getQuotes();
+    if (quotes.length) await this.saveQuotesToSheet(quotes[0].text, quotes[0].by);
     this.setSyncStatus('전체 동기화 완료', 'ok');
     setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
   }
