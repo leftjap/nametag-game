@@ -713,7 +713,7 @@ function handleNew(){const t=activeTab;if(textTypes.includes(t)){const nd=newDoc
 function handleSave(){const t=activeTab;if(textTypes.includes(t)){saveCurDoc(t);SYNC.scheduleDocSave(t)}else if(t==='book')saveBook();else if(t==='quote')saveQuote();else if(t==='memo')saveMemo()}
 
 // ═══ GAS Sync ═══
-const GAS_URL='https://script.google.com/macros/s/AKfycbysOb_XZi1k1FkhGhki9XqKraC-I5YMvpdSIBpcfUxDXtq7J9Nd-JcodVk5fM_78z4/exec';
+const GAS_URL='https://script.google.com/macros/s/AKfycbxQPZcWCGuzjE-ENOl3_cR22oJMw6TCfBoyFoDmFNLn128zmXwF0-SflyVeSdCZ_Rp8/exec';
 const SYNC={
   timer:null,checksTimer:null,checksSaving:false,checksPending:false,lastChecksPayload:'',
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
