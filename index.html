@@ -41,10 +41,13 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .side-menu-c{font-size:13px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;}
 .side-menu.on .side-menu-c{color:var(--ac-d);font-weight:600;}
 
-.sec{padding:16px 20px}.sec-border{border-top:1px solid var(--border)}
+.sec{padding:16px 20px}.sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx-m);margin-bottom:12px}
 .chk-table{display:flex;flex-direction:column}
-.chk-week-hdr{display:flex;align-items:center;padding:0 0 4px;margin-bottom:4px;border-bottom:1px solid var(--border)}.chk-week-hdr .chk-lb-space{flex:1;min-width:60px}.chk-week-hdr .day-labels{display:flex;gap:2px}.chk-week-hdr .day-lbl{width:16px;text-align:center;font-size:10px;color:var(--tx-d);font-family:'JetBrains Mono',monospace}
+.chk-week-hdr{display:flex;align-items:center;padding:0 0 4px;margin-bottom:4px;} /* 구분선 제거됨 */
+.chk-week-hdr .chk-lb-space{flex:1;min-width:60px}
+.chk-week-hdr .day-labels{display:flex;gap:2px}
+.chk-week-hdr .day-lbl{width:16px;text-align:center;font-size:10px;color:var(--tx-d);font-family:'JetBrains Mono',monospace}
 .chk-row{display:flex;align-items:center;padding:6px 6px;cursor:pointer;user-select:none;border-radius:var(--r-sm);transition:background .15s;margin:0 -6px}.chk-row:hover{background:var(--bg-card)}
 .chk-box{width:16px;height:16px;border:1.5px solid var(--border-l);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;margin-right:10px}.chk-row.on .chk-box{background:var(--grn);border-color:var(--grn)}
 .chk-box svg{width:10px;height:10px;stroke:white;stroke-width:3;fill:none;opacity:0;transition:.2s}.chk-row.on .chk-box svg{opacity:1}
@@ -77,16 +80,35 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-item.on .lp-item-title{color:var(--ac-d);}
 .lp-item-preview{font-size:13px;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
 
-/* 고정(Pin) & 삭제 버튼 */
-.lp-item-del{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--border-l);cursor:pointer;font-size:16px;opacity:0;transition:.2s;padding:2px}
-.lp-item:hover .lp-item-del{opacity:1}.lp-item-del:hover{color:var(--red)}
+/* 액션 버튼 (고정 & 삭제) 그룹화 및 정렬 */
+.lp-item-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.lp-item:hover .lp-item-actions { opacity: 1; }
+.lp-action-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--border-l);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: .15s;
+  border-radius: 4px;
+}
+.lp-action-btn:hover { background: var(--bg-card-h); color: var(--tx-m); }
+.lp-action-btn.pin.on { opacity: 1; color: var(--ac); }
+.lp-action-btn.del:hover { color: var(--red); }
+.lp-action-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lp-action-btn.pin.on svg { fill: currentColor; }
 
-.lp-item-pin{position:absolute;top:17px;right:40px;background:none;border:none;color:var(--border-l);cursor:pointer;opacity:0;transition:.2s;padding:2px;display:flex;align-items:center;justify-content:center}
-.lp-item:hover .lp-item-pin{opacity:1}
-.lp-item-pin:hover{color:var(--ac)}
-.lp-item-pin.on{opacity:1;color:var(--ac-light)}
-.lp-item-pin svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.lp-item-pin.on svg{fill:currentColor}
 
 /* 3단: EDITOR */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden}
@@ -111,6 +133,17 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .ed-body h1,.ed-body h2,.ed-body h3{font-family:'Noto Serif KR',serif;margin:24px 0 12px;font-weight:600}.ed-body h1{font-size:22px}.ed-body h2{font-size:19px}.ed-body h3{font-size:16px}
 .ed-body hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 .ed-body ul, .ed-body ol{padding-left:24px;margin:12px 0;}
+
+/* 에디터 내 이미지 붙여넣기 스타일 지원 */
+.ed-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5em auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
+}
 
 .ed-foot{padding:10px 20px;border-top:1px solid var(--border);background:var(--bg);display:flex;justify-content:center;gap:24px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--tx-m)}.ed-foot span{color:var(--tx-d)}
 
@@ -140,7 +173,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="sync-row"><span class="sync-status" id="syncStatus">초기화 중...</span><button class="sync-btn" onclick="SYNC.syncAll()">↻</button></div>
   </div>
   <div class="side-scroll">
-    <div class="sec" style="padding-bottom: 12px;">
+    <div class="sec sec-border" style="padding-bottom: 12px;">
       <div class="sec-t" style="margin-bottom:8px;">오늘의 어구</div>
       <div class="q-card" onclick="showRandomQuote()">
         <div class="q-content">
@@ -158,7 +191,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
       <div class="chk-table" id="chkTable"></div>
     </div>
     
-    <div class="sec sec-border" style="padding-bottom:30px;">
+    <div class="sec" style="padding-bottom:30px;">
       <div class="sec-t">기록</div>
       <div class="st-card" style="margin-bottom:16px">
         <div class="st-row"><span class="st-lb">오늘 쓴 글</span></div>
@@ -354,8 +387,8 @@ function saveBooks(b){S(K.books,b)}
 function newBook(){curBookId=null;document.getElementById('book-title').value='';document.getElementById('book-author').value='';document.getElementById('book-publisher').value='';document.getElementById('book-pages').value='';document.getElementById('book-body').innerHTML=''}
 function saveBook(){
   const title=document.getElementById('book-title').value.trim();if(!title)return;
-  const b={id:curBookId||Date.now().toString(),title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').innerHTML,date:today()};
-  const books=getBooks();if(curBookId){const idx=books.findIndex(x=>x.id===curBookId);if(idx!==-1)books[idx]=b}else books.unshift(b);
+  const b={id:curBookId||Date.now().toString(),title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').innerHTML,date:today(),pinned:false};
+  const books=getBooks();if(curBookId){const idx=books.findIndex(x=>x.id===curBookId);if(idx!==-1){ b.pinned = books[idx].pinned; books[idx]=b; }}else books.unshift(b);
   curBookId=b.id;saveBooks(books);renderListPanel();updateBookStats();SYNC.saveBooksToSheet(b);
 }
 function loadBook(id){const b=getBooks().find(x=>x.id===id);if(!b)return;curBookId=id;document.getElementById('book-title').value=b.title;document.getElementById('book-author').value=b.author||'';document.getElementById('book-publisher').value=b.publisher||'';document.getElementById('book-pages').value=b.pages||'';document.getElementById('book-body').innerHTML=b.memo||'';renderListPanel()}
@@ -376,16 +409,16 @@ function updateBookStats(){
   document.getElementById('bToday').textContent=pT;
   document.getElementById('bMonth').textContent=pM;
   document.getElementById('bYear').textContent=pY;
-  document.getElementById('bBar').style.width=Math.min(100,(pT/50)*100)+'%'; // 50페이지 기준 바 채움
+  document.getElementById('bBar').style.width=Math.min(100,(pT/50)*100)+'%';
   
-  const recentBooks = books.slice(0,5);
+  const recentBooks = [...books].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).slice(0,5);
   document.getElementById('bookMiniList').innerHTML=recentBooks.length?recentBooks.map(b=>`<div class="book-mini"><div class="book-mini-t">${b.title}</div><div class="book-mini-p">${b.pages}p</div></div>`).join(''):'<div style="font-size:12px;color:var(--tx-m);text-align:center;padding:10px 0">기록이 없습니다</div>';
 }
 
 // ═══ Quotes ═══
 function getQuotes(){return L(K.quotes)||[]}
 function saveQuotes(q){S(K.quotes,q)}
-function saveQuote(){const text=document.getElementById('quote-body').innerText.trim();if(!text)return;const by=document.getElementById('quote-by').value.trim();const quotes=getQuotes();quotes.unshift({id:Date.now().toString(),text,by,created:new Date().toISOString()});saveQuotes(quotes);newQuoteForm();renderListPanel();showRandomQuote();SYNC.saveQuotesToSheet(text,by)}
+function saveQuote(){const text=document.getElementById('quote-body').innerText.trim();if(!text)return;const by=document.getElementById('quote-by').value.trim();const quotes=getQuotes();quotes.unshift({id:Date.now().toString(),text,by,created:new Date().toISOString(),pinned:false});saveQuotes(quotes);newQuoteForm();renderListPanel();showRandomQuote();SYNC.saveQuotesToSheet(text,by)}
 function newQuoteForm(){document.getElementById('quote-body').innerHTML='';document.getElementById('quote-by').value=''}
 function loadQuote(id){const q=getQuotes().find(x=>x.id===id);if(!q)return;document.getElementById('quote-body').innerText=q.text;document.getElementById('quote-by').value=q.by||''}
 function delQuote(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveQuotes(getQuotes().filter(q=>q.id!==id));renderListPanel();showRandomQuote()}
@@ -427,16 +460,25 @@ function renderSideMenu(){
   nav.innerHTML=menu;
 }
 
+// 모든 탭 항목에 대한 고정(Pin) 기능 지원
 function togglePin(type, id, e) {
   e.stopPropagation();
   if (type === 'memo') {
-    const memos = getMemos();
-    const idx = memos.findIndex(m => m.id === id);
-    if (idx !== -1) { memos[idx].pinned = !memos[idx].pinned; saveMemos(memos); renderListPanel(); }
+    const items = getMemos();
+    const idx = items.findIndex(m => m.id === id);
+    if (idx !== -1) { items[idx].pinned = !items[idx].pinned; saveMemos(items); renderListPanel(); }
+  } else if (type === 'book') {
+    const items = getBooks();
+    const idx = items.findIndex(b => b.id === id);
+    if (idx !== -1) { items[idx].pinned = !items[idx].pinned; saveBooks(items); renderListPanel(); }
+  } else if (type === 'quote') {
+    const items = getQuotes();
+    const idx = items.findIndex(q => q.id === id);
+    if (idx !== -1) { items[idx].pinned = !items[idx].pinned; saveQuotes(items); renderListPanel(); }
   } else {
-    const docs = allDocs();
-    const idx = docs.findIndex(d => d.id === id);
-    if (idx !== -1) { docs[idx].pinned = !docs[idx].pinned; saveDocs(docs); renderListPanel(); }
+    const items = allDocs();
+    const idx = items.findIndex(d => d.id === id);
+    if (idx !== -1) { items[idx].pinned = !items[idx].pinned; saveDocs(items); renderListPanel(); }
   }
 }
 
@@ -476,11 +518,7 @@ function renderListPanel(){
   if(textTypes.includes(t)){
     let docs=getDocs(t);
     if(!docs.length){el.innerHTML=emptyState;return}
-    docs.sort((a,b) => {
-      if (a.pinned && !b.pinned) return -1;
-      if (!a.pinned && b.pinned) return 1;
-      return new Date(b.created) - new Date(a.created);
-    });
+    docs.sort((a,b) => (b.pinned===true) - (a.pinned===true) || new Date(b.created) - new Date(a.created));
     el.innerHTML=docs.map(d=>{
       const dt=new Date(d.created);
       const day=dt.getDate();
@@ -492,14 +530,20 @@ function renderListPanel(){
           <div class="lp-item-title">${d.title||'제목 없음'}</div>
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
         </div>
-        <button class="lp-item-pin ${d.pinned?'on':''}" onclick="togglePin('${t}','${d.id}',event)" title="상단 고정">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-        </button>
-        <button class="lp-item-del" onclick="delDoc('${t}','${d.id}',event)" title="삭제">✕</button>
+        <div class="lp-item-actions">
+          <button class="lp-action-btn pin ${d.pinned?'on':''}" onclick="togglePin('${t}','${d.id}',event)" title="상단 고정">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+          <button class="lp-action-btn del" onclick="delDoc('${t}','${d.id}',event)" title="삭제">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
       </div>`;
     }).join('');
   } else if(t==='book'){
-    const books=getBooks();if(!books.length){el.innerHTML=emptyState;return}
+    let books=getBooks();
+    if(!books.length){el.innerHTML=emptyState;return}
+    books.sort((a,b) => (b.pinned===true) - (a.pinned===true) || new Date(b.date||0) - new Date(a.date||0));
     el.innerHTML=books.map(b=>{
       const dt=new Date(b.date || Date.now());
       const day=dt.getDate();
@@ -510,11 +554,20 @@ function renderListPanel(){
           <div class="lp-item-title">${b.title}</div>
           <div class="lp-item-preview">${b.author||''} ${b.publisher?' · '+b.publisher:''}</div>
         </div>
-        <button class="lp-item-del" onclick="delBook('${b.id}',event)" title="삭제">✕</button>
+        <div class="lp-item-actions">
+          <button class="lp-action-btn pin ${b.pinned?'on':''}" onclick="togglePin('${t}','${b.id}',event)" title="상단 고정">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+          <button class="lp-action-btn del" onclick="delBook('${b.id}',event)" title="삭제">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
       </div>`;
     }).join('');
   } else if(t==='quote'){
-    const quotes=getQuotes();if(!quotes.length){el.innerHTML=emptyState;return}
+    let quotes=getQuotes();
+    if(!quotes.length){el.innerHTML=emptyState;return}
+    quotes.sort((a,b) => (b.pinned===true) - (a.pinned===true) || new Date(b.created) - new Date(a.created));
     el.innerHTML=quotes.map(q=>{
       const dt=new Date(q.created);
       const day=dt.getDate();
@@ -525,17 +578,20 @@ function renderListPanel(){
           <div class="lp-item-preview" style="-webkit-line-clamp:3;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx)">${q.text}</div>
           ${q.by ? `<div class="lp-item-preview" style="margin-top:6px;font-size:12px">${q.by}</div>` : ''}
         </div>
-        <button class="lp-item-del" onclick="delQuote('${q.id}',event)" title="삭제">✕</button>
+        <div class="lp-item-actions">
+          <button class="lp-action-btn pin ${q.pinned?'on':''}" onclick="togglePin('${t}','${q.id}',event)" title="상단 고정">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+          <button class="lp-action-btn del" onclick="delQuote('${q.id}',event)" title="삭제">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
       </div>`;
     }).join('');
   } else if(t==='memo'){
     let memos=getMemos();
     if(!memos.length){el.innerHTML=emptyState;return}
-    memos.sort((a,b) => {
-      if (a.pinned && !b.pinned) return -1;
-      if (!a.pinned && b.pinned) return 1;
-      return new Date(b.created) - new Date(a.created);
-    });
+    memos.sort((a,b) => (b.pinned===true) - (a.pinned===true) || new Date(b.created) - new Date(a.created));
     el.innerHTML=memos.map(m=>{
       const dt=new Date(m.created);
       const day=dt.getDate();
@@ -547,10 +603,14 @@ function renderListPanel(){
           <div class="lp-item-title">${m.title||'제목 없음'}</div>
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
         </div>
-        <button class="lp-item-pin ${m.pinned?'on':''}" onclick="togglePin('${t}','${m.id}',event)" title="상단 고정">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-        </button>
-        <button class="lp-item-del" onclick="delMemo('${m.id}',event)" title="삭제">✕</button>
+        <div class="lp-item-actions">
+          <button class="lp-action-btn pin ${m.pinned?'on':''}" onclick="togglePin('${t}','${m.id}',event)" title="상단 고정">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+          <button class="lp-action-btn del" onclick="delMemo('${m.id}',event)" title="삭제">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
       </div>`;
     }).join('');
   }
