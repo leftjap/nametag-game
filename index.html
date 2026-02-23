@@ -821,14 +821,14 @@ const SYNC = {
 
   // Apps Script 웹앱에 POST 전송 (공통)
   async _post(data) {
-    const resp = await fetch(GAS_URL, {
+    await fetch(GAS_URL, {
       method: 'POST',
-      redirect: 'follow',
+      mode: 'no-cors',
+      cache: 'no-store',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data)
     });
-    // Apps Script는 리다이렉트 후 opaque response를 줄 수 있음
-    try { return await resp.json(); } catch { return { status: 'sent' }; }
+    return { status: 'sent' };
   },
 
   // 디바운스된 문서 저장
