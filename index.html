@@ -693,4 +693,192 @@ function renderMemoList(){
 }
 
 // ═══ Google Apps Script 연동 ═══
-const GAS_URL = 'https://sc
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxl7cngj-9vbC-FH2zgZGhYz7IkTAgSTYDCbvu_6Yqz4CyBH0zvwEhjhZqlpjRiJZwl/exec';
+
+const SYNC = {
+  timer: null,
+  queue: [], // 저장 대기열
+  saving: false,
+
+  setSyncStatus(text, type) {
+    const el = document.getElementById('syncStatus');
+    if (el) { el.textContent = text; el.className = 'sync-status ' + (type || ''); }
+  },
+
+  // 글(navi, fiction, blog)을 구글 문서로 저장
+  async saveDocToGDrive(type, title, content) {
+    if (!GAS_URL || !content.trim()) return;
+    const folderMap = { navi: '오늘의 네비', fiction: '500자 습작', blog: '블로그' };
+    const folderName = folderMap[type];
+    if (!folderName) return;
+
+    const fileName = title || today();
+
+    try {
+      this.setSyncStatus('동기화 중...', 'syncing');
+      const resp = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveDocument',
+          folder: folderName,
+          title: fileName,
+          content: content
+        })
+      });
+      const result = await resp.json();
+      if (result.success) {
+        this.setSyncStatus('Drive 저장 완료', 'ok');
+        setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
+      } else {
+        console.error('GAS save error:', result.error);
+        this.setSyncStatus('저장 실패', 'error');
+      }
+    } catch (e) {
+      console.error('GAS fetch error:', e);
+      this.setSyncStatus('연결 실패', 'error');
+    }
+  },
+
+  // 루틴 체크를 구글 시트에 저장
+  async saveChecksToSheet() {
+    if (!GAS_URL) return;
+    const checks = L(K.checks) || {};
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveChecks',
+          data: checks
+        })
+      });
+    } catch (e) {
+      console.error('GAS checks error:', e);
+    }
+  },
+
+  // 어구록을 구글 시트에 저장
+  async saveQuotesToSheet() {
+    if (!GAS_URL) return;
+    const quotes = L(K.quotes) || [];
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveQuotes',
+          data: quotes
+        })
+      });
+    } catch (e) {
+      console.error('GAS quotes error:', e);
+    }
+  },
+
+  // 서재를 구글 시트에 저장
+  async saveBooksToSheet() {
+    if (!GAS_URL) return;
+    const books = L(K.books) || [];
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveBooks',
+          data: books
+        })
+      });
+    } catch (e) {
+      console.error('GAS books error:', e);
+    }
+  },
+
+  // 메모를 구글 시트에 저장
+  async saveMemosToSheet() {
+    if (!GAS_URL) return;
+    const memos = L(K.memos) || [];
+    try {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveMemos',
+          data: memos
+        })
+      });
+    } catch (e) {
+      console.error('GAS memos error:', e);
+    }
+  },
+
+  // 디바운스된 문서 저장
+  scheduleDocSave(type) {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      if (!curIds[type]) return;
+      const doc = allDocs().find(d => d.id === curIds[type]);
+      if (doc && doc.content.trim()) {
+        this.saveDocToGDrive(type, doc.title, doc.content);
+      }
+    }, 5000); // 5초 디바운스 (로컬 저장보다 느리게)
+  },
+
+  // 수동 전체 동기화
+  async syncAll() {
+    this.setSyncStatus('전체 동기화 중...', 'syncing');
+    // 현재 편집 중인 문서 모두 저장
+    for (const type of ['navi', 'fiction', 'blog']) {
+      if (curIds[type]) {
+        const doc = allDocs().find(d => d.id === curIds[type]);
+        if (doc && doc.content.trim()) {
+          await this.saveDocToGDrive(type, doc.title, doc.content);
+        }
+      }
+    }
+    await this.saveChecksToSheet();
+    await this.saveQuotesToSheet();
+    await this.saveBooksToSheet();
+    await this.saveMemosToSheet();
+    this.setSyncStatus('전체 동기화 완료', 'ok');
+    setTimeout(() => this.setSyncStatus('Google Drive 연결됨', 'ok'), 2000);
+  }
+};
+
+// ═══ Auto-save (로컬 + Drive 연동) ═══
+const timers={};
+function setupEditor(type){
+  const body=document.getElementById(`${type}-body`);const title=document.getElementById(`${type}-title`);if(!body)return;
+  const onInput=()=>{
+    const sv=document.getElementById(`${type}-save`);if(sv)sv.textContent='저장 중...';
+    clearTimeout(timers[type]);
+    timers[type]=setTimeout(()=>{
+      saveCurDoc(type);
+      // 로컬 저장 후 Drive에도 저장
+      if (['navi','fiction','blog'].includes(type)) SYNC.scheduleDocSave(type);
+    },800);
+    updateWC(type);
+  };
+  body.addEventListener('input',onInput);if(title)title.addEventListener('input',onInput);
+}
+
+// ═══ Init ═══
+function init(){
+  renderChk();renderBookMini();showRandomQuote();updateWritingStats();
+  ['navi','fiction','blog'].forEach(type=>{
+    setupEditor(type);const docs=getDocs(type);
+    if(docs.length)loadDoc(type,docs[0].id);else newDoc(type);
+  });
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();['navi','fiction','blog'].forEach(t=>saveCurDoc(t))}});
+
+  // GAS 연결 상태 확인
+  if (GAS_URL) {
+    SYNC.setSyncStatus('Google Drive 연결됨', 'ok');
+  } else {
+    SYNC.setSyncStatus('로컬 전용', '');
+  }
+}
+init();
+</script>
+</body>
+</html>
