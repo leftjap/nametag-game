@@ -67,7 +67,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .st-card{background:var(--bg-white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border-l);margin-bottom:14px;transition:.2s;}.st-card:hover{border-color:var(--ac-light);}
 .st-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 
-/* ✨ 1단 하단 위젯 제목 폰트색 변경 */
 .st-lb{font-size:13px;color:var(--tx-d);font-weight:600;letter-spacing:-0.01em;transition:color .15s;}
 .st-card:hover .st-lb{color:var(--tx);}
 
@@ -89,7 +88,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-date-wrap{display:flex;flex-direction:column;align-items:center;min-width:34px;}
 .lp-date-dow{font-size:11px;color:var(--tx-m);font-weight:600;}
 
-/* ✨ 2단 날짜 폰트색 변경 */
 .lp-date-day{font-size:20px;font-weight:700;color:var(--tx-d);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;transition:color .15s;}
 .lp-item.on .lp-date-day{color:var(--tx);}
 
@@ -99,7 +97,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-item-preview{font-size:13px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
 .lp-item.on .lp-item-preview{color:var(--tx-d);}
 
-/* ✨ 어구록 본문(제목역할) 텍스트 스타일 추가 */
 .quote-txt {font-size:13px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:color .15s;}
 .lp-item.on .quote-txt {color:var(--tx);font-weight:700;}
 
@@ -357,9 +354,14 @@ window.onload = function () {
   }
 };
 
-function showApp(){
+// ✨ DB 동기화 후 앱을 켜도록 수정
+async function showApp(){
   document.getElementById('lockScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
+  
+  SYNC.setSyncStatus('데이터 동기화 중...', 'syncing');
+  await SYNC.loadDatabase();
+  
   init();
 }
 
@@ -492,6 +494,7 @@ function delDoc(type,id,e){
   saveDocs(allDocs().filter(d=>d.id!==id));
   if(curIds[type]===id) { curIds[type]=null; currentLoadedDoc = { type:null, id:null }; }
   renderListPanel();
+  SYNC.scheduleDatabaseSave();
   const docs=getDocs(type);
   if(docs.length) loadDoc(type,docs[0].id, true);
   else { const nd=newDoc(type); loadDoc(type,nd.id, true); }
@@ -555,6 +558,7 @@ function delBook(id,e){
   if(curBookId===id) { curBookId=null; currentLoadedDoc = { type:null, id:null }; }
   renderListPanel();
   updateBookStats();
+  SYNC.scheduleDatabaseSave();
 }
 function updateBookStats(){
   const books=getBooks();
@@ -618,6 +622,7 @@ function delQuote(id,e){
   if(curQuoteId===id) { curQuoteId=null; currentLoadedDoc = { type:null, id:null }; }
   renderListPanel();
   showRandomQuote();
+  SYNC.scheduleDatabaseSave();
 }
 function showRandomQuote(){const quotes=getQuotes();if(!quotes.length){document.getElementById('rqText').textContent='어구록에 문장을 추가해보세요';document.getElementById('rqText').style.color='var(--tx-m)';document.getElementById('rqBy').textContent='';return}const q=quotes[Math.floor(Math.random()*quotes.length)];document.getElementById('rqText').textContent=q.text.length>80?q.text.slice(0,80)+'…':q.text;document.getElementById('rqText').style.color='var(--tx)';document.getElementById('rqBy').textContent=q.by?'— '+q.by:''}
 
@@ -660,6 +665,7 @@ function delMemo(id,e){
   saveMemos(getMemos().filter(m=>m.id!==id));
   if(curMemoId===id) { curMemoId=null; currentLoadedDoc = { type:null, id:null }; }
   renderListPanel();
+  SYNC.scheduleDatabaseSave();
 }
 
 // ═══ Writing Stats ═══
@@ -720,6 +726,7 @@ function togglePin(type, id, e) {
     const idx = items.findIndex(d => d.id === id);
     if (idx !== -1) { items[idx].pinned = !items[idx].pinned; saveDocs(items); renderListPanel(); }
   }
+  SYNC.scheduleDatabaseSave();
 }
 
 // ═══ Tab Switch ═══
@@ -955,7 +962,7 @@ function handleNew(){
 // ═══ GAS Sync ═══
 const GAS_URL='https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec';
 const SYNC = {
-  timer: null, checksTimer: null, bookTimer: null, quoteTimer: null, quoteSyncHistory: {},
+  dbTimer: null, timer: null, checksTimer: null, bookTimer: null, quoteTimer: null, quoteSyncHistory: {},
   checksSaving: false, checksPending: false, lastChecksPayload: '',
   savingDocs: {}, 
   dirtyDocs: {},
@@ -997,6 +1004,47 @@ const SYNC = {
       }
       throw e;
     }
+  },
+
+  // ✨ 드라이브에서 전체 데이터 불러와서 덮어쓰기
+  async loadDatabase() {
+    try {
+      const res = await this._post({ action: 'load_db' });
+      if (res && res.dbData) {
+        const db = res.dbData;
+        if (db[K.docs]) S(K.docs, db[K.docs]);
+        if (db[K.books]) S(K.books, db[K.books]);
+        if (db[K.memos]) S(K.memos, db[K.memos]);
+        if (db[K.quotes]) S(K.quotes, db[K.quotes]);
+        if (db[K.checks]) S(K.checks, db[K.checks]);
+        this.setSyncStatus('DB 동기화 완료', 'ok');
+      }
+    } catch(e) {
+      this.setSyncStatus('DB 불러오기 실패', 'error');
+      console.error(e);
+    }
+  },
+
+  // ✨ 현재 전체 데이터를 드라이브로 저장하기
+  async saveDatabase() {
+    const dbData = {
+      [K.docs]: L(K.docs) || [],
+      [K.books]: L(K.books) || [],
+      [K.memos]: L(K.memos) || [],
+      [K.quotes]: L(K.quotes) || [],
+      [K.checks]: L(K.checks) || {}
+    };
+    try {
+      await this._post({ action: 'save_db', dbData: dbData });
+    } catch(e) {
+      console.error('DB 저장 실패', e);
+    }
+  },
+
+  // ✨ DB 자동 저장 스케줄러
+  scheduleDatabaseSave() {
+    clearTimeout(this.dbTimer);
+    this.dbTimer = setTimeout(() => this.saveDatabase(), 3000);
   },
 
   async uploadImage(base64, filename, mimeType) {
@@ -1065,11 +1113,35 @@ const SYNC = {
     }
   },
 
-  scheduleChecksSave(){clearTimeout(this.checksTimer);this.checksTimer=setTimeout(()=>this.saveChecksToSheet(),400)},
+  scheduleChecksSave(){
+    clearTimeout(this.checksTimer);
+    this.checksTimer=setTimeout(()=>{
+      this.saveChecksToSheet();
+      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+    },400)
+  },
+  
   async saveChecksToSheet(){if(!GAS_URL)return;const p={action:'save_routine',date:today(),checks:getChk()};const pk=JSON.stringify(p);if(this.checksSaving){this.checksPending=true;return}if(pk===this.lastChecksPayload)return;this.checksSaving=true;try{await this._post(p);this.lastChecksPayload=pk}catch(e){console.error(e)}finally{this.checksSaving=false;if(this.checksPending){this.checksPending=false;this.scheduleChecksSave()}}},
   
-  scheduleBookSave(book) { clearTimeout(this.bookTimer); this.bookTimer = setTimeout(() => { this.saveBooksToSheet(book); }, 5000); },
-  scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(() => { if (!this.quoteSyncHistory[id]) { this.saveQuotesToSheet(text, by); this.quoteSyncHistory[id] = true; } }, 5000); },
+  scheduleBookSave(book) { 
+    clearTimeout(this.bookTimer); 
+    this.bookTimer = setTimeout(() => { 
+      this.saveBooksToSheet(book); 
+      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+    }, 5000); 
+  },
+  
+  scheduleQuoteSave(text, by, id) { 
+    clearTimeout(this.quoteTimer); 
+    this.quoteTimer = setTimeout(() => { 
+      if (!this.quoteSyncHistory[id]) { 
+        this.saveQuotesToSheet(text, by); 
+        this.quoteSyncHistory[id] = true; 
+      } 
+      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+    }, 5000); 
+  },
+  
   async saveQuotesToSheet(text,by){if(!GAS_URL)return;try{await this._post({action:'save_quote',text:text||'',by:by||''})}catch(e){console.error(e)}},
   
   async saveBooksToSheet(book) {
@@ -1095,6 +1167,7 @@ const SYNC = {
     this.timer = setTimeout(() => { 
       let id = (type === 'memo') ? curMemoId : curIds[type];
       if(id) this.saveDocToGDrive(id, type); 
+      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
     }, 5000);
   },
 
@@ -1106,6 +1179,8 @@ const SYNC = {
       if(curIds[type]) this.saveDocToGDrive(curIds[type], type);
     }
     if(curMemoId) this.saveDocToGDrive(curMemoId, 'memo');
+    
+    this.saveDatabase(); // ✨ 수동 동기화 시 DB 덮어쓰기
   }
 };
 
@@ -1124,6 +1199,8 @@ function setupAutoSave(){
 
   const doSaveAndSync = () => {
     saveLocalOnly();
+    SYNC.scheduleDatabaseSave(); // ✨ 타이핑을 멈추면 DB 파일도 통째로 업데이트
+    
     if(textTypes.includes(activeTab)) SYNC.scheduleDocSave(activeTab);
     else if(activeTab==='memo') SYNC.scheduleDocSave('memo');
   };
