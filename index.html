@@ -322,7 +322,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 <script>
 // ═══ GOOGLE AUTH ═══
-// 주의: "여기에_클라이언트_ID_입력" 부분을 구글 클라우드 콘솔에서 발급받은 실제 Client ID로 변경해야 함.
 const GOOGLE_CLIENT_ID = "910366325974-3ollm3pose37r1fvv8ngnd0v09f2p57l.apps.googleusercontent.com"; 
 const ALLOWED_EMAIL = "leftjap@gmail.com";
 
@@ -482,7 +481,6 @@ function saveCurDoc(type){
     docs[idx].content=content;
     docs[idx].updated=new Date().toISOString();
     saveDocs(docs);
-    // 화면 이탈/입력 시 버그 방지: 리스트 패널 렌더링만 분리하고 innerHTML 건드리지 않음
     if(!document.getElementById('edBody').matches(':focus')) {
        renderListPanel();
     }
@@ -865,7 +863,6 @@ function insertChecklist(){
   document.execCommand('insertHTML', false, '<ul style="list-style:none;padding-left:0;"><li><input type="checkbox" style="margin-right:8px;"> </li></ul>');
 }
 
-// 제목 등 인풋 창에서 Enter 누르면 다음 본문 영역으로 포커스 이동
 function setupEnterKey() {
   document.querySelectorAll('.ed-title, .sf-input').forEach(input => {
     input.addEventListener('keydown', e => {
@@ -881,8 +878,11 @@ function setupEnterKey() {
 // ═══ Image Paste Handler ═══
 async function handlePaste(e) {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  let hasImage = false;
+  
   for (let item of items) {
     if (item.type.indexOf('image/') === 0) {
+      hasImage = true;
       e.preventDefault();
       const file = item.getAsFile();
       const tempBlobUrl = URL.createObjectURL(file);
@@ -917,6 +917,14 @@ async function handlePaste(e) {
       reader.readAsDataURL(file);
       break; 
     }
+  }
+  
+  // 이미지가 아닌 일반 텍스트 복붙일 경우 즉시 로컬 저장 발동
+  if(!hasImage) {
+    setTimeout(() => {
+      if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
+      updateWC();
+    }, 100);
   }
 }
 
@@ -953,7 +961,12 @@ const SYNC={
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
   async _post(data){
     data.token=APP_TOKEN;
-    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(data) });
+    const res = await fetch(GAS_URL, { 
+      method:'POST', 
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, 
+      body:JSON.stringify(data),
+      keepalive: true // 탭을 닫거나 다른 화면으로 넘어가도 네트워크 요청이 중단되지 않도록 보장!
+    });
     return await res.json();
   },
   async uploadImage(base64, filename, mimeType) {
@@ -989,7 +1002,7 @@ const SYNC={
   async syncAll(){this.setSyncStatus('전체 동기화 중...','syncing');for(const type of textTypes){if(curIds[type]){const doc=allDocs().find(d=>d.id===curIds[type]);if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(type,doc.title,doc.content)}}this.setSyncStatus('전체 동기화 완료','ok');setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)}
 };
 
-// ═══ Auto-save (모바일 에디터 버그 완벽 방어) ═══
+// ═══ Auto-save (완벽 방어) ═══
 let _at=null;
 function setupAutoSave(){
   const showSaving = () => document.getElementById('edSaveStatus').textContent = '저장 중...';
@@ -1013,8 +1026,23 @@ function setupAutoSave(){
     const el = document.getElementById(id);
     if(el) {
         el.addEventListener('input', onInput);
-        // 화면 이탈 시(blur) 에디터를 다시 그리는 로직을 차단하고 배열에만 저장
-        el.addEventListener('blur', () => { clearTimeout(_at); doSave(); }); 
+        
+        // [수정점] 화면 이탈 시(blur) 한글 조합이 온전히 DOM에 안착하도록 200ms 시간 차를 둠
+        el.addEventListener('blur', () => { 
+          setTimeout(() => {
+            clearTimeout(_at); 
+            doSave(); 
+          }, 200); 
+        }); 
+    }
+  });
+
+  // [수정점] 브라우저 탭을 닫거나 앱을 백그라운드로 넘길 때 즉시 저장 & 동기화 큐 발송
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      clearTimeout(_at);
+      doSave();
+      SYNC.syncAll();
     }
   });
 }
