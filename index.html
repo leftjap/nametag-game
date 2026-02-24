@@ -454,7 +454,7 @@ function getDocs(type){return allDocs().filter(d=>d.type===type)}
 function saveDocs(docs){S(K.docs,docs)}
 
 function newDoc(type){
-  const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
+  const doc={id:Date.now().toString(), driveId: null, type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
   const docs=allDocs();docs.unshift(doc);saveDocs(docs);
   return doc;
 }
@@ -523,11 +523,11 @@ function newBook(){
 function saveBook(){
   const title=document.getElementById('book-title').value.trim();
   if(!title)return; 
-  const b={id:curBookId||Date.now().toString(),title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').innerHTML,date:today(),pinned:false};
+  const b={id:curBookId||Date.now().toString(), driveId: null, title,author:document.getElementById('book-author').value.trim(),publisher:document.getElementById('book-publisher').value.trim(),pages:parseInt(document.getElementById('book-pages').value)||0,memo:document.getElementById('book-body').innerHTML,date:today(),pinned:false};
   const books=getBooks();
   if(curBookId){
     const idx=books.findIndex(x=>x.id===curBookId);
-    if(idx!==-1){ b.pinned = books[idx].pinned; books[idx]=b; }
+    if(idx!==-1){ b.pinned = books[idx].pinned; b.driveId = books[idx].driveId; books[idx]=b; }
   } else {
     books.unshift(b);
   }
@@ -634,7 +634,7 @@ function saveMemo(){
     const idx=memos.findIndex(m=>m.id===curMemoId);
     if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}
   }else{
-    const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
+    const memo={id:Date.now().toString(), driveId: null, title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
     memos.unshift(memo);curMemoId=memo.id;
   }
   saveMemos(memos);
@@ -958,6 +958,10 @@ const GAS_URL='https://script.google.com/macros/s/AKfycbxLpsQekXm0HVwAfzjKo-zENi
 const SYNC={
   timer:null,checksTimer:null,bookTimer:null,quoteTimer:null,quoteSyncHistory:{},
   checksSaving:false,checksPending:false,lastChecksPayload:'',
+  
+  // ✨ 여러 번 빠르게 수정하더라도 꼬이지 않도록 '동기화 대기줄(Queue)' 도입
+  syncPromises: {}, 
+
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
   async _post(data){
     data.token=APP_TOKEN;
@@ -970,6 +974,7 @@ const SYNC={
     });
     return await res.json();
   },
+  
   async uploadImage(base64, filename, mimeType) {
     if(!GAS_URL) throw new Error("No GAS URL");
     this.setSyncStatus('이미지 업로드 중...','syncing');
@@ -980,22 +985,78 @@ const SYNC={
       return res;
     } catch(e) { this.setSyncStatus('이미지 업로드 실패','error'); throw e; }
   },
+
   async saveDocToGDrive(id, type, title, content){
     if(!GAS_URL||!stripHtml(content).trim())return;
-    try{
+
+    // ✨ 이미 이 문서가 업로드 중이라면 대기줄에서 기다렸다가 순서대로 처리합니다.
+    if (this.syncPromises[id]) {
+      await this.syncPromises[id]; 
+    }
+
+    const syncTask = (async () => {
       this.setSyncStatus('동기화 중...','syncing');
-      await this._post({action:'save_doc', id: id, type: type, title:title||today(), content:stripHtml(content)});
+      
+      let driveId = null;
+      const items = (type === 'memo') ? getMemos() : allDocs();
+      const doc = items.find(d => d.id === id);
+      if (doc && doc.driveId) driveId = doc.driveId; // 이전에 구글에서 받은 진짜 ID를 챙겨갑니다.
+
+      const res = await this._post({
+        action: 'save_doc', id: id, driveId: driveId, type: type, title: title||today(), content: stripHtml(content)
+      });
+
+      // ✨ 성공적으로 저장 후, 구글에서 돌아온 새 Drive ID를 내 컴퓨터 메모리에 업데이트합니다.
+      if (res && res.driveId) {
+        const freshItems = (type === 'memo') ? getMemos() : allDocs();
+        const freshDoc = freshItems.find(d => d.id === id);
+        if (freshDoc && freshDoc.driveId !== res.driveId) {
+          freshDoc.driveId = res.driveId;
+          if (type === 'memo') saveMemos(freshItems);
+          else saveDocs(freshItems);
+        }
+      }
+
       this.setSyncStatus('Drive 저장 완료','ok');
-      setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)
-    }catch(e){console.error(e);this.setSyncStatus('저장 실패','error')}
+      setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000);
+    })();
+
+    this.syncPromises[id] = syncTask;
+    try {
+      await syncTask;
+    } catch(e) {
+      console.error(e);
+      this.setSyncStatus('저장 실패','error');
+    } finally {
+      delete this.syncPromises[id];
+    }
   },
+
   scheduleChecksSave(){clearTimeout(this.checksTimer);this.checksTimer=setTimeout(()=>this.saveChecksToSheet(),400)},
   async saveChecksToSheet(){if(!GAS_URL)return;const p={action:'save_routine',date:today(),checks:getChk()};const pk=JSON.stringify(p);if(this.checksSaving){this.checksPending=true;return}if(pk===this.lastChecksPayload)return;this.checksSaving=true;try{await this._post(p);this.lastChecksPayload=pk}catch(e){console.error(e)}finally{this.checksSaving=false;if(this.checksPending){this.checksPending=false;this.scheduleChecksSave()}}},
   scheduleBookSave(book) { clearTimeout(this.bookTimer); this.bookTimer = setTimeout(() => { this.saveBooksToSheet(book); }, 5000); },
   scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(() => { if (!this.quoteSyncHistory[id]) { this.saveQuotesToSheet(text, by); this.quoteSyncHistory[id] = true; } }, 5000); },
   async saveQuotesToSheet(text,by){if(!GAS_URL)return;try{await this._post({action:'save_quote',text:text||'',by:by||''})}catch(e){console.error(e)}},
-  async saveBooksToSheet(book){if(!GAS_URL||!book)return;try{await this._post({action:'save_doc',id: book.id, type:'book',title:book.title,content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')})}catch(e){console.error(e)}},
-  async saveMemosToSheet(memo){if(!GAS_URL||!memo)return;try{await this._post({action:'save_doc',id: memo.id, type:'memo',title:memo.title||'메모',content:memo.content||''})}catch(e){console.error(e)}},
+  
+  async saveBooksToSheet(book){
+    if(!GAS_URL||!book)return;
+    try{
+      const res = await this._post({
+        action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title,
+        content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')
+      });
+      // 책 저장 역시 ID를 받아옵니다.
+      if(res && res.driveId) {
+        const books = getBooks();
+        const idx = books.findIndex(b => b.id === book.id);
+        if(idx !== -1 && books[idx].driveId !== res.driveId) {
+          books[idx].driveId = res.driveId;
+          saveBooks(books);
+        }
+      }
+    }catch(e){console.error(e)}
+  },
+
   scheduleDocSave(type){
     if(type === 'memo') {
       const doc = getMemos().find(d=>d.id===curMemoId);
@@ -1005,6 +1066,7 @@ const SYNC={
       this.timer=setTimeout(()=>{if(!curIds[type])return;const doc=allDocs().find(d=>d.id===curIds[type]);if(doc&&stripHtml(doc.content).trim())this.saveDocToGDrive(doc.id, type, doc.title, doc.content)},5000);
     }
   },
+
   async syncAll(){
     this.setSyncStatus('전체 동기화 중...','syncing');
     for(const type of textTypes){
