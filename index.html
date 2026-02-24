@@ -321,7 +321,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <input class="ed-title" id="edTitle" placeholder="제목">
-        <div class="ed-body" id="edBody" contenteditable="true" data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
+        <div class="ed-body" id="edBody" contenteditable="true" spellcheck="false" translate="no" data-gramm="false" data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
     </div>
     <div class="ed-foot"><span id="edChars">0자</span><span id="edWords">0단어</span><span id="edPages">0매</span></div>
@@ -334,7 +334,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
           <div class="sf-field"><span class="sf-label">제목</span><input class="sf-input" id="book-title" placeholder="책 제목"></div>
           <div class="sf-row"><div class="sf-field" style="flex:2"><span class="sf-label">저자</span><input class="sf-input" id="book-author" placeholder="저자명"></div><div class="sf-field" style="flex:2"><span class="sf-label">출판사</span><input class="sf-input" id="book-publisher" placeholder="출판사명"></div><div class="sf-field" style="flex:1"><span class="sf-label">읽은 양 (p)</span><input class="sf-input" id="book-pages" placeholder="숫자만" type="number"></div></div>
         </div>
-        <div class="ed-body" id="book-body" contenteditable="true" data-placeholder="책에 대한 메모..."></div>
+        <div class="ed-body" id="book-body" contenteditable="true" spellcheck="false" translate="no" data-gramm="false" data-placeholder="책에 대한 메모..."></div>
       </div>
     </div>
   </div>
@@ -343,7 +343,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <div class="special-form"><div class="sf-field"><span class="sf-label">출처</span><input class="sf-input" id="quote-by" placeholder="책 제목, 저자 등"></div></div>
-        <div class="ed-body" id="quote-body" contenteditable="true" data-placeholder="인상 깊은 문장을 기록하세요..." style="font-family:'Noto Serif KR',serif;font-size:17px;line-height:2.0"></div>
+        <div class="ed-body" id="quote-body" contenteditable="true" spellcheck="false" translate="no" data-gramm="false" data-placeholder="인상 깊은 문장을 기록하세요..." style="font-family:'Noto Serif KR',serif;font-size:17px;line-height:2.0"></div>
       </div>
     </div>
   </div>
@@ -352,7 +352,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <input class="ed-title" id="memo-title" placeholder="메모 제목">
-        <div class="ed-body" id="memo-body" contenteditable="true" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
+        <div class="ed-body" id="memo-body" contenteditable="true" spellcheck="false" translate="no" data-gramm="false" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
     </div>
   </div>
@@ -424,6 +424,11 @@ const textTypes=['navi','fiction','blog'];
 const TAB_META={navi:'오늘의 네비',fiction:'500자 습작',blog:'블로그',book:'서재',quote:'어구',memo:'메모'};
 const curIds={};
 let curQuoteId = null;
+let curBookId=null;
+let curMemoId=null;
+
+// 중복 로드 및 마지막 글자 증발 방지용 객체
+let currentLoadedDoc = { type: null, id: null };
 
 function setMobileView(view) {
   const app = document.getElementById('mainApp');
@@ -467,30 +472,75 @@ function toggleChk(id){saveChk(id,!getChk()[id]);renderChk();clearTimeout(_chkT)
 function allDocs(){return L(K.docs)||[]}
 function getDocs(type){return allDocs().filter(d=>d.type===type)}
 function saveDocs(docs){S(K.docs,docs)}
-function newDoc(type){const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};const docs=allDocs();docs.unshift(doc);saveDocs(docs);return doc}
-function loadDoc(type,id){
-  const doc=allDocs().find(d=>d.id===id);if(!doc)return;curIds[type]=id;
+
+function newDoc(type){
+  const doc={id:Date.now().toString(),type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
+  const docs=allDocs();docs.unshift(doc);saveDocs(docs);
+  return doc;
+}
+
+// force 속성을 추가해 중복 로드 시 에디터를 덮어쓰지 않게 방어
+function loadDoc(type, id, force=false){
+  const doc=allDocs().find(d=>d.id===id);if(!doc)return;
+  // 이미 에디터에 열려있는 글이라면 새로 덮어쓰지 않고 무시 (타이핑 날아감 방지)
+  if(!force && currentLoadedDoc.type === type && currentLoadedDoc.id === id) return;
+  
+  curIds[type]=id;
+  currentLoadedDoc = { type, id };
   document.getElementById('edTitle').value=doc.title;
   document.getElementById('edBody').innerHTML=fixDriveImageUrls(doc.content);
-  document.getElementById('edDate').textContent=formatTopDate(doc.created);updateWC();renderListPanel();
+  document.getElementById('edDate').textContent=formatTopDate(doc.created);
+  updateWC();
+  renderListPanel();
 }
+
 function saveCurDoc(type){
-  if(!curIds[type])return;const title=document.getElementById('edTitle').value.trim();const content=document.getElementById('edBody').innerHTML;
+  if(!curIds[type])return;
+  const title=document.getElementById('edTitle').value.trim();
+  const content=document.getElementById('edBody').innerHTML;
   const docs=allDocs();const idx=docs.findIndex(d=>d.id===curIds[type]);
-  if(idx!==-1){docs[idx].title=title;docs[idx].content=content;docs[idx].updated=new Date().toISOString();saveDocs(docs);renderListPanel();updateWC()}
+  if(idx!==-1){
+    docs[idx].title=title;
+    docs[idx].content=content;
+    docs[idx].updated=new Date().toISOString();
+    saveDocs(docs);
+    renderListPanel();
+  }
 }
-function delDoc(type,id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveDocs(allDocs().filter(d=>d.id!==id));if(curIds[type]===id)curIds[type]=null;renderListPanel();const docs=getDocs(type);if(docs.length)loadDoc(type,docs[0].id);else{const nd=newDoc(type);loadDoc(type,nd.id)}}
+
+function delDoc(type,id,e){
+  e.stopPropagation();if(!confirm('삭제할까요?'))return;
+  saveDocs(allDocs().filter(d=>d.id!==id));
+  if(curIds[type]===id) { curIds[type]=null; currentLoadedDoc = { type:null, id:null }; }
+  renderListPanel();
+  const docs=getDocs(type);
+  if(docs.length) loadDoc(type,docs[0].id, true);
+  else { const nd=newDoc(type); loadDoc(type,nd.id, true); }
+}
+
 function updateWC(){
-  const t=document.getElementById('edBody').innerText.trim();const c=t.replace(/\s/g,'').length;const w=t.split(/\s+/).filter(x=>x).length;
-  document.getElementById('edChars').textContent=c.toLocaleString()+'자';document.getElementById('edWords').textContent=w.toLocaleString()+'단어';document.getElementById('edPages').textContent=(c/200).toFixed(1)+'매';
+  // textContent를 사용하여 IME 렌더링 충돌 방지
+  const t = document.getElementById('edBody').textContent.trim();
+  const c = t.replace(/\s/g,'').length;
+  const w = t.split(/\s+/).filter(x=>x).length;
+  document.getElementById('edChars').textContent = c.toLocaleString()+'자';
+  document.getElementById('edWords').textContent = w.toLocaleString()+'단어';
+  document.getElementById('edPages').textContent = (c/200).toFixed(1)+'매';
   updateWritingStats();
 }
 
 // ═══ Books ═══
-let curBookId=null;
 function getBooks(){return L(K.books)||[]}
 function saveBooks(b){S(K.books,b)}
-function newBook(){curBookId=null;document.getElementById('book-title').value='';document.getElementById('book-author').value='';document.getElementById('book-publisher').value='';document.getElementById('book-pages').value='';document.getElementById('book-body').innerHTML=''}
+function newBook(){
+  curBookId=null;
+  currentLoadedDoc = { type: 'book', id: null };
+  document.getElementById('book-title').value='';
+  document.getElementById('book-author').value='';
+  document.getElementById('book-publisher').value='';
+  document.getElementById('book-pages').value='';
+  document.getElementById('book-body').innerHTML='';
+}
 function saveBook(){
   const title=document.getElementById('book-title').value.trim();
   if(!title)return; 
@@ -508,8 +558,26 @@ function saveBook(){
   updateBookStats();
   SYNC.scheduleBookSave(b);
 }
-function loadBook(id){const b=getBooks().find(x=>x.id===id);if(!b)return;curBookId=id;document.getElementById('book-title').value=b.title;document.getElementById('book-author').value=b.author||'';document.getElementById('book-publisher').value=b.publisher||'';document.getElementById('book-pages').value=b.pages||'';document.getElementById('book-body').innerHTML=b.memo||'';renderListPanel()}
-function delBook(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveBooks(getBooks().filter(b=>b.id!==id));curBookId=null;renderListPanel();updateBookStats()}
+function loadBook(id, force=false){
+  const b=getBooks().find(x=>x.id===id);if(!b)return;
+  if(!force && currentLoadedDoc.type === 'book' && currentLoadedDoc.id === id) return;
+  
+  curBookId=id;
+  currentLoadedDoc = { type: 'book', id };
+  document.getElementById('book-title').value=b.title;
+  document.getElementById('book-author').value=b.author||'';
+  document.getElementById('book-publisher').value=b.publisher||'';
+  document.getElementById('book-pages').value=b.pages||'';
+  document.getElementById('book-body').innerHTML=b.memo||'';
+  renderListPanel();
+}
+function delBook(id,e){
+  e.stopPropagation();if(!confirm('삭제할까요?'))return;
+  saveBooks(getBooks().filter(b=>b.id!==id));
+  if(curBookId===id) { curBookId=null; currentLoadedDoc = { type:null, id:null }; }
+  renderListPanel();
+  updateBookStats();
+}
 
 function updateBookStats(){
   const books=getBooks();
@@ -552,22 +620,57 @@ function saveQuote(){
   renderListPanel();
   SYNC.scheduleQuoteSave(text, by, curQuoteId);
 }
-function newQuoteForm(){curQuoteId=null;document.getElementById('quote-body').innerHTML='';document.getElementById('quote-by').value=''}
-function loadQuote(id){const q=getQuotes().find(x=>x.id===id);if(!q)return;curQuoteId=id;document.getElementById('quote-body').innerText=q.text;document.getElementById('quote-by').value=q.by||'';renderListPanel();}
-function delQuote(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveQuotes(getQuotes().filter(q=>q.id!==id));renderListPanel();showRandomQuote()}
+function newQuoteForm(){
+  curQuoteId=null;
+  currentLoadedDoc = { type: 'quote', id: null };
+  document.getElementById('quote-body').innerHTML='';
+  document.getElementById('quote-by').value='';
+}
+function loadQuote(id, force=false){
+  const q=getQuotes().find(x=>x.id===id);if(!q)return;
+  if(!force && currentLoadedDoc.type === 'quote' && currentLoadedDoc.id === id) return;
+  
+  curQuoteId=id;
+  currentLoadedDoc = { type: 'quote', id };
+  document.getElementById('quote-body').innerText=q.text;
+  document.getElementById('quote-by').value=q.by||'';
+  renderListPanel();
+}
+function delQuote(id,e){
+  e.stopPropagation();if(!confirm('삭제할까요?'))return;
+  saveQuotes(getQuotes().filter(q=>q.id!==id));
+  if(curQuoteId===id) { curQuoteId=null; currentLoadedDoc = { type:null, id:null }; }
+  renderListPanel();
+  showRandomQuote();
+}
 function showRandomQuote(){const quotes=getQuotes();if(!quotes.length){document.getElementById('rqText').textContent='어구록에 문장을 추가해보세요';document.getElementById('rqText').style.color='var(--tx-m)';document.getElementById('rqBy').textContent='';return}const q=quotes[Math.floor(Math.random()*quotes.length)];document.getElementById('rqText').textContent=q.text.length>80?q.text.slice(0,80)+'…':q.text;document.getElementById('rqText').style.color='var(--tx)';document.getElementById('rqBy').textContent=q.by?'— '+q.by:''}
 
 // ═══ Memos ═══
-let curMemoId=null;
 function getMemos(){return L(K.memos)||[]}
 function saveMemos(m){S(K.memos,m)}
 function saveMemo(){const title=document.getElementById('memo-title').value.trim();const body=document.getElementById('memo-body').innerHTML;if(!title&&!stripHtml(body).trim())return;const memos=getMemos();if(curMemoId){const idx=memos.findIndex(m=>m.id===curMemoId);if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}}else{const memo={id:Date.now().toString(),title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};memos.unshift(memo);curMemoId=memo.id}saveMemos(memos);renderListPanel();SYNC.scheduleDocSave('memo');}
-function loadMemo(id){const m=getMemos().find(x=>x.id===id);if(!m)return;curMemoId=id;document.getElementById('memo-title').value=m.title||'';
+function loadMemo(id, force=false){
+  const m=getMemos().find(x=>x.id===id);if(!m)return;
+  if(!force && currentLoadedDoc.type === 'memo' && currentLoadedDoc.id === id) return;
+  
+  curMemoId=id;
+  currentLoadedDoc = { type: 'memo', id };
+  document.getElementById('memo-title').value=m.title||'';
   document.getElementById('memo-body').innerHTML=fixDriveImageUrls(m.content);
   renderListPanel();
 }
-function newMemoForm(){curMemoId=null;document.getElementById('memo-title').value='';document.getElementById('memo-body').innerHTML=''}
-function delMemo(id,e){e.stopPropagation();if(!confirm('삭제할까요?'))return;saveMemos(getMemos().filter(m=>m.id!==id));renderListPanel()}
+function newMemoForm(){
+  curMemoId=null;
+  currentLoadedDoc = { type: 'memo', id: null };
+  document.getElementById('memo-title').value='';
+  document.getElementById('memo-body').innerHTML='';
+}
+function delMemo(id,e){
+  e.stopPropagation();if(!confirm('삭제할까요?'))return;
+  saveMemos(getMemos().filter(m=>m.id!==id));
+  if(curMemoId===id) { curMemoId=null; currentLoadedDoc = { type:null, id:null }; }
+  renderListPanel();
+}
 
 // ═══ Writing Stats ═══
 function updateWritingStats(){
@@ -631,7 +734,8 @@ function togglePin(type, id, e) {
 
 // ═══ Tab Switch ═══
 function switchTab(t){
-  if(textTypes.includes(activeTab))saveCurDoc(activeTab);activeTab=t;
+  if(textTypes.includes(activeTab))saveCurDoc(activeTab);
+  activeTab=t;
   
   document.getElementById('editorText').style.display=textTypes.includes(t)?'flex':'none';
   document.getElementById('editorBook').style.display=t==='book'?'flex':'none';
@@ -642,9 +746,15 @@ function switchTab(t){
   
   document.getElementById('lpHeadTitleText').textContent = TAB_META[t] || '목록';
 
-  if(textTypes.includes(t)){const docs=getDocs(t);if(curIds[t])loadDoc(t,curIds[t]);else if(docs.length)loadDoc(t,docs[0].id);else{const nd=newDoc(t);loadDoc(t,nd.id)}}
-  if(t==='book'){if(curBookId)loadBook(curBookId);else{const b=getBooks();if(b.length)loadBook(b[0].id);else newBook()}}
-  if(t==='memo'){if(curMemoId)loadMemo(curMemoId);else{const m=getMemos();if(m.length)loadMemo(m[0].id);else newMemoForm()}}
+  // 탭 이동 시에는 강제로 loadDoc 실행 (force = true)
+  if(textTypes.includes(t)){
+    const docs=getDocs(t);
+    if(curIds[t]) loadDoc(t,curIds[t], true);
+    else if(docs.length) loadDoc(t,docs[0].id, true);
+    else {const nd=newDoc(t);loadDoc(t,nd.id, true);}
+  }
+  if(t==='book'){if(curBookId)loadBook(curBookId, true);else{const b=getBooks();if(b.length)loadBook(b[0].id, true);else newBook()}}
+  if(t==='memo'){if(curMemoId)loadMemo(curMemoId, true);else{const m=getMemos();if(m.length)loadMemo(m[0].id, true);else newMemoForm()}}
   if(t==='quote'){newQuoteForm();}
   renderListPanel();
 }
@@ -826,7 +936,7 @@ function setupEditorImageSelection() {
   const onImageClick = function(e) {
     if (e.target.tagName === 'IMG') {
       const range = document.createRange();
-      range.selectNode(e.target); // 이미지를 드래그한 것처럼 범위를 잡음
+      range.selectNode(e.target);
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
@@ -839,7 +949,7 @@ function setupEditorImageSelection() {
 // ═══ Actions ═══
 function handleNew(){
   const t=activeTab;
-  if(textTypes.includes(t)){const nd=newDoc(t);loadDoc(t,nd.id)}
+  if(textTypes.includes(t)){const nd=newDoc(t);loadDoc(t,nd.id,true)}
   else if(t==='book')newBook();
   else if(t==='quote')newQuoteForm();
   else if(t==='memo')newMemoForm();
@@ -919,40 +1029,38 @@ const SYNC={
   async syncAll(){this.setSyncStatus('전체 동기화 중...','syncing');for(const type of textTypes){if(curIds[type]){const doc=allDocs().find(d=>d.id===curIds[type]);if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(type,doc.title,doc.content)}}this.setSyncStatus('전체 동기화 완료','ok');setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)}
 };
 
-// ═══ Auto-save ═══
+// ═══ Auto-save (완벽 보호 로직 적용) ═══
 let _at=null;
 function setupAutoSave(){
   const showSaving = () => document.getElementById('edSaveStatus').textContent = '저장 중...';
   const showSaved = () => document.getElementById('edSaveStatus').textContent = '저장됨';
 
-  const body=document.getElementById('edBody'),title=document.getElementById('edTitle');
+  const doSave = () => {
+    if(textTypes.includes(activeTab)){ saveCurDoc(activeTab); SYNC.scheduleDocSave(activeTab); showSaved(); }
+    else if(activeTab==='memo'){ saveMemo(); showSaved(); }
+    else if(activeTab==='book'){ saveBook(); showSaved(); }
+    else if(activeTab==='quote'){ saveQuote(); showSaved(); }
+  };
+
   const onInput=()=>{
     showSaving(); clearTimeout(_at);
-    _at=setTimeout(()=>{ if(textTypes.includes(activeTab)){ saveCurDoc(activeTab); SYNC.scheduleDocSave(activeTab); showSaved(); } }, 800); updateWC();
+    _at=setTimeout(doSave, 800);
+    updateWC();
   };
-  body.addEventListener('input',onInput);title.addEventListener('input',onInput);
   
-  const mb=document.getElementById('memo-body'),mt=document.getElementById('memo-title');
-  const memoInput=()=>{
-    showSaving(); clearTimeout(_at);
-    _at=setTimeout(()=>{ if(activeTab==='memo'){ saveMemo(); showSaved(); } }, 800);
+  const forceSave=()=>{
+    clearTimeout(_at);
+    doSave();
   };
-  mb.addEventListener('input',memoInput);mt.addEventListener('input',memoInput);
 
-  const bookInputs=['book-title','book-author','book-publisher','book-pages','book-body'];
-  bookInputs.forEach(id=>{
-    document.getElementById(id).addEventListener('input', ()=>{
-      showSaving(); clearTimeout(_at);
-      _at=setTimeout(()=>{ if(activeTab==='book'){ saveBook(); showSaved(); } }, 800);
-    });
-  });
-
-  const quoteInputs=['quote-by','quote-body'];
-  quoteInputs.forEach(id=>{
-    document.getElementById(id).addEventListener('input', ()=>{
-      showSaving(); clearTimeout(_at);
-      _at=setTimeout(()=>{ if(activeTab==='quote'){ saveQuote(); showSaved(); } }, 800);
-    });
+  const els = ['edBody', 'edTitle', 'memo-body', 'memo-title', 'book-title', 'book-author', 'book-publisher', 'book-pages', 'book-body', 'quote-by', 'quote-body'];
+  els.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+        el.addEventListener('input', onInput);
+        // 화면을 벗어날 때 즉시 강제 저장하여 마지막 글자가 유실되지 않도록 방어
+        el.addEventListener('blur', forceSave); 
+    }
   });
 }
 
@@ -965,7 +1073,7 @@ function init(){
     document.getElementById('memo-body').addEventListener('paste', handlePaste);
     setupEditorImageSelection();
     
-    const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id);else{const nd=newDoc('navi');loadDoc('navi',nd.id)}
+    const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id,true);else{const nd=newDoc('navi');loadDoc('navi',nd.id,true)}
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
     document.getElementById('lpHeadTitleText').textContent = TAB_META[activeTab] || '목록';
     
