@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="gio_circle_white_closeup2_512.png">
+<link rel="apple-touch-icon" href="gio_circle_white_closeup2_512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="이름표">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, nofollow">
 <title>인생은 이름표 붙이기 게임</title>
@@ -327,8 +332,9 @@ function handleCredentialResponse(response) {
     const payload = JSON.parse(atob(jwt.split('.')[1]));
     
     if (payload.email === ALLOWED_EMAIL) {
-      sessionStorage.setItem('gb_auth', '1');
-      sessionStorage.setItem('gb_id_token', jwt);
+      // ✨ sessionStorage 대신 localStorage 사용 (모바일 영구 로그인)
+      localStorage.setItem('gb_auth', '1');
+      localStorage.setItem('gb_id_token', jwt);
       showApp();
     } else {
       document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
@@ -339,7 +345,8 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  if (sessionStorage.getItem('gb_auth') === '1' && sessionStorage.getItem('gb_id_token')) {
+  // ✨ sessionStorage 대신 localStorage 사용
+  if (localStorage.getItem('gb_auth') === '1' && localStorage.getItem('gb_id_token')) {
     showApp();
   } else {
     document.getElementById('lockScreen').classList.remove('hidden');
@@ -354,7 +361,6 @@ window.onload = function () {
   }
 };
 
-// ✨ DB 동기화 후 앱을 켜도록 수정
 async function showApp(){
   document.getElementById('lockScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
@@ -974,7 +980,8 @@ const SYNC = {
   
   async _post(data) {
     data.token = APP_TOKEN;
-    data.idToken = sessionStorage.getItem('gb_id_token');
+    // ✨ 요청할 때도 localStorage에서 토큰을 꺼내오도록 수정
+    data.idToken = localStorage.getItem('gb_id_token');
     
     try {
       const res = await fetch(GAS_URL, { 
@@ -988,8 +995,9 @@ const SYNC = {
       if (json.status === 'error') {
         if (json.message === 'Unauthorized') {
           alert('구글 로그인 세션이 만료되었습니다.\n보안을 위해 확인을 누르면 새로고침하여 다시 로그인합니다.');
-          sessionStorage.removeItem('gb_auth');
-          sessionStorage.removeItem('gb_id_token');
+          // ✨ 에러 발생 시에도 localStorage 지우기
+          localStorage.removeItem('gb_auth');
+          localStorage.removeItem('gb_id_token');
           location.reload();
           throw new Error('Unauthorized');
         } else {
@@ -1006,7 +1014,6 @@ const SYNC = {
     }
   },
 
-  // ✨ 드라이브에서 전체 데이터 불러와서 덮어쓰기
   async loadDatabase() {
     try {
       const res = await this._post({ action: 'load_db' });
@@ -1025,7 +1032,6 @@ const SYNC = {
     }
   },
 
-  // ✨ 현재 전체 데이터를 드라이브로 저장하기
   async saveDatabase() {
     const dbData = {
       [K.docs]: L(K.docs) || [],
@@ -1041,7 +1047,6 @@ const SYNC = {
     }
   },
 
-  // ✨ DB 자동 저장 스케줄러
   scheduleDatabaseSave() {
     clearTimeout(this.dbTimer);
     this.dbTimer = setTimeout(() => this.saveDatabase(), 3000);
@@ -1117,7 +1122,7 @@ const SYNC = {
     clearTimeout(this.checksTimer);
     this.checksTimer=setTimeout(()=>{
       this.saveChecksToSheet();
-      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+      this.scheduleDatabaseSave();
     },400)
   },
   
@@ -1127,7 +1132,7 @@ const SYNC = {
     clearTimeout(this.bookTimer); 
     this.bookTimer = setTimeout(() => { 
       this.saveBooksToSheet(book); 
-      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+      this.scheduleDatabaseSave();
     }, 5000); 
   },
   
@@ -1138,7 +1143,7 @@ const SYNC = {
         this.saveQuotesToSheet(text, by); 
         this.quoteSyncHistory[id] = true; 
       } 
-      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+      this.scheduleDatabaseSave();
     }, 5000); 
   },
   
@@ -1167,7 +1172,7 @@ const SYNC = {
     this.timer = setTimeout(() => { 
       let id = (type === 'memo') ? curMemoId : curIds[type];
       if(id) this.saveDocToGDrive(id, type); 
-      this.scheduleDatabaseSave(); // ✨ DB 동시 백업
+      this.scheduleDatabaseSave();
     }, 5000);
   },
 
@@ -1180,7 +1185,7 @@ const SYNC = {
     }
     if(curMemoId) this.saveDocToGDrive(curMemoId, 'memo');
     
-    this.saveDatabase(); // ✨ 수동 동기화 시 DB 덮어쓰기
+    this.saveDatabase();
   }
 };
 
@@ -1199,7 +1204,7 @@ function setupAutoSave(){
 
   const doSaveAndSync = () => {
     saveLocalOnly();
-    SYNC.scheduleDatabaseSave(); // ✨ 타이핑을 멈추면 DB 파일도 통째로 업데이트
+    SYNC.scheduleDatabaseSave(); 
     
     if(textTypes.includes(activeTab)) SYNC.scheduleDocSave(activeTab);
     else if(activeTab==='memo') SYNC.scheduleDocSave('memo');
