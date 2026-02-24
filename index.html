@@ -13,7 +13,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow:hidden}
 
-/* 로그인(잠금) 화면 디자인 맞춤 */
 #lockScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px}
 #lockScreen.hidden{display:none}
 .lock-card{background:var(--bg-white);padding:40px 30px;border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;width:90%;max-width:320px;}
@@ -23,22 +22,18 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 .app{display:flex;height:100vh;display:flex;}
 
-/* 공통 헤더 */
 .col-header{height:60px;min-height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;}
 
-/* 모바일 전용 버튼 기본 숨김 */
 .mobile-nav-btn { display: none; background: none; border: none; cursor: pointer; margin-right: 12px; padding: 4px; border-radius: 4px; color: var(--tx-d); transition: .2s; }
 .mobile-nav-btn:hover { background: var(--bg-card); color: var(--tx); }
 .mobile-nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
-/* 1단: SIDEBAR */
 .side{width:var(--side-w);min-width:var(--side-w);background:var(--bg-side);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .side-hdr{justify-content:space-between; padding:0 20px;}
 .sync-row{display:flex;align-items:center;gap:8px}
 .sync-status{font-size:11px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}.sync-status.ok{color:#6a9960}
 .sync-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-white);color:var(--tx-d);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:.15s}.sync-btn:hover{background:var(--bg-card)}
 
-/* 로고/아바타 스타일 */
 .cat-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; filter: brightness(1.05) contrast(1.05); box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
 
 .side-scroll{flex:1;overflow-y:auto;}
@@ -53,7 +48,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .sec{padding:16px 20px}.sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx-m);margin-bottom:12px}
 
-/* 루틴 UI */
 .chk-table{display:flex;flex-direction:column}
 .chk-week-hdr{display:flex;align-items:center;padding:0 0 4px;margin-bottom:4px;} 
 .chk-week-hdr .chk-lb-space{flex:1;min-width:60px}
@@ -67,11 +61,9 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .chk-dots{display:flex;gap:2px}
 .chk-dot{width:16px;height:16px;border-radius:3px;background:var(--bg-white);border:1px solid var(--border)}.chk-dot.done{background:var(--grn-light);border-color:var(--grn)}.chk-dot.today{box-shadow:inset 0 0 0 1.5px var(--ac-light)}
 
-/* 어구 박스 */
 .q-card{background:var(--bg-white);border-radius:var(--r);padding:14px;border-left:3px solid var(--ac-light);cursor:pointer;transition:.2s;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;align-items:flex-start}.q-card:hover{background:var(--bg-card)}
 .q-content{width:100%;min-width:0}.q-text{font-family:'Noto Serif KR',serif;font-size:13px;line-height:1.7;color:var(--tx)}.q-by{font-size:11px;color:var(--tx-m);margin-top:6px}.q-hint{font-size:10px;color:var(--tx-m);text-align:center;margin-top:8px;opacity:.6}
 
-/* 기록 부분 디자인 맞춤 (디자인 일관성 강화) */
 .st-card{background:var(--bg-white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border-l);margin-bottom:14px;transition:.2s;}.st-card:hover{border-color:var(--ac-light);}
 .st-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .st-lb{font-size:13px;color:var(--tx);font-weight:600;letter-spacing:-0.01em;}
@@ -83,7 +75,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .book-mini{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border);}.book-mini:last-child{border-bottom:none;padding-bottom:0;}
 .book-mini-t{color:var(--tx-d);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.book-mini-p{color:var(--ac-d);font-family:'JetBrains Mono',monospace;font-size:11px;margin-left:8px;font-weight:500;}
 
-/* 2단: LIST PANEL */
 .list-panel{width:var(--list-w);min-width:var(--list-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .lp-head{background:var(--bg-side);font-size:14px;font-weight:600;color:var(--tx-d); display: flex; align-items: center; padding: 0 20px;}
 .lp-list{flex:1;overflow-y:auto}
@@ -101,7 +92,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-item-preview{font-size:13px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
 .lp-item.on .lp-item-preview{color:var(--tx-d);}
 
-/* 액션 버튼 */
 .lp-item-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s; }
 .lp-item:hover .lp-item-actions { opacity: 1; }
 .lp-action-btn { background: none; border: none; padding: 4px; width: 26px; height: 26px; cursor: pointer; color: var(--border-l); display: flex; align-items: center; justify-content: center; transition: .15s; border-radius: 4px; }
@@ -111,7 +101,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-action-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lp-action-btn.pin.on svg { fill: currentColor; }
 
-/* 3단: EDITOR */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden}
 .ed-topbar{background:var(--bg);position:relative;justify-content:space-between; padding:0 20px;}
 .ed-topbar-left{display:flex;align-items:center;gap:12px;}
@@ -145,7 +134,6 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-l);border-radius:4px}
 
-/* 모바일 반응형 뷰 */
 @media (max-width: 768px) {
   .app { position: relative; display: block; height: 100vh; height: 100dvh; overflow: hidden; width: 100vw; }
   .side, .list-panel, .editor { position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height: 100%; min-width: 100%; border-right: none; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease; background: var(--bg-white); box-shadow: -4px 0 15px rgba(0,0,0,0.05); }
@@ -332,7 +320,7 @@ function handleCredentialResponse(response) {
     
     if (payload.email === ALLOWED_EMAIL) {
       sessionStorage.setItem('gb_auth', '1');
-      sessionStorage.setItem('gb_id_token', jwt); // 보안 토큰 저장 (GAS 전송용)
+      sessionStorage.setItem('gb_id_token', jwt); 
       showApp();
     } else {
       document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
@@ -955,106 +943,112 @@ function handleNew(){
 
 // ═══ GAS Sync ═══
 const GAS_URL='https://script.google.com/macros/s/AKfycbxLpsQekXm0HVwAfzjKo-zENiMalH1jHIWZwGiEYDy0XUCk2aWTYfG9rfREWBDUUV5P/exec';
-const SYNC={
-  timer:null,checksTimer:null,bookTimer:null,quoteTimer:null,quoteSyncHistory:{},
-  checksSaving:false,checksPending:false,lastChecksPayload:'',
+const SYNC = {
+  timer: null, checksTimer: null, bookTimer: null, quoteTimer: null, quoteSyncHistory: {},
+  checksSaving: false, checksPending: false, lastChecksPayload: '',
   
-  // ✨ 여러 번 빠르게 수정하더라도 꼬이지 않도록 '동기화 대기줄(Queue)' 도입
-  syncPromises: {}, 
+  // 🔥 트래픽 잼(교통체증)을 완벽히 방어하는 '절대 대기열(Queue)'
+  taskQueue: Promise.resolve(), 
 
-  setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
-  async _post(data){
-    data.token=APP_TOKEN;
-    data.idToken=sessionStorage.getItem('gb_id_token'); // 보안 토큰 전송
+  setSyncStatus(text, type) { 
+    const el = document.getElementById('syncStatus'); 
+    if(el) { el.textContent = text; el.className = 'sync-status ' + (type||''); } 
+  },
+  
+  async _post(data) {
+    data.token = APP_TOKEN;
+    data.idToken = sessionStorage.getItem('gb_id_token');
     const res = await fetch(GAS_URL, { 
-      method:'POST', 
-      headers:{'Content-Type':'text/plain;charset=utf-8'}, 
-      body:JSON.stringify(data),
+      method: 'POST', 
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+      body: JSON.stringify(data),
       keepalive: true
     });
     return await res.json();
   },
-  
+
   async uploadImage(base64, filename, mimeType) {
     if(!GAS_URL) throw new Error("No GAS URL");
-    this.setSyncStatus('이미지 업로드 중...','syncing');
-    try {
-      const res = await this._post({ action: 'upload_image', bytes: base64, filename: filename, mimeType: mimeType });
-      if(res.status === 'error') throw new Error(res.message);
-      this.setSyncStatus('드라이브 저장 완료','ok');
-      return res;
-    } catch(e) { this.setSyncStatus('이미지 업로드 실패','error'); throw e; }
+    // 이미지 업로드도 순서대로 줄 세우기
+    return new Promise((resolve, reject) => {
+      this.taskQueue = this.taskQueue.then(async () => {
+        this.setSyncStatus('이미지 업로드 중...','syncing');
+        try {
+          const res = await this._post({ action: 'upload_image', bytes: base64, filename: filename, mimeType: mimeType });
+          if(res.status === 'error') throw new Error(res.message);
+          this.setSyncStatus('드라이브 저장 완료','ok');
+          resolve(res);
+        } catch(e) { 
+          this.setSyncStatus('이미지 업로드 실패','error'); 
+          reject(e); 
+        }
+      });
+    });
   },
 
-  async saveDocToGDrive(id, type, title, content){
-    if(!GAS_URL||!stripHtml(content).trim())return;
+  saveDocToGDrive(id, type, title, content) {
+    if(!GAS_URL || !stripHtml(content).trim()) return;
 
-    // ✨ 이미 이 문서가 업로드 중이라면 대기줄에서 기다렸다가 순서대로 처리합니다.
-    if (this.syncPromises[id]) {
-      await this.syncPromises[id]; 
-    }
-
-    const syncTask = (async () => {
+    // 🔥 핵심: 앞선 작업이 끝나야만 내부 코드가 실행됨 (순차적 실행 보장)
+    this.taskQueue = this.taskQueue.then(async () => {
       this.setSyncStatus('동기화 중...','syncing');
       
       let driveId = null;
       const items = (type === 'memo') ? getMemos() : allDocs();
       const doc = items.find(d => d.id === id);
-      if (doc && doc.driveId) driveId = doc.driveId; // 이전에 구글에서 받은 진짜 ID를 챙겨갑니다.
+      
+      // 내 순서가 왔을 때, 비로소 가장 최신의 driveId를 컴퓨터에서 읽어옴
+      if (doc && doc.driveId) driveId = doc.driveId; 
 
-      const res = await this._post({
-        action: 'save_doc', id: id, driveId: driveId, type: type, title: title||today(), content: stripHtml(content)
-      });
+      try {
+        const res = await this._post({
+          action: 'save_doc', id: id, driveId: driveId, type: type, title: title||today(), content: stripHtml(content)
+        });
 
-      // ✨ 성공적으로 저장 후, 구글에서 돌아온 새 Drive ID를 내 컴퓨터 메모리에 업데이트합니다.
-      if (res && res.driveId) {
-        const freshItems = (type === 'memo') ? getMemos() : allDocs();
-        const freshDoc = freshItems.find(d => d.id === id);
-        if (freshDoc && freshDoc.driveId !== res.driveId) {
-          freshDoc.driveId = res.driveId;
-          if (type === 'memo') saveMemos(freshItems);
-          else saveDocs(freshItems);
+        // 갓 생성된 파일이라면 구글이 보내준 새 driveId를 내 컴퓨터에 각인
+        if (res && res.driveId) {
+          const freshItems = (type === 'memo') ? getMemos() : allDocs();
+          const freshDoc = freshItems.find(d => d.id === id);
+          if (freshDoc && freshDoc.driveId !== res.driveId) {
+            freshDoc.driveId = res.driveId;
+            if (type === 'memo') saveMemos(freshItems);
+            else saveDocs(freshItems);
+          }
         }
+        this.setSyncStatus('Drive 저장 완료','ok');
+        setTimeout(() => this.setSyncStatus('Google Drive 연결됨','ok'), 2000);
+      } catch(e) {
+        console.error(e);
+        this.setSyncStatus('저장 실패','error');
       }
-
-      this.setSyncStatus('Drive 저장 완료','ok');
-      setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000);
-    })();
-
-    this.syncPromises[id] = syncTask;
-    try {
-      await syncTask;
-    } catch(e) {
-      console.error(e);
-      this.setSyncStatus('저장 실패','error');
-    } finally {
-      delete this.syncPromises[id];
-    }
+    });
   },
 
   scheduleChecksSave(){clearTimeout(this.checksTimer);this.checksTimer=setTimeout(()=>this.saveChecksToSheet(),400)},
   async saveChecksToSheet(){if(!GAS_URL)return;const p={action:'save_routine',date:today(),checks:getChk()};const pk=JSON.stringify(p);if(this.checksSaving){this.checksPending=true;return}if(pk===this.lastChecksPayload)return;this.checksSaving=true;try{await this._post(p);this.lastChecksPayload=pk}catch(e){console.error(e)}finally{this.checksSaving=false;if(this.checksPending){this.checksPending=false;this.scheduleChecksSave()}}},
+  
   scheduleBookSave(book) { clearTimeout(this.bookTimer); this.bookTimer = setTimeout(() => { this.saveBooksToSheet(book); }, 5000); },
   scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(() => { if (!this.quoteSyncHistory[id]) { this.saveQuotesToSheet(text, by); this.quoteSyncHistory[id] = true; } }, 5000); },
   async saveQuotesToSheet(text,by){if(!GAS_URL)return;try{await this._post({action:'save_quote',text:text||'',by:by||''})}catch(e){console.error(e)}},
   
-  async saveBooksToSheet(book){
-    if(!GAS_URL||!book)return;
-    try{
-      const res = await this._post({
-        action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title,
-        content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')
-      });
-      // 책 저장 역시 ID를 받아옵니다.
-      if(res && res.driveId) {
-        const books = getBooks();
-        const idx = books.findIndex(b => b.id === book.id);
-        if(idx !== -1 && books[idx].driveId !== res.driveId) {
-          books[idx].driveId = res.driveId;
-          saveBooks(books);
+  saveBooksToSheet(book) {
+    if(!GAS_URL || !book) return;
+    this.taskQueue = this.taskQueue.then(async () => {
+      try {
+        const res = await this._post({
+          action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title,
+          content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')
+        });
+        if (res && res.driveId) {
+          const books = getBooks();
+          const idx = books.findIndex(b => b.id === book.id);
+          if (idx !== -1 && books[idx].driveId !== res.driveId) {
+            books[idx].driveId = res.driveId;
+            saveBooks(books);
+          }
         }
-      }
-    }catch(e){console.error(e)}
+      } catch(e) { console.error(e); }
+    });
   },
 
   scheduleDocSave(type){
@@ -1067,20 +1061,24 @@ const SYNC={
     }
   },
 
-  async syncAll(){
+  syncAll(){
     this.setSyncStatus('전체 동기화 중...','syncing');
     for(const type of textTypes){
       if(curIds[type]){
         const doc=allDocs().find(d=>d.id===curIds[type]);
-        if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(doc.id, type, doc.title, doc.content);
+        if(doc&&stripHtml(doc.content).trim()) this.saveDocToGDrive(doc.id, type, doc.title, doc.content);
       }
     }
     if(curMemoId) {
       const doc = getMemos().find(d=>d.id===curMemoId);
-      if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(doc.id, 'memo', doc.title, doc.content);
+      if(doc&&stripHtml(doc.content).trim()) this.saveDocToGDrive(doc.id, 'memo', doc.title, doc.content);
     }
-    this.setSyncStatus('전체 동기화 완료','ok');
-    setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)
+    
+    // 큐가 모두 비워지면 상태 업데이트
+    this.taskQueue.then(() => {
+      this.setSyncStatus('전체 동기화 완료','ok');
+      setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000);
+    });
   }
 };
 
