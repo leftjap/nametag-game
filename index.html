@@ -947,8 +947,9 @@ const SYNC = {
   timer: null, checksTimer: null, bookTimer: null, quoteTimer: null, quoteSyncHistory: {},
   checksSaving: false, checksPending: false, lastChecksPayload: '',
   
-  taskQueue: Promise.resolve(), 
-  pendingDocs: new Set(), // ✨ 중복 요청 방지용 세트 추가
+  // ✨ 핵심: '저장 중' 상태와 '저장 중에 또 수정됨' 상태를 완벽 분리
+  savingDocs: {}, 
+  dirtyDocs: {},
 
   setSyncStatus(text, type) { 
     const el = document.getElementById('syncStatus'); 
@@ -968,68 +969,77 @@ const SYNC = {
 
   async uploadImage(base64, filename, mimeType) {
     if(!GAS_URL) throw new Error("No GAS URL");
-    return new Promise((resolve, reject) => {
-      this.taskQueue = this.taskQueue.then(async () => {
-        this.setSyncStatus('이미지 업로드 중...','syncing');
-        try {
-          const res = await this._post({ action: 'upload_image', bytes: base64, filename: filename, mimeType: mimeType });
-          if(res.status === 'error') throw new Error(res.message);
-          this.setSyncStatus('드라이브 저장 완료','ok');
-          resolve(res);
-        } catch(e) { 
-          this.setSyncStatus('이미지 업로드 실패','error'); 
-          reject(e); 
-        }
-      });
-    });
+    this.setSyncStatus('이미지 업로드 중...','syncing');
+    try {
+      const res = await this._post({ action: 'upload_image', bytes: base64, filename: filename, mimeType: mimeType });
+      if(res.status === 'error') throw new Error(res.message);
+      this.setSyncStatus('드라이브 저장 완료','ok');
+      return res;
+    } catch(e) { 
+      this.setSyncStatus('이미지 업로드 실패','error'); 
+      throw e; 
+    }
   },
 
-  // ✨ 수정됨: 큐 내부에서 문서를 읽도록 변경하여 항상 최신 데이터와 driveId를 사용
-  saveDocToGDrive(id, type) {
-    if(!GAS_URL) return;
+  // ✨ 수정됨: 큐 방식 대신 상태 머신(State Machine) 방식으로 변경
+  async saveDocToGDrive(id, type) {
+    if (!GAS_URL) return;
 
-    // 이미 대기열에 이 문서가 있다면 스킵 (중복 전송 완벽 차단)
-    if (this.pendingDocs.has(id)) return;
-    this.pendingDocs.add(id);
+    // 만약 현재 서버랑 통신하며 저장 중이라면? "나중에 또 저장해라"라고 꼬리표(dirty)만 붙이고 패스!
+    if (this.savingDocs[id]) {
+      this.dirtyDocs[id] = type;
+      return;
+    }
 
-    this.taskQueue = this.taskQueue.then(async () => {
-      this.pendingDocs.delete(id); // 내 차례가 왔으니 대기열 명단에서 제거
+    this.savingDocs[id] = true; // 통신 시작을 알림
 
-      // 내 차례가 온 바로 이 시점에! 가장 최신의 로컬 데이터를 읽어옵니다.
-      const items = (type === 'memo') ? getMemos() : allDocs();
-      const doc = items.find(d => d.id === id);
-      
-      if (!doc || !stripHtml(doc.content).trim()) return;
+    // 내 차례가 온 이 순간, 가장 최신 로컬 데이터를 읽음
+    const items = (type === 'memo') ? getMemos() : allDocs();
+    const doc = items.find(d => d.id === id);
+    
+    if (!doc || !stripHtml(doc.content).trim()) {
+      this.savingDocs[id] = false;
+      return;
+    }
 
-      this.setSyncStatus('동기화 중...','syncing');
-      
-      try {
-        const res = await this._post({
-          action: 'save_doc', 
-          id: doc.id, 
-          driveId: doc.driveId || null, 
-          type: type, 
-          title: doc.title || today(), 
-          content: stripHtml(doc.content)
-        });
+    this.setSyncStatus('동기화 중...','syncing');
+    
+    try {
+      const res = await this._post({
+        action: 'save_doc', 
+        id: doc.id, 
+        driveId: doc.driveId || null, 
+        type: type, 
+        title: doc.title || today(), 
+        content: stripHtml(doc.content)
+      });
 
-        // 갓 생성된 파일이면 구글이 보내준 새 driveId를 컴퓨터에 각인
-        if (res && res.driveId) {
-          const freshItems = (type === 'memo') ? getMemos() : allDocs();
-          const freshDoc = freshItems.find(d => d.id === doc.id);
-          if (freshDoc && freshDoc.driveId !== res.driveId) {
-            freshDoc.driveId = res.driveId;
-            if (type === 'memo') saveMemos(freshItems);
-            else saveDocs(freshItems);
-          }
+      // 서버가 새 드라이브 ID를 줬다면 내 컴퓨터에도 저장
+      if (res && res.driveId) {
+        const freshItems = (type === 'memo') ? getMemos() : allDocs();
+        const freshDoc = freshItems.find(d => d.id === doc.id);
+        if (freshDoc && freshDoc.driveId !== res.driveId) {
+          freshDoc.driveId = res.driveId;
+          if (type === 'memo') saveMemos(freshItems);
+          else saveDocs(freshItems);
         }
-        this.setSyncStatus('Drive 저장 완료','ok');
-        setTimeout(() => this.setSyncStatus('Google Drive 연결됨','ok'), 2000);
-      } catch(e) {
-        console.error(e);
-        this.setSyncStatus('저장 실패','error');
       }
-    });
+      this.setSyncStatus('Drive 저장 완료','ok');
+      setTimeout(() => this.setSyncStatus('Google Drive 연결됨','ok'), 2000);
+    } catch(e) {
+      console.error(e);
+      this.setSyncStatus('저장 실패','error');
+    } finally {
+      this.savingDocs[id] = false; // 통신 끝!
+      
+      // 통신하는 동안 누군가 글을 또 수정해서 꼬리표(dirty)가 붙어있다면?
+      // 바뀐 최신 데이터로 다시 구글 드라이브 업데이트 시작!
+      if (this.dirtyDocs[id]) {
+        const nextType = this.dirtyDocs[id];
+        delete this.dirtyDocs[id];
+        this.saveDocToGDrive(id, nextType);
+      }
+    }
   },
 
   scheduleChecksSave(){clearTimeout(this.checksTimer);this.checksTimer=setTimeout(()=>this.saveChecksToSheet(),400)},
@@ -1039,24 +1049,22 @@ const SYNC = {
   scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(() => { if (!this.quoteSyncHistory[id]) { this.saveQuotesToSheet(text, by); this.quoteSyncHistory[id] = true; } }, 5000); },
   async saveQuotesToSheet(text,by){if(!GAS_URL)return;try{await this._post({action:'save_quote',text:text||'',by:by||''})}catch(e){console.error(e)}},
   
-  saveBooksToSheet(book) {
+  async saveBooksToSheet(book) {
     if(!GAS_URL || !book) return;
-    this.taskQueue = this.taskQueue.then(async () => {
-      try {
-        const res = await this._post({
-          action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title,
-          content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')
-        });
-        if (res && res.driveId) {
-          const books = getBooks();
-          const idx = books.findIndex(b => b.id === book.id);
-          if (idx !== -1 && books[idx].driveId !== res.driveId) {
-            books[idx].driveId = res.driveId;
-            saveBooks(books);
-          }
+    try {
+      const res = await this._post({
+        action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title,
+        content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')
+      });
+      if (res && res.driveId) {
+        const books = getBooks();
+        const idx = books.findIndex(b => b.id === book.id);
+        if (idx !== -1 && books[idx].driveId !== res.driveId) {
+          books[idx].driveId = res.driveId;
+          saveBooks(books);
         }
-      } catch(e) { console.error(e); }
-    });
+      }
+    } catch(e) { console.error(e); }
   },
 
   scheduleDocSave(type){
@@ -1068,23 +1076,18 @@ const SYNC = {
   },
 
   syncAll(){
-    clearTimeout(this.timer); // 탭 전환 시 중복 타이머 방지
+    clearTimeout(this.timer);
     this.setSyncStatus('전체 동기화 중...','syncing');
     
     for(const type of textTypes){
       if(curIds[type]) this.saveDocToGDrive(curIds[type], type);
     }
     if(curMemoId) this.saveDocToGDrive(curMemoId, 'memo');
-    
-    this.taskQueue.then(() => {
-      this.setSyncStatus('전체 동기화 완료','ok');
-      setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000);
-    });
   }
 };
 
 // ═══ Auto-save ═══
-let _at=null;
+let _at = null;
 function setupAutoSave(){
   const showSaving = () => document.getElementById('edSaveStatus').textContent = '저장 중...';
   const showSaved = () => document.getElementById('edSaveStatus').textContent = '저장됨';
@@ -1098,14 +1101,14 @@ function setupAutoSave(){
 
   const doSaveAndSync = () => {
     saveLocalOnly();
-    // 텍스트/메모 타입만 5초 타이머 스케줄링 발동
     if(textTypes.includes(activeTab)) SYNC.scheduleDocSave(activeTab);
     else if(activeTab==='memo') SYNC.scheduleDocSave('memo');
   };
 
-  const onInput=()=>{
+  const onInput = () => {
     showSaving(); clearTimeout(_at);
-    _at=setTimeout(doSaveAndSync, 800);
+    // 타이핑 중일 때만 드라이브 동기화 타이머 발동
+    _at = setTimeout(doSaveAndSync, 800);
     updateWC();
   };
 
@@ -1114,20 +1117,20 @@ function setupAutoSave(){
     const el = document.getElementById(id);
     if(el) {
         el.addEventListener('input', onInput);
+        
+        // ✨ 수정됨: blur 이벤트에서는 화면이 번쩍거리는 걸 방지하기 위해 로컬 저장만 합니다.
         el.addEventListener('blur', () => { 
           setTimeout(() => {
-            clearTimeout(_at); 
-            doSaveAndSync(); 
+            saveLocalOnly(); 
           }, 200); 
         }); 
     }
   });
 
-  // ✨ 화면 가려질 때 (탭 닫기 등)는 로컬 즉시 저장 후 큐에 바로 꽂아버림
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
       clearTimeout(_at);
-      saveLocalOnly(); 
+      saveLocalOnly();
       SYNC.syncAll();
     }
   });
