@@ -66,7 +66,11 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 .st-card{background:var(--bg-white);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border-l);margin-bottom:14px;transition:.2s;}.st-card:hover{border-color:var(--ac-light);}
 .st-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.st-lb{font-size:13px;color:var(--tx);font-weight:600;letter-spacing:-0.01em;}
+
+/* ✨ 1단 하단 위젯 제목 폰트색 변경 */
+.st-lb{font-size:13px;color:var(--tx-d);font-weight:600;letter-spacing:-0.01em;transition:color .15s;}
+.st-card:hover .st-lb{color:var(--tx);}
+
 .st-sub{display:flex;justify-content:space-between;gap:8px;margin-top:8px;}
 .st-sub span{font-size:11px;color:var(--tx-m);font-family:'Pretendard',sans-serif;display:flex;flex-direction:column;align-items:center;gap:2px;}
 .st-sub b{color:var(--tx);font-size:14px;font-weight:600;font-family:'JetBrains Mono',monospace;}
@@ -84,13 +88,20 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-item.on{background:var(--bg-white);box-shadow:inset 3px 0 0 var(--ac)}
 .lp-date-wrap{display:flex;flex-direction:column;align-items:center;min-width:34px;}
 .lp-date-dow{font-size:11px;color:var(--tx-m);font-weight:600;}
-.lp-date-day{font-size:20px;font-weight:700;color:var(--tx);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;}
-.lp-item.on .lp-date-day{color:var(--ac-d);}
+
+/* ✨ 2단 날짜 폰트색 변경 */
+.lp-date-day{font-size:20px;font-weight:700;color:var(--tx-d);line-height:1.1;margin-top:2px;font-family:'JetBrains Mono',monospace;transition:color .15s;}
+.lp-item.on .lp-date-day{color:var(--tx);}
+
 .lp-text-wrap{flex:1;min-width:0;}
 .lp-item-title{font-size:15px;font-weight:600;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px;letter-spacing:-.01em;padding-right:50px;}
 .lp-item.on .lp-item-title{color:var(--tx); font-weight:700;}
 .lp-item-preview{font-size:13px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
 .lp-item.on .lp-item-preview{color:var(--tx-d);}
+
+/* ✨ 어구록 본문(제목역할) 텍스트 스타일 추가 */
+.quote-txt {font-size:13px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:color .15s;}
+.lp-item.on .quote-txt {color:var(--tx);font-weight:700;}
 
 .lp-item-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s; }
 .lp-item:hover .lp-item-actions { opacity: 1; }
@@ -803,7 +814,7 @@ function renderListPanel(){
       return `<div class="lp-item ${curQuoteId===q.id?'on':''}" onclick="loadQuote('${q.id}'); setMobileView('editor');">
         <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
         <div class="lp-text-wrap">
-          <div class="lp-item-preview" style="-webkit-line-clamp:3;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx)">${q.text}</div>
+          <div class="quote-txt">${q.text}</div>
           ${q.by ? `<div class="lp-item-preview" style="margin-top:6px;font-size:12px">${q.by}</div>` : ''}
         </div>
         <div class="lp-item-actions">
@@ -954,7 +965,6 @@ const SYNC = {
     if(el) { el.textContent = text; el.className = 'sync-status ' + (type||''); } 
   },
   
-  // ✨ 추가된 핵심 에러 처리 로직
   async _post(data) {
     data.token = APP_TOKEN;
     data.idToken = sessionStorage.getItem('gb_id_token');
