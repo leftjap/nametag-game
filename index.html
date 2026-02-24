@@ -18,7 +18,7 @@
 *{margin:0;padding:0;box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
 body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow:hidden}
 
-/* ✨ 로딩 스크린 */
+/* 로딩 스크린 */
 #lockScreen, #loadingScreen {position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;transition:opacity 0.4s ease;}
 #lockScreen.hidden, #loadingScreen.hidden {display:none;opacity:0;pointer-events:none;}
 .lock-card{background:var(--bg-white);padding:40px 30px;border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border-l);display:flex;flex-direction:column;align-items:center;text-align:center;width:90%;max-width:320px;}
@@ -60,19 +60,19 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .side-menu.on{background:var(--bg-white);color:var(--tx);box-shadow:var(--shadow);}
 .side-menu-l{font-weight:600;letter-spacing:-.02em}
 
-/* ✨ 배지 우측 정렬 디자인 */
+/* 공통 배지 스타일 (우측 정렬용) */
 .badge-pill { font-size:13px; font-weight:700; color:var(--tx-m); font-family:'JetBrains Mono',monospace; background:var(--bg-card); padding:3px 12px; border-radius:20px; transition:.2s; display:inline-flex; align-items:center; justify-content:center; }
 .side-menu.on .badge-pill { background:var(--bg-side); color:var(--tx-d); }
 
 .sec{padding:24px 20px}.sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--tx-m);margin-bottom:16px}
 
-/* ✨ 어구록 큰 따옴표 디자인 */
+/* 어구록 큰 따옴표 디자인 */
 .q-card{position:relative;background:#f5f1eb;border-radius:var(--r);padding:24px 20px;cursor:pointer;transition:.2s;box-shadow:var(--shadow);overflow:hidden;border:1px solid #efeae1;}
 .q-card::before { content: '“'; position: absolute; top: -10px; left: 16px; font-size: 80px; font-family: 'Georgia', serif; color: rgba(176,137,104,0.15); line-height: 1; z-index: 0; pointer-events: none; }
 .q-content{position:relative;z-index:1;width:100%;min-width:0}.q-text{font-family:'Noto Serif KR',serif;font-size:15px;line-height:1.7;color:var(--tx);font-weight:500;word-break:keep-all;}.q-by{font-size:12px;color:var(--tx-m);margin-top:12px; font-family:'Pretendard',sans-serif;}.q-hint{font-size:11px;color:var(--tx-m);text-align:center;margin-top:12px;opacity:.7}
 
-/* ✨ 데일리 루틴 디자인 (좌측 체크박스, 우측 불꽃) */
+/* 데일리 루틴 디자인 (좌측 체크박스, 우측 불꽃) */
 .chk-table{display:flex;flex-direction:column;}
 .chk-week-hdr{display:flex;align-items:center;justify-content:flex-end;padding:0 0 8px;margin-bottom:4px; border-bottom: 1px solid var(--border-l);} 
 .chk-week-hdr .day-labels{display:flex;gap:6px;}
@@ -107,10 +107,10 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-head{background:var(--bg);font-size:16px;font-weight:700;color:var(--tx); display: flex; align-items: center; padding: 0 20px;}
 .lp-list{flex:1;overflow-y:auto;padding-bottom:100px;}
 
-/* ✨ 2단 목록 월별 헤더 */
+/* 2단 목록 월별 헤더 */
 .lp-month-hdr { font-size: 14px; font-weight: 700; color: var(--tx-d); padding: 16px 20px 8px; background: var(--bg); position: sticky; top: 0; z-index: 5; text-transform: uppercase; letter-spacing: 0.5px;}
 
-/* ✨ 아이폰 사파리 더블 클릭 버그 방지 (@media hover 적용) */
+/* 아이폰 더블클릭 방지 호버 처리 */
 .lp-item{display:flex;padding:18px 20px;cursor:pointer;border-bottom:1px solid var(--border);position:relative;gap:16px;align-items:flex-start;}
 .lp-item.on{background:var(--bg-white);box-shadow:inset 4px 0 0 var(--ac)}
 .lp-date-wrap{display:flex;flex-direction:column;align-items:center;min-width:32px;padding-top:2px;}
@@ -125,7 +125,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 .quote-txt {font-size:15px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
-/* PC 환경에서만 hover 적용하여 모바일 터치 오작동 완벽 차단 */
+/* PC 환경에서만 hover 적용 */
 .lp-item-actions { position: absolute; top: 18px; right: 16px; display: flex; gap: 4px; opacity: 1; }
 @media (hover: hover) and (pointer: fine) { 
   .lp-item:hover { background: var(--bg-card); }
@@ -139,7 +139,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-action-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lp-action-btn.pin.on svg { fill: currentColor; }
 
-/* 플로팅 글쓰기 버튼 */
+/* 플로팅 버튼 */
 .fab-btn { display: none; position: absolute; bottom: 32px; right: 24px; width: 60px; height: 60px; border-radius: 50%; background: var(--yellow); color: white; border: none; box-shadow: 0 4px 16px rgba(251, 191, 36, 0.4); cursor: pointer; z-index: 90; transition: transform 0.1s; }
 .fab-btn svg { width: 28px; height: 28px; stroke: white; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 .fab-btn:active { transform: scale(0.9); }
@@ -181,7 +181,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 
 ::-webkit-scrollbar{width:8px;height:8px;}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-l);border-radius:4px}
 
-/* ✨ 모바일 바텀시트 편집 툴 (키보드 위) */
+/* 모바일 바텀시트 편집 툴 */
 .mob-tool-bar { display:none; position:absolute; bottom:max(16px, env(safe-area-inset-bottom)); right:16px; flex-direction:column; gap:12px; z-index:80; }
 .mob-fmt-btn { width:52px; height:52px; border-radius:50%; background:var(--bg-white); border:1px solid var(--border-l); box-shadow:0 4px 16px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; font-family:'Noto Serif KR', serif; font-size:22px; font-weight:700; color:var(--tx); cursor:pointer; transition:0.1s;}
 .mob-fmt-btn:active { background:var(--bg-card); transform:scale(0.95); }
@@ -204,6 +204,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   .side { background: var(--bg-side); z-index: 30; }
   .list-panel { background: var(--bg); z-index: 20; }
   .editor { z-index: 40; }
+  
   .app.view-side .side { transform: translateX(0); opacity: 1; }
   .app.view-side .list-panel { transform: translateX(30%); opacity: 0.3; pointer-events: none; }
   .app.view-side .editor { transform: translateX(100%); }
@@ -215,18 +216,17 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   .app.view-editor .editor { transform: translateX(0); opacity: 1; }
   
   .mobile-nav-btn { display: flex; align-items: center; justify-content: center; }
-  .mobile-back-btn { display: none !important; } /* 뒤로가기 숨김 */
+  .mobile-back-btn { display: none !important; } 
   .ed-date-center { display: none; }
   
-  /* 3단 에디터 헤더 데이원 스타일 (노란색) */
+  /* 3단 에디터 헤더 (데이원 옐로우) */
   .ed-topbar { padding: 0 20px; justify-content:space-between; background:var(--yellow); border-bottom:none; height:60px; min-height:60px;}
   .ed-header-date { font-size:16px; font-weight:700; color:white; }
   .ed-top-btn.pc-only { display: none; } 
   .ed-save-status { display:none; } 
   .ed-btn-done { display:block; color:white; font-weight:800; background:none; border:none; font-size:17px; cursor:pointer; font-family:'Pretendard',sans-serif; padding:10px 0 10px 10px; margin-right:-4px; }
-  .toolbar { display:none !important; } /* PC 툴바 완전 숨김 */
+  .toolbar { display:none !important; } 
   
-  /* 모바일 폰트 확대 및 여백 추가 */
   .ed-title { font-size: 28px; padding-bottom: 5px; margin-bottom: 24px; }
   .ed-body { font-size: 19px; line-height: 1.85; }
   .quote-body { font-size: 22px; line-height: 1.8; }
@@ -235,18 +235,17 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   .sf-row { flex-direction: column; gap: 12px; }
   .special-form { padding: 16px 24px; gap: 12px; }
   
-  /* 2단 리스트 모바일 여백 */
+  /* 2단 리스트 */
   .lp-head { background: var(--bg); padding-top: 10px; height: 64px; }
   .fab-btn { display: flex; align-items: center; justify-content: center; }
   
-  /* 1단 사이드바 모바일 폰트 */
+  /* 1단 사이드바 폰트 */
   .side-menu { font-size: 18px; padding: 16px; gap:10px; }
   .chk-lb { font-size: 17px; }
   .chk-fire { font-size: 16px; }
   .badge-pill { font-size: 15px; padding: 4px 14px; }
   .chk-row { padding: 14px 0; }
   
-  /* 모바일 키보드 툴바 활성화 */
   .mob-tool-bar { display:flex; }
 }
 </style>
@@ -617,6 +616,8 @@ function loadDoc(type, id, force=false){
   document.getElementById('edBody').innerHTML=fixDriveImageUrls(doc.content);
   document.getElementById('edDate').textContent=formatTopDate(doc.created);
   updateWC();
+  // ✨ 버그 수정: loadDoc 시점에 목록을 갱신하여 사이드 메뉴 렌더링 정상화
+  renderListPanel(); 
 }
 
 function saveCurDoc(type){
@@ -693,6 +694,7 @@ function loadBook(id, force=false){
   document.getElementById('book-pages').value=b.pages||'';
   document.getElementById('book-body').innerHTML=b.memo||'';
   document.getElementById('edDate').textContent=formatTopDate(b.date ? new Date(b.date).toISOString() : new Date().toISOString());
+  renderListPanel();
 }
 function delBook(id,e){
   e.stopPropagation();if(!confirm('삭제할까요?'))return;
@@ -756,6 +758,7 @@ function loadQuote(id, force=false){
   document.getElementById('quote-body').innerText=q.text;
   document.getElementById('quote-by').value=q.by||'';
   document.getElementById('edDate').textContent=formatTopDate(q.created);
+  renderListPanel();
 }
 function delQuote(id,e){
   e.stopPropagation();if(!confirm('삭제할까요?'))return;
@@ -793,6 +796,7 @@ function loadMemo(id, force=false){
   document.getElementById('memo-title').value=m.title||'';
   document.getElementById('memo-body').innerHTML=fixDriveImageUrls(m.content);
   document.getElementById('edDate').textContent=formatTopDate(m.created);
+  renderListPanel();
 }
 function newMemoForm(){
   curMemoId=null;
@@ -836,6 +840,7 @@ function getTabCount(t){
   return 0;
 }
 
+// ✨ 사이드 메뉴 (메뉴 누를 때 동기화 문제 해결)
 function renderSideMenu(){
   const nav=document.getElementById('sideNav');
   if(!nav)return;
@@ -1017,7 +1022,7 @@ function insertChecklist(){
   document.execCommand('insertHTML', false, '<ul style="list-style:none;padding-left:0;"><li><input type="checkbox" style="margin-right:8px;transform:scale(1.2);"> </li></ul>');
 }
 
-// ✨ 모바일 바텀시트 메뉴
+// 모바일 바텀시트 메뉴 토글
 let isFormatMenuOpen = false;
 function toggleFormatMenu() {
   const overlay = document.getElementById('formatSheetOverlay');
@@ -1092,8 +1097,12 @@ async function handlePaste(e) {
       break; 
     }
   }
+  
   if(!hasImage) {
-    setTimeout(() => { if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo(); updateWC(); }, 100);
+    setTimeout(() => {
+      if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
+      updateWC();
+    }, 100);
   }
 }
 
@@ -1131,7 +1140,7 @@ function handleDone() {
 function setupGesturesAndUI() {
   const app = document.getElementById('mainApp');
   
-  // ✨ 모바일 키보드 감지 시에만 툴바 표시
+  // 모바일 툴바 (키보드 올라올 때만)
   const mobToolbar = document.getElementById('mobToolbar');
   const onFocus = () => { if(window.innerWidth <= 768) mobToolbar.style.display = 'flex'; };
   const onBlur = () => { setTimeout(() => { mobToolbar.style.display = 'none'; }, 200); };
@@ -1166,7 +1175,7 @@ function setupGesturesAndUI() {
       let dy = e.touches[0].screenY - startY;
       let dx = Math.abs(e.touches[0].screenX - startX);
       
-      // 세로로 당길 때만 작동 (가로 스와이프 간섭 방지)
+      // 세로로 당길 때만 작동
       if (dy > 0 && dy > dx) {
         e.preventDefault(); 
         let progress = dy / (window.innerHeight * 0.4);
@@ -1186,7 +1195,7 @@ function setupGesturesAndUI() {
     const dx = e.changedTouches[0].screenX - startX;
     const dy = e.changedTouches[0].screenY - startY;
     
-    // 왼쪽에서 스와이프
+    // 왼쪽에서 오른쪽 스와이프 (뒤로가기)
     if (Math.abs(dx) > Math.abs(dy) * 1.5 && dx > 50 && startX < 40) {
       if (app.classList.contains('view-editor')) handleDone();
       else if (app.classList.contains('view-list')) setMobileView('side');
@@ -1358,6 +1367,9 @@ function init(){
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id,true);else{const nd=newDoc('navi');loadDoc('navi',nd.id,true)}
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
     document.getElementById('lpHeadTitleText').textContent = TAB_META[activeTab] || '목록';
+    
+    // ✨ 앱 실행 시 확실하게 목록을 그려줍니다.
+    renderListPanel();
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
 }
 </script>
