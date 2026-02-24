@@ -991,7 +991,6 @@ const SYNC = {
       
       if (json.status === 'error') {
         if (json.message === 'Unauthorized') {
-          // 세션 만료 시에만 팝업 알림 허용
           alert('구글 로그인 세션이 만료되었습니다.\n보안을 위해 확인을 누르면 새로고침하여 다시 로그인합니다.');
           localStorage.removeItem('gb_auth');
           localStorage.removeItem('gb_id_token');
@@ -1004,7 +1003,6 @@ const SYNC = {
       return json;
     } catch(e) {
       if(e.message !== 'Unauthorized') {
-        // ✨ 수정: 거슬리는 팝업(alert) 대신 왼쪽 위 상태창만 조용히 '통신 지연'으로 변경합니다.
         this.setSyncStatus('통신 지연 (재시도 중)', 'error');
         console.warn("네트워크 지연 발생 (백그라운드 처리):", e.message);
       }
@@ -1247,7 +1245,8 @@ function init(){
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
     document.getElementById('lpHeadTitleText').textContent = TAB_META[activeTab] || '목록';
     
-    setMobileView('list');
+    // ✨ 핵심 변경 부분: 맨 마지막에 앱 초기 화면을 사이드바(side)로 고정합니다.
+    setMobileView('side');
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
 }
 </script>
