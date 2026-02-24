@@ -83,9 +83,9 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .book-mini{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border);}.book-mini:last-child{border-bottom:none;padding-bottom:0;}
 .book-mini-t{color:var(--tx-d);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.book-mini-p{color:var(--ac-d);font-family:'JetBrains Mono',monospace;font-size:11px;margin-left:8px;font-weight:500;}
 
-.list-panel{width:var(--list-w);min-width:var(--list-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.list-panel{width:var(--list-w);min-width:var(--list-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;}
 .lp-head{background:var(--bg-side);font-size:14px;font-weight:600;color:var(--tx-d); display: flex; align-items: center; padding: 0 20px;}
-.lp-list{flex:1;overflow-y:auto}
+.lp-list{flex:1;overflow-y:auto;padding-bottom:80px;}
 
 .lp-item{display:flex;padding:16px 20px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;position:relative;gap:14px;align-items:flex-start;}
 .lp-item:hover{background:var(--bg-card)}
@@ -113,6 +113,11 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .lp-action-btn.del:hover { color: var(--red); }
 .lp-action-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lp-action-btn.pin.on svg { fill: currentColor; }
+
+/* ✨ 모바일용 플로팅 작성 버튼 (PC에서는 숨김) */
+.fab-btn { display: none; position: absolute; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--ac); color: white; border: none; box-shadow: 0 4px 12px rgba(176, 137, 104, 0.3); cursor: pointer; z-index: 90; transition: transform 0.2s, background 0.2s; }
+.fab-btn svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.fab-btn:active { transform: scale(0.92); background: var(--ac-d); }
 
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden}
 .ed-topbar{background:var(--bg);position:relative;justify-content:space-between; padding:0 20px;}
@@ -172,6 +177,8 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
   .tb-btn { flex-shrink: 0; width: 38px; height: 36px; }
   .sf-row { flex-direction: column; gap: 10px; }
   .special-form { padding: 16px 20px; gap: 10px; }
+  /* ✨ 모바일 크기에서만 플로팅 버튼 활성화 */
+  .fab-btn { display: flex; align-items: center; justify-content: center; }
 }
 </style>
 </head>
@@ -240,6 +247,10 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
     <span id="lpHeadTitleText" style="font-weight: 600;">글 목록</span>
   </div>
   <div class="lp-list" id="lpList"></div>
+  
+  <button class="fab-btn" onclick="handleNew()" title="새 글 작성">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+  </button>
 </div>
 
 <div class="editor">
@@ -1232,6 +1243,42 @@ function setupAutoSave(){
   });
 }
 
+// ═══ Mobile Swipe Gesture ═══
+// ✨ 화면 왼쪽에서 오른쪽으로 스와이프하면 뒤로 가기가 되도록 설정
+function setupSwipeGestures() {
+  let startX = 0;
+  let startY = 0;
+  const app = document.getElementById('mainApp');
+
+  app.addEventListener('touchstart', e => {
+    startX = e.changedTouches[0].screenX;
+    startY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  app.addEventListener('touchend', e => {
+    const endX = e.changedTouches[0].screenX;
+    const endY = e.changedTouches[0].screenY;
+    const dx = endX - startX;
+    const dy = endY - startY;
+    
+    // 가로 이동이 세로 이동보다 크고, 우측으로 50px 이상 밀었을 때
+    if (Math.abs(dx) > Math.abs(dy) * 1.5 && dx > 50) {
+      // 아이폰 네이티브 앱처럼 화면 왼쪽 끝(50px 이내)에서 출발한 경우만 뒤로가기 인정
+      if (startX < 50) {
+        if (window.innerWidth <= 768) { // 모바일 환경에서만
+          if (app.classList.contains('view-editor')) {
+            // 에디터에서 빠져나갈 때 키보드 숨김 및 자동저장 유도
+            if(document.activeElement) document.activeElement.blur(); 
+            setMobileView('list');
+          } else if (app.classList.contains('view-list')) {
+            setMobileView('side');
+          }
+        }
+      }
+    }
+  }, { passive: true });
+}
+
 // ═══ Init ═══
 function init(){
   try{
@@ -1240,12 +1287,12 @@ function init(){
     document.getElementById('edBody').addEventListener('paste', handlePaste);
     document.getElementById('memo-body').addEventListener('paste', handlePaste);
     setupEditorImageSelection();
+    setupSwipeGestures(); // ✨ 스와이프 기능 활성화
     
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id,true);else{const nd=newDoc('navi');loadDoc('navi',nd.id,true)}
     if(GAS_URL)SYNC.setSyncStatus('Google Drive 연결됨','ok');else SYNC.setSyncStatus('로컬 전용','');
     document.getElementById('lpHeadTitleText').textContent = TAB_META[activeTab] || '목록';
     
-    // ✨ 핵심 변경 부분: 맨 마지막에 앱 초기 화면을 사이드바(side)로 고정합니다.
     setMobileView('side');
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
 }
