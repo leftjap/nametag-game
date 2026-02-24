@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="gio_circle_white_closeup2_512.png">
-<link rel="apple-touch-icon" href="gio_circle_white_closeup2_512.png">
+<link rel="apple-touch-icon" href="apple-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="이름표">
@@ -36,7 +36,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--tx);mi
 .side{width:var(--side-w);min-width:var(--side-w);background:var(--bg-side);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .side-hdr{justify-content:space-between; padding:0 20px;}
 .sync-row{display:flex;align-items:center;gap:8px}
-.sync-status{font-size:11px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}.sync-status.ok{color:#6a9960}
+.sync-status{font-size:11px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}.sync-status.ok{color:#6a9960}.sync-status.error{color:var(--red)}
 .sync-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg-white);color:var(--tx-d);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:.15s}.sync-btn:hover{background:var(--bg-card)}
 
 .cat-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; filter: brightness(1.05) contrast(1.05); box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
@@ -332,7 +332,6 @@ function handleCredentialResponse(response) {
     const payload = JSON.parse(atob(jwt.split('.')[1]));
     
     if (payload.email === ALLOWED_EMAIL) {
-      // ✨ sessionStorage 대신 localStorage 사용 (모바일 영구 로그인)
       localStorage.setItem('gb_auth', '1');
       localStorage.setItem('gb_id_token', jwt);
       showApp();
@@ -345,7 +344,6 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  // ✨ sessionStorage 대신 localStorage 사용
   if (localStorage.getItem('gb_auth') === '1' && localStorage.getItem('gb_id_token')) {
     showApp();
   } else {
@@ -980,7 +978,6 @@ const SYNC = {
   
   async _post(data) {
     data.token = APP_TOKEN;
-    // ✨ 요청할 때도 localStorage에서 토큰을 꺼내오도록 수정
     data.idToken = localStorage.getItem('gb_id_token');
     
     try {
@@ -994,21 +991,22 @@ const SYNC = {
       
       if (json.status === 'error') {
         if (json.message === 'Unauthorized') {
+          // 세션 만료 시에만 팝업 알림 허용
           alert('구글 로그인 세션이 만료되었습니다.\n보안을 위해 확인을 누르면 새로고침하여 다시 로그인합니다.');
-          // ✨ 에러 발생 시에도 localStorage 지우기
           localStorage.removeItem('gb_auth');
           localStorage.removeItem('gb_id_token');
           location.reload();
           throw new Error('Unauthorized');
         } else {
-          alert("서버 오류가 발생했습니다:\n" + json.message);
           throw new Error(json.message);
         }
       }
       return json;
     } catch(e) {
       if(e.message !== 'Unauthorized') {
-        alert("통신 중 오류가 발생했습니다. 권한 설정이나 인터넷 연결을 확인해주세요.\n\n오류 내용: " + e.message);
+        // ✨ 수정: 거슬리는 팝업(alert) 대신 왼쪽 위 상태창만 조용히 '통신 지연'으로 변경합니다.
+        this.setSyncStatus('통신 지연 (재시도 중)', 'error');
+        console.warn("네트워크 지연 발생 (백그라운드 처리):", e.message);
       }
       throw e;
     }
