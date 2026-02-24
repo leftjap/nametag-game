@@ -332,6 +332,7 @@ function handleCredentialResponse(response) {
     
     if (payload.email === ALLOWED_EMAIL) {
       sessionStorage.setItem('gb_auth', '1');
+      sessionStorage.setItem('gb_id_token', jwt); // 보안 토큰 저장 (GAS 전송용)
       showApp();
     } else {
       document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
@@ -342,7 +343,7 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  if (sessionStorage.getItem('gb_auth') === '1') {
+  if (sessionStorage.getItem('gb_auth') === '1' && sessionStorage.getItem('gb_id_token')) {
     showApp();
   } else {
     document.getElementById('lockScreen').classList.remove('hidden');
@@ -919,7 +920,6 @@ async function handlePaste(e) {
     }
   }
   
-  // 이미지가 아닌 일반 텍스트 복붙일 경우 즉시 로컬 저장 발동
   if(!hasImage) {
     setTimeout(() => {
       if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
@@ -961,11 +961,12 @@ const SYNC={
   setSyncStatus(text,type){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.className='sync-status '+(type||'')}},
   async _post(data){
     data.token=APP_TOKEN;
+    data.idToken=sessionStorage.getItem('gb_id_token'); // 보안 토큰 전송
     const res = await fetch(GAS_URL, { 
       method:'POST', 
       headers:{'Content-Type':'text/plain;charset=utf-8'}, 
       body:JSON.stringify(data),
-      keepalive: true // 탭을 닫거나 다른 화면으로 넘어가도 네트워크 요청이 중단되지 않도록 보장!
+      keepalive: true
     });
     return await res.json();
   },
@@ -979,30 +980,49 @@ const SYNC={
       return res;
     } catch(e) { this.setSyncStatus('이미지 업로드 실패','error'); throw e; }
   },
-  async saveDocToGDrive(type,title,content){
+  async saveDocToGDrive(id, type, title, content){
     if(!GAS_URL||!stripHtml(content).trim())return;
-    try{this.setSyncStatus('동기화 중...','syncing');await this._post({action:'save_doc',type,title:title||today(),content:stripHtml(content)});this.setSyncStatus('Drive 저장 완료','ok');setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)}catch(e){console.error(e);this.setSyncStatus('저장 실패','error')}
+    try{
+      this.setSyncStatus('동기화 중...','syncing');
+      await this._post({action:'save_doc', id: id, type: type, title:title||today(), content:stripHtml(content)});
+      this.setSyncStatus('Drive 저장 완료','ok');
+      setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)
+    }catch(e){console.error(e);this.setSyncStatus('저장 실패','error')}
   },
   scheduleChecksSave(){clearTimeout(this.checksTimer);this.checksTimer=setTimeout(()=>this.saveChecksToSheet(),400)},
   async saveChecksToSheet(){if(!GAS_URL)return;const p={action:'save_routine',date:today(),checks:getChk()};const pk=JSON.stringify(p);if(this.checksSaving){this.checksPending=true;return}if(pk===this.lastChecksPayload)return;this.checksSaving=true;try{await this._post(p);this.lastChecksPayload=pk}catch(e){console.error(e)}finally{this.checksSaving=false;if(this.checksPending){this.checksPending=false;this.scheduleChecksSave()}}},
   scheduleBookSave(book) { clearTimeout(this.bookTimer); this.bookTimer = setTimeout(() => { this.saveBooksToSheet(book); }, 5000); },
   scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(() => { if (!this.quoteSyncHistory[id]) { this.saveQuotesToSheet(text, by); this.quoteSyncHistory[id] = true; } }, 5000); },
   async saveQuotesToSheet(text,by){if(!GAS_URL)return;try{await this._post({action:'save_quote',text:text||'',by:by||''})}catch(e){console.error(e)}},
-  async saveBooksToSheet(book){if(!GAS_URL||!book)return;try{await this._post({action:'save_doc',type:'book',title:book.title,content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')})}catch(e){console.error(e)}},
-  async saveMemosToSheet(memo){if(!GAS_URL||!memo)return;try{await this._post({action:'save_doc',type:'memo',title:memo.title||'메모',content:memo.content||''})}catch(e){console.error(e)}},
+  async saveBooksToSheet(book){if(!GAS_URL||!book)return;try{await this._post({action:'save_doc',id: book.id, type:'book',title:book.title,content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'')})}catch(e){console.error(e)}},
+  async saveMemosToSheet(memo){if(!GAS_URL||!memo)return;try{await this._post({action:'save_doc',id: memo.id, type:'memo',title:memo.title||'메모',content:memo.content||''})}catch(e){console.error(e)}},
   scheduleDocSave(type){
     if(type === 'memo') {
       const doc = getMemos().find(d=>d.id===curMemoId);
-      if(doc) { clearTimeout(this.timer); this.timer=setTimeout(()=>{ if(stripHtml(doc.content).trim()) this.saveDocToGDrive(type,doc.title,doc.content) },5000); }
+      if(doc) { clearTimeout(this.timer); this.timer=setTimeout(()=>{ if(stripHtml(doc.content).trim()) this.saveDocToGDrive(doc.id, type, doc.title, doc.content) },5000); }
     } else {
       clearTimeout(this.timer);
-      this.timer=setTimeout(()=>{if(!curIds[type])return;const doc=allDocs().find(d=>d.id===curIds[type]);if(doc&&stripHtml(doc.content).trim())this.saveDocToGDrive(type,doc.title,doc.content)},5000);
+      this.timer=setTimeout(()=>{if(!curIds[type])return;const doc=allDocs().find(d=>d.id===curIds[type]);if(doc&&stripHtml(doc.content).trim())this.saveDocToGDrive(doc.id, type, doc.title, doc.content)},5000);
     }
   },
-  async syncAll(){this.setSyncStatus('전체 동기화 중...','syncing');for(const type of textTypes){if(curIds[type]){const doc=allDocs().find(d=>d.id===curIds[type]);if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(type,doc.title,doc.content)}}this.setSyncStatus('전체 동기화 완료','ok');setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)}
+  async syncAll(){
+    this.setSyncStatus('전체 동기화 중...','syncing');
+    for(const type of textTypes){
+      if(curIds[type]){
+        const doc=allDocs().find(d=>d.id===curIds[type]);
+        if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(doc.id, type, doc.title, doc.content);
+      }
+    }
+    if(curMemoId) {
+      const doc = getMemos().find(d=>d.id===curMemoId);
+      if(doc&&stripHtml(doc.content).trim())await this.saveDocToGDrive(doc.id, 'memo', doc.title, doc.content);
+    }
+    this.setSyncStatus('전체 동기화 완료','ok');
+    setTimeout(()=>this.setSyncStatus('Google Drive 연결됨','ok'),2000)
+  }
 };
 
-// ═══ Auto-save (완벽 방어) ═══
+// ═══ Auto-save ═══
 let _at=null;
 function setupAutoSave(){
   const showSaving = () => document.getElementById('edSaveStatus').textContent = '저장 중...';
@@ -1026,8 +1046,6 @@ function setupAutoSave(){
     const el = document.getElementById(id);
     if(el) {
         el.addEventListener('input', onInput);
-        
-        // [수정점] 화면 이탈 시(blur) 한글 조합이 온전히 DOM에 안착하도록 200ms 시간 차를 둠
         el.addEventListener('blur', () => { 
           setTimeout(() => {
             clearTimeout(_at); 
@@ -1037,7 +1055,6 @@ function setupAutoSave(){
     }
   });
 
-  // [수정점] 브라우저 탭을 닫거나 앱을 백그라운드로 넘길 때 즉시 저장 & 동기화 큐 발송
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
       clearTimeout(_at);
