@@ -946,8 +946,6 @@ const GAS_URL='https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4
 const SYNC = {
   timer: null, checksTimer: null, bookTimer: null, quoteTimer: null, quoteSyncHistory: {},
   checksSaving: false, checksPending: false, lastChecksPayload: '',
-  
-  // ✨ 핵심: '저장 중' 상태와 '저장 중에 또 수정됨' 상태를 완벽 분리
   savingDocs: {}, 
   dirtyDocs: {},
 
@@ -956,15 +954,39 @@ const SYNC = {
     if(el) { el.textContent = text; el.className = 'sync-status ' + (type||''); } 
   },
   
+  // ✨ 추가된 핵심 에러 처리 로직
   async _post(data) {
     data.token = APP_TOKEN;
     data.idToken = sessionStorage.getItem('gb_id_token');
-    const res = await fetch(GAS_URL, { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-      body: JSON.stringify(data)
-    });
-    return await res.json();
+    
+    try {
+      const res = await fetch(GAS_URL, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+        body: JSON.stringify(data)
+      });
+      
+      const json = await res.json();
+      
+      if (json.status === 'error') {
+        if (json.message === 'Unauthorized') {
+          alert('구글 로그인 세션이 만료되었습니다.\n보안을 위해 확인을 누르면 새로고침하여 다시 로그인합니다.');
+          sessionStorage.removeItem('gb_auth');
+          sessionStorage.removeItem('gb_id_token');
+          location.reload();
+          throw new Error('Unauthorized');
+        } else {
+          alert("서버 오류가 발생했습니다:\n" + json.message);
+          throw new Error(json.message);
+        }
+      }
+      return json;
+    } catch(e) {
+      if(e.message !== 'Unauthorized') {
+        alert("통신 중 오류가 발생했습니다. 권한 설정이나 인터넷 연결을 확인해주세요.\n\n오류 내용: " + e.message);
+      }
+      throw e;
+    }
   },
 
   async uploadImage(base64, filename, mimeType) {
@@ -972,7 +994,6 @@ const SYNC = {
     this.setSyncStatus('이미지 업로드 중...','syncing');
     try {
       const res = await this._post({ action: 'upload_image', bytes: base64, filename: filename, mimeType: mimeType });
-      if(res.status === 'error') throw new Error(res.message);
       this.setSyncStatus('드라이브 저장 완료','ok');
       return res;
     } catch(e) { 
@@ -981,19 +1002,16 @@ const SYNC = {
     }
   },
 
-  // ✨ 수정됨: 큐 방식 대신 상태 머신(State Machine) 방식으로 변경
   async saveDocToGDrive(id, type) {
     if (!GAS_URL) return;
 
-    // 만약 현재 서버랑 통신하며 저장 중이라면? "나중에 또 저장해라"라고 꼬리표(dirty)만 붙이고 패스!
     if (this.savingDocs[id]) {
       this.dirtyDocs[id] = type;
       return;
     }
 
-    this.savingDocs[id] = true; // 통신 시작을 알림
+    this.savingDocs[id] = true;
 
-    // 내 차례가 온 이 순간, 가장 최신 로컬 데이터를 읽음
     const items = (type === 'memo') ? getMemos() : allDocs();
     const doc = items.find(d => d.id === id);
     
@@ -1014,7 +1032,6 @@ const SYNC = {
         content: stripHtml(doc.content)
       });
 
-      // 서버가 새 드라이브 ID를 줬다면 내 컴퓨터에도 저장
       if (res && res.driveId) {
         const freshItems = (type === 'memo') ? getMemos() : allDocs();
         const freshDoc = freshItems.find(d => d.id === doc.id);
@@ -1027,13 +1044,9 @@ const SYNC = {
       this.setSyncStatus('Drive 저장 완료','ok');
       setTimeout(() => this.setSyncStatus('Google Drive 연결됨','ok'), 2000);
     } catch(e) {
-      console.error(e);
       this.setSyncStatus('저장 실패','error');
     } finally {
-      this.savingDocs[id] = false; // 통신 끝!
-      
-      // 통신하는 동안 누군가 글을 또 수정해서 꼬리표(dirty)가 붙어있다면?
-      // 바뀐 최신 데이터로 다시 구글 드라이브 업데이트 시작!
+      this.savingDocs[id] = false;
       if (this.dirtyDocs[id]) {
         const nextType = this.dirtyDocs[id];
         delete this.dirtyDocs[id];
@@ -1107,7 +1120,6 @@ function setupAutoSave(){
 
   const onInput = () => {
     showSaving(); clearTimeout(_at);
-    // 타이핑 중일 때만 드라이브 동기화 타이머 발동
     _at = setTimeout(doSaveAndSync, 800);
     updateWC();
   };
@@ -1117,12 +1129,8 @@ function setupAutoSave(){
     const el = document.getElementById(id);
     if(el) {
         el.addEventListener('input', onInput);
-        
-        // ✨ 수정됨: blur 이벤트에서는 화면이 번쩍거리는 걸 방지하기 위해 로컬 저장만 합니다.
         el.addEventListener('blur', () => { 
-          setTimeout(() => {
-            saveLocalOnly(); 
-          }, 200); 
+          setTimeout(() => { saveLocalOnly(); }, 200); 
         }); 
     }
   });
