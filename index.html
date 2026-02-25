@@ -966,7 +966,7 @@ function updateBookStats(){
     if(d.startsWith(tm)) pM+=p;
     if(d.startsWith(ty)) pY+=p;
   });
-  if(document.getElementById('bToday')) document.getElementById('bToday').innerHTML=pT+'<span class='unit'>p</span>';
+  if(document.getElementById('bToday')) document.getElementById('bToday').innerHTML=pT+`<span class='unit'>p</span>`;
   if(document.getElementById('bMonth')) document.getElementById('bMonth').textContent=pM+'p';
   if(document.getElementById('bYear')) document.getElementById('bYear').textContent=pY+'p';
   if(document.getElementById('bBar')) document.getElementById('bBar').style.width=Math.min(100,(pT/50)*100)+'%';
@@ -1092,7 +1092,7 @@ function updateWritingStats(){
     if(dt.startsWith(tm)) tM+=c;
     if(dt.startsWith(ty)) tY+=c;
   });
-  if(document.getElementById('wToday')) document.getElementById('wToday').innerHTML=(tT/200).toFixed(1)+'<span class='unit'>매</span>';
+  if(document.getElementById('wToday')) document.getElementById('wToday').innerHTML=(tT/200).toFixed(1)+`<span class='unit'>매</span>`;
   if(document.getElementById('wMonth')) document.getElementById('wMonth').textContent=(tM/200).toFixed(1)+'매';
   if(document.getElementById('wYear')) document.getElementById('wYear').textContent=(tY/200).toFixed(1)+'매';
   if(document.getElementById('wBar')) document.getElementById('wBar').style.width=Math.min(100,(tT/200)/10*100)+'%';
