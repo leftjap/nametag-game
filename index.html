@@ -478,7 +478,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   
   <div class="side-scroll">
     <div class="sec sec-border quote-section">
-      <div class="sec-t" style="display:none;">오늘의 어구</div>
+      <div class="sec-t">오늘의 어구</div>
       <div class="q-card quote-card" onclick="showRandomQuote()">
         <div class="quote-mark">"</div>
         <div class="quote-label" style="display:none;">오늘의 어구</div>
@@ -489,7 +489,8 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
       </div>
     </div>
 
-    <div class="sec sec-border side-nav" style="padding:12px 16px 8px">
+    <div class="sec sec-border side-nav" style="padding:8px 16px 12px">
+      <div class="sec-t" style="margin-bottom:4px">글쓰기</div>
       <div id="sideNav" class="writing-grid"></div>
     </div>
 
@@ -792,27 +793,20 @@ function renderChk(){
     h+=`<div class="chk-week-hdr"><div style="min-width:90px"></div><div class="day-labels">${dayN.map(d=>`<div class="day-lbl">${d}</div>`).join('')}</div></div>`;
   }
 
+  // 요일 헤더 (한 번만)
+  const wkHdr = `<div class="chk-week-hdr"><div class="chk-week-hdr-spacer"></div><div class="day-labels">${['일','월','화','수','목','금','토'].map(d=>`<span class="day-lbl">${d}</span>`).join('')}</div></div>`;
+  if(mob) h += wkHdr;
+
   ROUTINE_META.forEach(r=>{
     const weekDone=week.map(dt=>all[dt]&&all[dt][r.id]?1:0);
     const doneCount=weekDone.filter(d=>d).length;
     const pct=Math.round((doneCount/7)*100);
 
-    // blob 크기 및 위치 계산
-    // count 1→d=120, count 7→d=400, 선형 보간
-    const blobPositions=[
-      null,                                           // 0: 없음
-      {d:100, left:-50, topFn:h=>h/2-50},            // 1: 좌측 중앙 작게
-      {d:130, left:-65, topFn:h=>h/2-65},            // 2
-      {d:160, left:-80, topFn:h=>h/2-80},            // 3
-      {d:195, left:-98, topFn:h=>h/2-98},            // 4
-      {d:235, left:-118, topFn:h=>h/2-118},          // 5
-      {d:280, left:-140, topFn:h=>h/2-140},          // 6: 우쿨렐레
-      {d:340, left:-170, topFn:h=>h/2-170},          // 7: 꽉 참
-    ];
-    const bp = doneCount > 0 ? blobPositions[doneCount] : null;
-    const cardH = mob ? 48 : 52;
-    const blobStyle = bp
-      ? `background:${r.color};width:${bp.d}px;height:${bp.d}px;left:${bp.left}px;top:${bp.topFn ? bp.topFn(cardH) : bp.top}px`
+    // 선형 채움 — 좌→우, (doneCount/7)*100%
+    const fillW = (doneCount/7)*100;
+    const fillRadius = doneCount===7 ? '10px' : '10px 0 0 10px';
+    const fillStyle = doneCount > 0
+      ? `position:absolute;left:0;top:0;bottom:0;width:${fillW}%;background:${r.bg};border-radius:${fillRadius};pointer-events:none`
       : '';
 
     const dotHtml=weekDone.map((done,i)=>{
@@ -821,13 +815,9 @@ function renderChk(){
       return `<div class="chk-dot ${done?'done':''} ${isTd?'today':''}" onclick="event.stopPropagation();toggleDay('${r.id}','${dt}')"></div>`;
     }).join('');
 
-    // 요일 헤더 (첫 항목 앞에 한 번만)
-    const isFirst = ROUTINE_META.indexOf(r) === 0;
-    const wkHdr = isFirst ? `<div class="chk-week-hdr"><div class="chk-week-hdr-spacer"></div><div class="day-labels">${['일','월','화','수','목','금','토'].map(d=>`<span class="day-lbl">${d}</span>`).join('')}</div></div>` : '';
-
-    h += wkHdr + `<div class="chk-row" onclick="toggleChk('${r.id}')">
-      ${bp ? `<div class="chk-blob" style="${blobStyle}"></div>` : ''}
-      ${bp ? `<span class="chk-pct">${pct}%</span>` : ''}
+    h += `<div class="chk-row" onclick="toggleChk('${r.id}')">
+      ${doneCount>0 ? `<div style="${fillStyle}"></div>` : ''}
+      ${doneCount>0 ? `<span class="chk-pct">${pct}%</span>` : ''}
       <div class="chk-left"><span class="chk-lb">${r.name}</span></div>
       <div class="chk-dots">${dotHtml}</div>
     </div>`;
