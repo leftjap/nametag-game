@@ -383,17 +383,57 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   }
   .mob-fmt-btn:active{opacity:.5}
 
-  /* 바텀시트 — 데이원 스타일 */
-  .fs-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+  /* 편집 팝업 — Aa 툴바 바로 위 */
+  .fs-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
   .fs-overlay.on{opacity:1;pointer-events:auto}
-  .fs-sheet{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg-card);border-radius:16px 16px 0 0;padding:16px 20px max(16px,env(safe-area-inset-bottom));z-index:101;transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 -4px 24px rgba(0,0,0,.12);flex-direction:column;gap:0}
-  .fs-sheet.on{transform:translateY(0)}
-  .fs-sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px;flex-shrink:0}
-  .fs-btn{display:flex;align-items:center;width:100%;padding:14px 4px;font-size:16px;font-weight:500;font-family:'Pretendard',sans-serif;border:none;background:none;text-align:left;color:var(--tx);cursor:pointer;gap:16px;border-radius:8px}
-  .fs-btn:active{background:rgba(0,0,0,.04)}
-  .fs-btn-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:700;color:var(--tx-d)}
-  .fs-btn-icon svg{width:22px;height:22px;stroke:var(--tx-d);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .fs-sub{margin-left:auto;font-size:14px;color:var(--tx-hint);font-weight:400;font-family:'JetBrains Mono',monospace}
+
+  .fs-popup{
+    position:fixed;left:0;right:0;
+    background:var(--bg-card);
+    border-radius:14px 14px 0 0;
+    box-shadow:0 -4px 20px rgba(0,0,0,.1);
+    z-index:101;
+    display:none;
+    flex-direction:column;
+    max-height:55vh;
+  }
+  .fs-popup.on{display:flex}
+  .fs-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 4px;flex-shrink:0}
+
+  /* 기본: 최근 5개 위 / 더 보기 아래 고정 */
+  .fs-default{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+  .fs-default-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+
+  /* 확장: 접기 위 고정 / 전체 목록 아래 스크롤 */
+  .fs-expanded{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+  .fs-expanded.on{display:flex}
+  .fs-expanded-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+
+  /* 더 보기 / 접기 버튼 공통 */
+  .fs-toggle-btn{
+    display:flex;align-items:center;
+    padding:12px 20px;
+    border:none;background:none;width:100%;cursor:pointer;
+    flex-shrink:0;
+  }
+  .fs-toggle-btn:active{background:rgba(0,0,0,.04)}
+  .fs-more-btn{border-top:1px solid var(--border-l)}
+  .fs-fold-btn{border-bottom:1px solid var(--border-l)}
+  .fs-toggle-arrow{font-size:11px;color:var(--ac);font-weight:700;margin-right:10px}
+  .fs-toggle-label{font-size:14px;font-weight:500;color:var(--tx-m)}
+
+  /* 행 */
+  .fs-row{display:flex;align-items:center;padding:14px 20px;border:none;background:none;width:100%;cursor:pointer}
+  .fs-row:active{background:rgba(0,0,0,.04)}
+  .fs-name{flex:1;text-align:left;font-size:16px;font-weight:400;color:var(--tx)}
+  .fs-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fs-icon svg{width:20px;height:20px;stroke:var(--tx-d);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .fs-icon-txt{font-size:15px;font-weight:700;color:var(--tx-d);font-family:-apple-system,sans-serif;line-height:1}
+  .fs-sep{height:1px;background:var(--border-l);margin:0 20px}
+  .fs-last-pad{height:8px}
+  .fs-row.active .fs-name{color:var(--ac)}
+  .fs-row.active .fs-icon svg{stroke:var(--ac)}
+  .fs-row.active .fs-icon-txt{color:var(--ac)}
 }
 </style>
 </head>
@@ -443,11 +483,6 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
       </div>
     </div>
 
-    <div class="sec sec-border side-nav">
-      <div class="sec-t">글쓰기</div>
-      <div class="writing-grid" id="sideNav"></div>
-    </div>
-    
     <div class="sec sec-border">
       <div class="sec-t">데일리 루틴</div>
       <div class="chk-table" id="chkTable"></div>
@@ -558,31 +593,30 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   </div>
   
   <div class="mob-tool-bar" id="mobToolbar">
-    <button class="mob-fmt-btn aa-btn" onmousedown="event.preventDefault(); toggleFormatMenu()">Aa</button>
+    <button class="mob-fmt-btn aa-btn" id="aaBtn" onmousedown="event.preventDefault(); toggleFormatMenu()">Aa</button>
   </div>
 
-  <div id="formatSheetOverlay" class="fs-overlay" onmousedown="event.preventDefault(); toggleFormatMenu()"></div>
-  <div id="formatSheet" class="fs-sheet">
-    <div class="fs-sheet-handle"></div>
-    <button class="fs-btn" onmousedown="event.preventDefault();execCmd('formatBlock','p');toggleFormatMenu()">
-      <span class="fs-btn-icon">¶</span><span>본문</span>
-    </button>
-    <button class="fs-btn" onmousedown="event.preventDefault();execCmd('formatBlock','h1');toggleFormatMenu()">
-      <span class="fs-btn-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"/></svg></span><span>제목</span><span class="fs-sub">1</span>
-    </button>
-    <button class="fs-btn" onmousedown="event.preventDefault();execCmd('formatBlock','h2');toggleFormatMenu()">
-      <span class="fs-btn-icon"><svg viewBox="0 0 24 24"><path d="M4 6h12M4 12h8M4 18h12"/></svg></span><span>부제</span><span class="fs-sub">2</span>
-    </button>
-    <button class="fs-btn" onmousedown="event.preventDefault();execCmd('insertUnorderedList');toggleFormatMenu()">
-      <span class="fs-btn-icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="3" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="3" cy="18" r="1" fill="currentColor" stroke="none"/></svg></span><span>목록</span>
-    </button>
-    <button class="fs-btn" onmousedown="event.preventDefault();execCmd('indent');toggleFormatMenu()">
-      <span class="fs-btn-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><polyline points="8 12 12 16 8 20"/><line x1="12" y1="12" x2="21" y2="12"/><line x1="12" y1="18" x2="21" y2="18"/></svg></span><span>들여쓰기</span>
-    </button>
-    <button class="fs-btn" onmousedown="event.preventDefault();toggleFormatMenu();setTimeout(()=>toggleExtraFormats(),50)">
-      <span class="fs-btn-icon" style="font-size:12px;color:var(--ac)">▶</span><span>다른 옵션 보기</span>
-      <span class="fs-sub" style="font-family:'Pretendard',sans-serif">가가</span>
-    </button>
+  <div id="formatSheetOverlay" class="fs-overlay" onmousedown="event.preventDefault(); closeFormatMenu()"></div>
+  <div id="formatPopup" class="fs-popup">
+    <div class="fs-handle"></div>
+
+    <!-- 기본: 최근 5개 + 더 보기(맨 아래) -->
+    <div class="fs-default" id="fmtDefault">
+      <div class="fs-default-list" id="fmtRecentList"></div>
+      <button class="fs-toggle-btn fs-more-btn" onmousedown="event.preventDefault()" onclick="fmtExpand()">
+        <span class="fs-toggle-arrow">▶</span>
+        <span class="fs-toggle-label">더 보기</span>
+      </button>
+    </div>
+
+    <!-- 확장: 접기(맨 위) + 전체 목록 -->
+    <div class="fs-expanded" id="fmtExpanded">
+      <button class="fs-toggle-btn fs-fold-btn" onmousedown="event.preventDefault()" onclick="fmtCollapse()">
+        <span class="fs-toggle-arrow">▼</span>
+        <span class="fs-toggle-label">접기</span>
+      </button>
+      <div class="fs-expanded-list" id="fmtFullList"></div>
+    </div>
   </div>
 
 </div>
@@ -757,13 +791,13 @@ function renderChk(){
     // count 1→d=120, count 7→d=400, 선형 보간
     const blobPositions=[
       null, // 0체크: 없음
-      {d:120, left:-60, top:-60},              // 1: 좌상단 모서리 (5시방향)
-      {d:160, left:-80, topFn:h=>h-80},        // 2: 좌하단 모서리 (2시방향)
-      {d:200, left:-100, topFn:h=>h/2-100},    // 3: 좌측 수직중앙 (3시)
-      {d:240, left:-120, top:-60},             // 4: 좌상단 (4시)
-      {d:280, left:-20,  top:-140},            // 5: 상단 중앙
-      {d:320, left:-160, topFn:h=>h/2-160},   // 6: 좌측 수직중앙 크게
-      {d:400, left:-200, topFn:h=>h/2-200},   // 7: 꽉 참
+      {d:120, left:-60, top:-60},              // 1: 좌상단 모서리
+      {d:160, left:-80, topFn:h=>h-80},        // 2: 좌하단 모서리
+      {d:200, left:-100, topFn:h=>h/2-100},    // 3: 좌측 수직중앙
+      {d:240, left:-120, top:-60},             // 4: 좌상단
+      {d:280, left:-140, topFn:h=>h/2-140},   // 5: 좌측 수직중앙 (더 큰 반원)
+      {d:340, left:-170, top:-100},            // 6: 좌상단 넓게
+      {d:420, left:-210, topFn:h=>h/2-210},   // 7: 꽉 참
     ];
     const bp = doneCount > 0 ? blobPositions[doneCount] : null;
     const cardH = mob ? 48 : 52;
@@ -1266,27 +1300,107 @@ function insertChecklist(){
 
 // 모바일 바텀시트
 let isFormatMenuOpen = false;
-function toggleFormatMenu() {
-  const overlay = document.getElementById('formatSheetOverlay');
-  const sheet = document.getElementById('formatSheet');
-  isFormatMenuOpen = !isFormatMenuOpen;
-  if(isFormatMenuOpen) {
-    overlay.classList.add('on');
-    sheet.classList.add('on');
-  } else {
-    overlay.classList.remove('on');
-    sheet.classList.remove('on');
-  }
+// ═══ 편집 팝업 ═══
+const FMT_ITEMS = [
+  { cmd:'bold',       name:'굵게',       toggle:true,  exec:()=>execCmd('bold') },
+  { cmd:'italic',     name:'기울임',     toggle:true,  exec:()=>execCmd('italic') },
+  { cmd:'strike',     name:'취소선',     toggle:true,  exec:()=>execCmd('strikeThrough') },
+  { cmd:'h1',         name:'제목',       toggle:false, exec:()=>execCmd('formatBlock','h1') },
+  { cmd:'h2',         name:'부제목',     toggle:false, exec:()=>execCmd('formatBlock','h2') },
+  { cmd:'h3',         name:'소제목',     toggle:false, exec:()=>execCmd('formatBlock','h3') },
+  { cmd:'blockquote', name:'인용',       toggle:false, exec:()=>execCmd('formatBlock','blockquote') },
+  { cmd:'hr',         name:'구분선',     toggle:false, exec:()=>execCmd('insertHorizontalRule') },
+  { cmd:'ul',         name:'목록',       toggle:false, exec:()=>execCmd('insertUnorderedList') },
+  { cmd:'ol',         name:'순서 목록',  toggle:false, exec:()=>execCmd('insertOrderedList') },
+  { cmd:'checklist',  name:'체크리스트', toggle:false, exec:()=>insertChecklist() },
+];
+const FMT_ICONS = {
+  bold:       '<span class="fs-icon-txt"><b>B</b></span>',
+  italic:     '<span class="fs-icon-txt"><i>I</i></span>',
+  strike:     '<span class="fs-icon-txt"><s>S</s></span>',
+  h1:         '<span class="fs-icon-txt">H1</span>',
+  h2:         '<span class="fs-icon-txt" style="font-size:13px">H2</span>',
+  h3:         '<span class="fs-icon-txt" style="font-size:11px">H3</span>',
+  blockquote: '<svg viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3M14 17h3l2-4V7h-6v6h3"/></svg>',
+  hr:         '<svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/></svg>',
+  ul:         '<svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>',
+  ol:         '<svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="9" font-size="7" stroke="none" fill="currentColor" font-weight="600">1</text><text x="2" y="15" font-size="7" stroke="none" fill="currentColor" font-weight="600">2</text><text x="2" y="21" font-size="7" stroke="none" fill="currentColor" font-weight="600">3</text></svg>',
+  checklist:  '<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+};
+const FMT_RECENT_KEY = 'fmt_recent';
+
+function fmtGetRecent() {
+  try { return JSON.parse(localStorage.getItem(FMT_RECENT_KEY)) || FMT_ITEMS.slice(0,5).map(i=>i.cmd); }
+  catch { return FMT_ITEMS.slice(0,5).map(i=>i.cmd); }
 }
-function toggleExtraFormats() {
-  // 다른 옵션 보기 — 굵게/기울임/취소선 시트로 전환
-  const sheet = document.getElementById('formatSheet');
-  const extra = document.getElementById('formatSheetExtra');
-  if(extra) { extra.classList.add('on'); return; }
-  // 없으면 기본 bold/italic 처리
-  execCmd('bold');
+function fmtSaveRecent(cmd) {
+  let r = fmtGetRecent().filter(c=>c!==cmd);
+  r.unshift(cmd);
+  if(r.length>5) r=r.slice(0,5);
+  localStorage.setItem(FMT_RECENT_KEY, JSON.stringify(r));
 }
-function showMoreFormats() {}
+function fmtMakeRows(container, items) {
+  container.innerHTML='';
+  items.forEach((item,idx) => {
+    const btn = document.createElement('button');
+    btn.className='fs-row';
+    btn.dataset.cmd=item.cmd;
+    btn.innerHTML=`<span class="fs-name">${item.name}</span><span class="fs-icon">${FMT_ICONS[item.cmd]}</span>`;
+    btn.addEventListener('mousedown', e=>e.preventDefault());
+    btn.addEventListener('click', ()=>{
+      fmtSaveRecent(item.cmd);
+      item.exec();
+      if(item.toggle){ btn.classList.toggle('active'); }
+      else { closeFormatMenu(); }
+    });
+    container.appendChild(btn);
+    if(idx<items.length-1){ const sep=document.createElement('div'); sep.className='fs-sep'; container.appendChild(sep); }
+  });
+  const pad=document.createElement('div'); pad.className='fs-last-pad'; container.appendChild(pad);
+}
+
+function fmtGetBottom(){
+  const vv=window.visualViewport;
+  const kbH=vv ? window.innerHeight-vv.height-vv.offsetTop : 0;
+  return (kbH>100 ? kbH : 0) + 44; // 44 = 툴바 높이
+}
+
+function toggleFormatMenu(){
+  const popup=document.getElementById('formatPopup');
+  if(popup.classList.contains('on')) closeFormatMenu();
+  else openFormatMenu();
+}
+function openFormatMenu(){
+  const popup=document.getElementById('formatPopup');
+  const overlay=document.getElementById('formatSheetOverlay');
+  // bottom 위치 설정
+  popup.style.bottom = fmtGetBottom()+'px';
+  // 기본 뷰
+  document.getElementById('fmtDefault').style.display='flex';
+  document.getElementById('fmtExpanded').classList.remove('on');
+  // 최근 5개
+  const recent=fmtGetRecent();
+  const recentItems=FMT_ITEMS.filter(i=>recent.includes(i.cmd)).sort((a,b)=>recent.indexOf(a.cmd)-recent.indexOf(b.cmd));
+  fmtMakeRows(document.getElementById('fmtRecentList'), recentItems);
+  popup.classList.add('on');
+  overlay.classList.add('on');
+  isFormatMenuOpen=true;
+}
+function closeFormatMenu(){
+  document.getElementById('formatPopup').classList.remove('on');
+  document.getElementById('formatSheetOverlay').classList.remove('on');
+  isFormatMenuOpen=false;
+}
+function fmtExpand(){
+  fmtMakeRows(document.getElementById('fmtFullList'), FMT_ITEMS);
+  document.getElementById('fmtDefault').style.display='none';
+  document.getElementById('fmtExpanded').classList.add('on');
+}
+function fmtCollapse(){
+  document.getElementById('fmtExpanded').classList.remove('on');
+  document.getElementById('fmtDefault').style.display='flex';
+}
+function toggleExtraFormats(){} // 호환성 유지
 
 function setupEnterKey() {
   document.querySelectorAll('.ed-title, .sf-input').forEach(input => {
@@ -1414,6 +1528,9 @@ function setupGesturesAndUI() {
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', adjustToolbar);
     window.visualViewport.addEventListener('scroll', adjustToolbar);
+    window.visualViewport.addEventListener('resize', ()=>{
+      if(isFormatMenuOpen) document.getElementById('formatPopup').style.bottom=fmtGetBottom()+'px';
+    });
   }
 
   // 뷰 전환 시 툴바 상태 관리
