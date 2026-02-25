@@ -472,6 +472,10 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   </div>
   
   <div class="side-scroll">
+    <div class="sec sec-border side-nav" style="padding:12px 16px 8px">
+      <div id="sideNav" class="writing-grid"></div>
+    </div>
+
     <div class="sec sec-border quote-section">
       <div class="sec-t" style="display:none;">오늘의 어구</div>
       <div class="q-card quote-card" onclick="showRandomQuote()">
@@ -791,14 +795,14 @@ function renderChk(){
     // blob 크기 및 위치 계산
     // count 1→d=120, count 7→d=400, 선형 보간
     const blobPositions=[
-      null, // 0체크: 없음
-      {d:120, left:-60, top:-60},              // 1: 좌상단 모서리
-      {d:160, left:-80, topFn:h=>h-80},        // 2: 좌하단 모서리
-      {d:200, left:-100, topFn:h=>h/2-100},    // 3: 좌측 수직중앙
-      {d:240, left:-120, top:-60},             // 4: 좌상단
-      {d:280, left:-140, topFn:h=>h/2-140},   // 5: 좌측 수직중앙 (더 큰 반원)
-      {d:340, left:-170, top:-100},            // 6: 좌상단 넓게
-      {d:420, left:-210, topFn:h=>h/2-210},   // 7: 꽉 참
+      null,                                           // 0: 없음
+      {d:100, left:-50, topFn:h=>h/2-50},            // 1: 좌측 중앙 작게
+      {d:130, left:-65, topFn:h=>h/2-65},            // 2
+      {d:160, left:-80, topFn:h=>h/2-80},            // 3
+      {d:195, left:-98, topFn:h=>h/2-98},            // 4
+      {d:235, left:-118, topFn:h=>h/2-118},          // 5
+      {d:280, left:-140, topFn:h=>h/2-140},          // 6: 우쿨렐레
+      {d:340, left:-170, topFn:h=>h/2-170},          // 7: 꽉 참
     ];
     const bp = doneCount > 0 ? blobPositions[doneCount] : null;
     const cardH = mob ? 48 : 52;
