@@ -94,25 +94,30 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .wi-arrow{display:none}
 .side-menu::before{display:none}
 
-/* PC 루틴 — v3 프로그레스 바 + 도트 */
-.chk-table{display:flex;flex-direction:column;gap:0}
-.chk-week-hdr{display:flex;align-items:flex-end;margin-bottom:4px}
-.chk-week-hdr .day-labels{display:flex}
-.chk-week-hdr .day-lbl{width:18px;text-align:center;font-size:9px;color:var(--tx-hint);font-family:'JetBrains Mono',monospace;font-weight:400;margin:0 1px}
-.chk-row{display:flex;align-items:center;padding:5px 0;border-radius:3px;cursor:pointer;transition:.1s;position:relative;user-select:none;background:none;border:none}
-.chk-row:hover{background:rgba(0,0,0,.015)}
-.routine-progress{position:absolute;top:0;left:0;height:100%;border-radius:3px;opacity:.05;transition:width .5s ease;pointer-events:none}
-.chk-left{display:flex;align-items:center;min-width:90px;z-index:1;gap:0}
+/* PC 루틴 — blob 원형 게이지 */
+.chk-table{display:flex;flex-direction:column;gap:4px}
+.chk-week-hdr{display:flex;margin-bottom:3px}
+.chk-week-hdr-spacer{width:100px;flex-shrink:0}
+.chk-week-hdr .day-labels{display:flex;flex:1}
+.chk-week-hdr .day-lbl{flex:1;text-align:center;font-size:9px;color:var(--tx-hint);font-family:'JetBrains Mono',monospace;font-weight:400}
+.chk-row{display:flex;align-items:center;border-radius:10px;cursor:pointer;position:relative;overflow:hidden;height:52px;background:var(--bg-white);border:1px solid var(--border-l);transition:.15s;user-select:none}
+.chk-row:hover{border-color:var(--border)}
+.chk-blob{position:absolute;border-radius:50%;pointer-events:none;opacity:.22}
+.chk-pct{position:absolute;top:6px;left:9px;font-size:7px;font-weight:700;font-family:'JetBrains Mono',monospace;color:rgba(0,0,0,.25);z-index:2}
+.routine-progress{display:none}
 .routine-box{display:none}
-.chk-lb{font-size:12px;font-weight:400;color:var(--tx-d);width:52px;min-width:52px;padding:0}
-.chk-total{font-size:10px;font-weight:500;min-width:34px;display:flex;align-items:center;gap:1px;font-family:'JetBrains Mono',monospace;background:transparent;padding:0;border:none}
-.chk-info{display:flex;align-items:center;min-width:90px;z-index:1}
-.chk-dots{display:flex;margin-left:auto;z-index:1;gap:0}
-.chk-dot{width:18px;height:16px;border-radius:3px;background:var(--bg-white);border:1px solid var(--border-l);transition:.15s;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;color:transparent;margin:0 1px}
-.chk-dot.done{border-color:transparent;color:white}
-.chk-dot.done::after{content:'✓'}
-.chk-dot.today{box-shadow:inset 0 0 0 1.2px var(--ac-light)}
-.chk-dot:hover{opacity:.8}
+.chk-left{width:100px;flex-shrink:0;z-index:1;padding:0 4px 0 11px;display:flex;align-items:center}
+.chk-lb{font-size:12px;font-weight:400;color:var(--tx);white-space:nowrap}
+.chk-total{display:none}
+.chk-info{display:none}
+.chk-dots{display:flex;flex:1;z-index:1;align-items:center;justify-content:space-around;padding-right:6px}
+.chk-dot{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer}
+.chk-dot::before{content:'';display:block;width:4px;height:4px;border-radius:50%;border:1px solid #bbb}
+.chk-dot.done::before{display:none}
+.chk-dot.done::after{content:'✓';font-size:14px;font-weight:500;color:var(--ac);font-family:-apple-system,sans-serif;line-height:1}
+.chk-dot.today::before{border-color:var(--ac);width:5px;height:5px}
+.chk-dot.today.done::before{display:none}
+.chk-dot.today.done::after{color:var(--ac)}
 
 /* PC 기록 — v3 flat stats */
 .st-card{background:none;border-radius:0;padding:0;box-shadow:none;border:none;margin-bottom:0}
@@ -265,23 +270,29 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .badge-pill{font-size:20px;font-weight:800;color:var(--tx-hint);font-family:'Pretendard',sans-serif}
   .wi-arrow{display:block;position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--tx-hint);opacity:.5}
 
-  /* ── 모바일 루틴 — 프로토타입 반영 ── */
-  .chk-table{gap:6px}
-  .chk-week-hdr{display:none}
-  .chk-row{background:var(--bg-card);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.03);padding:12px 14px;border:none;gap:10px;position:relative}
-  .routine-progress{position:absolute;top:0;left:0;height:100%;border-radius:12px;opacity:.12;pointer-events:none}
-  .routine-box{display:flex !important;width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:var(--bg-card);align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
-  .routine-box.checked{border-color:transparent;color:white;font-size:12px;font-weight:700}
-  .routine-box.checked::after{content:'✓'}
-  .chk-left{min-width:auto;gap:10px}
-  .chk-info{display:flex;flex-direction:column;gap:0;min-width:auto}
-  .chk-lb{font-size:13px;font-weight:600;color:var(--tx);width:auto;min-width:auto;letter-spacing:-.2px}
-  .chk-total{font-size:11px;font-weight:700;display:flex;align-items:center;gap:2px}
-  .chk-dots{gap:4px;margin-left:auto}
-  .chk-dot{width:22px;height:22px;border-radius:5px;font-size:9px;font-weight:600;color:var(--tx-hint);background:var(--bg);border:none;display:flex;align-items:center;justify-content:center;margin:0}
-  .chk-dot.done{color:white;font-weight:700}
-  .chk-dot.done::after{content:'✓'}
-  .chk-dot.today{box-shadow:inset 0 0 0 1.5px var(--tx-hint)}
+  /* ── 모바일 루틴 — blob 원형 게이지 ── */
+  .chk-table{gap:4px}
+  .chk-week-hdr{display:flex !important;margin-bottom:3px}
+  .chk-week-hdr-spacer{width:90px;flex-shrink:0}
+  .chk-week-hdr .day-labels{display:flex;flex:1}
+  .chk-week-hdr .day-lbl{flex:1;text-align:center;font-size:9px;color:var(--tx-hint)}
+  .chk-row{background:var(--bg-card);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);height:48px;padding:0;border:none;gap:0;position:relative}
+  .chk-blob{position:absolute;border-radius:50%;pointer-events:none;opacity:.25}
+  .chk-pct{position:absolute;top:5px;left:8px;font-size:7px;font-weight:700;color:rgba(0,0,0,.25);z-index:2}
+  .routine-progress{display:none}
+  .routine-box{display:none !important}
+  .chk-left{width:90px;flex-shrink:0;z-index:1;padding:0 4px 0 10px;display:flex;align-items:center;min-width:unset;gap:0}
+  .chk-info{display:none}
+  .chk-lb{font-size:12px;font-weight:400;color:var(--tx);width:auto;min-width:auto;white-space:nowrap}
+  .chk-total{display:none}
+  .chk-dots{display:flex;flex:1;z-index:1;align-items:center;justify-content:space-around;padding-right:6px;gap:0;margin-left:0}
+  .chk-dot{width:18px;height:18px;border-radius:0;background:none;border:none;display:flex;align-items:center;justify-content:center;font-size:0;color:transparent;margin:0;flex-shrink:0}
+  .chk-dot::before{content:'';display:block;width:4px;height:4px;border-radius:50%;border:1px solid #bbb}
+  .chk-dot.done::before{display:none}
+  .chk-dot.done::after{content:'✓';font-size:14px;font-weight:500;color:var(--ac);font-family:-apple-system,sans-serif;line-height:1}
+  .chk-dot.today::before{border-color:var(--ac);width:5px;height:5px}
+  .chk-dot.today.done::before{display:none}
+  .chk-dot.today.done::after{color:var(--ac)}
 
   /* 모바일 통계 */
   .st-card{border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:16px;border:none;background:var(--bg-card)}
@@ -737,45 +748,41 @@ function renderChk(){
     const weekDone=week.map(dt=>all[dt]&&all[dt][r.id]?1:0);
     const doneCount=weekDone.filter(d=>d).length;
     const pct=Math.round((doneCount/7)*100);
-    const todayDone=chk[r.id];
+
+    // blob 크기 및 위치 계산
+    // count 1→d=120, count 7→d=400, 선형 보간
+    const blobPositions=[
+      null, // 0체크: 없음
+      {d:120, left:-60, top:-60},              // 1: 좌상단 모서리 (5시방향)
+      {d:160, left:-80, topFn:h=>h-80},        // 2: 좌하단 모서리 (2시방향)
+      {d:200, left:-100, topFn:h=>h/2-100},    // 3: 좌측 수직중앙 (3시)
+      {d:240, left:-120, top:-60},             // 4: 좌상단 (4시)
+      {d:280, left:-20,  top:-140},            // 5: 상단 중앙
+      {d:320, left:-160, topFn:h=>h/2-160},   // 6: 좌측 수직중앙 크게
+      {d:400, left:-200, topFn:h=>h/2-200},   // 7: 꽉 참
+    ];
+    const bp = doneCount > 0 ? blobPositions[doneCount] : null;
+    const cardH = mob ? 48 : 52;
+    const blobStyle = bp
+      ? `background:${r.color};width:${bp.d}px;height:${bp.d}px;left:${bp.left}px;top:${bp.topFn ? bp.topFn(cardH) : bp.top}px`
+      : '';
 
     const dotHtml=weekDone.map((done,i)=>{
       const dt=week[i];
       const isTd=dt===td;
-      if(mob){
-        // 모바일: 미완료=요일텍스트, 완료=✓+색
-        return `<div class="chk-dot ${done?'done':''} ${isTd?'today':''}" style="${done?'background:'+r.color+';color:white':''}" onclick="event.stopPropagation();toggleDay('${r.id}','${dt}')">${done?'':dayN[i]}</div>`;
-      } else {
-        // PC: v3 스타일 ✓ 도트
-        return `<div class="chk-dot ${done?'done':''} ${isTd?'today':''}" style="${done?'background:'+r.color:''}" onclick="event.stopPropagation();toggleDay('${r.id}','${dt}')"></div>`;
-      }
+      return `<div class="chk-dot ${done?'done':''} ${isTd?'today':''}" onclick="event.stopPropagation();toggleDay('${r.id}','${dt}')"></div>`;
     }).join('');
 
-    if(mob){
-      // 모바일: 프로토타입 카드형
-      const boxStyle=todayDone?`background:${r.color};border-color:${r.color}`:'';
-      h+=`<div class="chk-row" onclick="toggleChk('${r.id}')">
-        <div class="routine-progress" style="width:${pct}%;background:${r.color}"></div>
-        <div class="chk-left">
-          <div class="routine-box ${todayDone?'checked':''}" style="${boxStyle}"></div>
-          <div class="chk-info">
-            <div class="chk-lb">${r.name}</div>
-            ${totals[r.id]>0?`<div class="chk-total" style="color:${r.color}">🔥 ${totals[r.id]}</div>`:''}
-          </div>
-        </div>
-        <div class="chk-dots">${dotHtml}</div>
-      </div>`;
-    } else {
-      // PC: v3 프로그레스바 행
-      h+=`<div class="chk-row" onclick="toggleChk('${r.id}')">
-        <div class="routine-progress" style="width:${pct}%;background:${r.color}"></div>
-        <div class="chk-left">
-          <div class="chk-lb">${r.name}</div>
-          <div class="chk-total" style="color:${totals[r.id]>0?r.color:'transparent'}">${totals[r.id]>0?'🔥'+totals[r.id]:''}</div>
-        </div>
-        <div class="chk-dots">${dotHtml}</div>
-      </div>`;
-    }
+    // 요일 헤더 (첫 항목 앞에 한 번만)
+    const isFirst = ROUTINE_META.indexOf(r) === 0;
+    const wkHdr = isFirst ? `<div class="chk-week-hdr"><div class="chk-week-hdr-spacer"></div><div class="day-labels">${['일','월','화','수','목','금','토'].map(d=>`<span class="day-lbl">${d}</span>`).join('')}</div></div>` : '';
+
+    h += wkHdr + `<div class="chk-row" onclick="toggleChk('${r.id}')">
+      ${bp ? `<div class="chk-blob" style="${blobStyle}"></div>` : ''}
+      ${bp ? `<span class="chk-pct">${pct}%</span>` : ''}
+      <div class="chk-left"><span class="chk-lb">${r.name}</span></div>
+      <div class="chk-dots">${dotHtml}</div>
+    </div>`;
   });
   container.innerHTML=h;
 }
