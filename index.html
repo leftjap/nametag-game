@@ -71,13 +71,13 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .side-scroll{flex:1;overflow-y:auto;padding-bottom:16px}
 .sec{padding:14px 20px}
 .sec-border{border-bottom:1px solid var(--border)}
-.sec-t{font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--tx-m);margin-bottom:8px}
+.sec-t{font-size:12px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--tx-m);margin-bottom:8px}
 
 /* PC 어구록 — v3 스타일 */
 .quote-section{padding:16px 20px}
 .q-card{cursor:pointer;transition:.2s;padding:14px 20px;border-left:none;background:none;box-shadow:none;border-radius:0;display:block}
 .q-card:hover{opacity:.8}
-.q-text{font-family:'Noto Serif KR',serif;font-size:12.5px;font-weight:400;line-height:1.75;color:var(--tx);word-break:keep-all}
+.q-text{font-family:'Noto Serif KR',serif;font-size:14px;font-weight:400;line-height:1.75;color:var(--tx);word-break:keep-all}
 .q-by{font-size:10.5px;color:var(--tx-m);margin-top:5px;font-weight:400}
 .quote-mark{display:none}
 .quote-label{display:none}
@@ -85,7 +85,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 /* PC 글쓰기 메뉴 — v3 */
 .side-nav{padding:0;border-bottom:1px solid var(--border)}
 .writing-grid{display:flex;flex-direction:column;padding:14px 20px}
-.side-menu{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--r);cursor:pointer;transition:.12s;font-size:13px;font-family:'Pretendard',sans-serif;color:var(--tx-d);background:none;border:none;width:100%;text-align:left;font-weight:400;margin-bottom:0;position:relative}
+.side-menu{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--r);cursor:pointer;transition:.12s;font-size:14px;font-family:'Pretendard',sans-serif;color:var(--tx-d);background:none;border:none;width:100%;text-align:left;font-weight:400;margin-bottom:0;position:relative}
 .side-menu:hover{background:rgba(0,0,0,.03)}
 .side-menu.on{background:var(--bg-white);color:var(--tx);font-weight:500}
 .side-menu-l{font-weight:inherit}
@@ -127,8 +127,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .stat-col{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:0 12px}
 .stat-col+.stat-col{border-left:1px solid var(--border-l)}
 .stat-label{font-size:10px;font-weight:500;color:var(--tx-m);margin-bottom:6px}
-.stat-big{font-size:24px;font-weight:400;font-family:'JetBrains Mono',monospace;color:var(--tx);line-height:1.1;letter-spacing:-2px}
+.stat-big{font-size:22px;font-weight:400;font-family:'JetBrains Mono',monospace;color:var(--tx);line-height:1.1;letter-spacing:-1px}
 .stat-sub{font-size:11px;color:var(--tx-hint);margin-top:4px}
+.stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
 .st-sub{display:none}
 .st-bar{display:none}
 .more-btn{display:none}
@@ -308,8 +309,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .stat-col{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:0 12px}
   .stat-col+.stat-col{border-left:1px solid var(--border-l)}
   .stat-label{font-size:11px;color:var(--tx-m);font-weight:500;margin-bottom:6px}
-  .stat-big{font-size:26px;font-weight:400;color:var(--tx);line-height:1.1;letter-spacing:-.5px;font-family:'JetBrains Mono',monospace}
+  .stat-big{font-size:22px;font-weight:400;color:var(--tx);line-height:1.1;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
   .stat-sub{font-size:11px;color:var(--tx-hint);margin-top:4px}
+.stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
 
   /* ── 2단: 리스트 — 데이원 정밀 매칭 ── */
   .col-header{height:56px;min-height:56px}
@@ -964,7 +966,7 @@ function updateBookStats(){
     if(d.startsWith(tm)) pM+=p;
     if(d.startsWith(ty)) pY+=p;
   });
-  if(document.getElementById('bToday')) document.getElementById('bToday').textContent=pT+'p';
+  if(document.getElementById('bToday')) document.getElementById('bToday').innerHTML=pT+'<span class='unit'>p</span>';
   if(document.getElementById('bMonth')) document.getElementById('bMonth').textContent=pM+'p';
   if(document.getElementById('bYear')) document.getElementById('bYear').textContent=pY+'p';
   if(document.getElementById('bBar')) document.getElementById('bBar').style.width=Math.min(100,(pT/50)*100)+'%';
@@ -1090,7 +1092,7 @@ function updateWritingStats(){
     if(dt.startsWith(tm)) tM+=c;
     if(dt.startsWith(ty)) tY+=c;
   });
-  if(document.getElementById('wToday')) document.getElementById('wToday').textContent=(tT/200).toFixed(1)+'매';
+  if(document.getElementById('wToday')) document.getElementById('wToday').innerHTML=(tT/200).toFixed(1)+'<span class='unit'>매</span>';
   if(document.getElementById('wMonth')) document.getElementById('wMonth').textContent=(tM/200).toFixed(1)+'매';
   if(document.getElementById('wYear')) document.getElementById('wYear').textContent=(tY/200).toFixed(1)+'매';
   if(document.getElementById('wBar')) document.getElementById('wBar').style.width=Math.min(100,(tT/200)/10*100)+'%';
