@@ -54,11 +54,11 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
    PC LAYOUT — v3 프로토타입 기반
    ═══════════════════════════════════════ */
 .app{display:flex;height:100vh}
-.col-header{height:48px;min-height:48px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px}
+.col-header{height:60px;min-height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px}
 
 /* Sidebar */
 .side{width:var(--side-w);min-width:var(--side-w);background:var(--bg-side);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:30}
-.side-hdr{display:flex;align-items:center;padding:14px 20px 12px;border-bottom:1px solid var(--border);gap:12px}
+.side-hdr{display:flex;align-items:center;padding:0 20px;height:60px;min-height:60px;border-bottom:1px solid var(--border);gap:12px}
 .brand-wrap{display:flex;align-items:center;gap:12px}
 .brand{display:none}
 .cat-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#e8ddd0,#d0c4b4);box-shadow:0 2px 8px rgba(0,0,0,.08);flex-shrink:0}
@@ -137,7 +137,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 
 /* ═══ List Panel (PC) — v3 ═══ */
 .list-panel{width:var(--list-w);min-width:340px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative}
-.lp-head{height:48px;min-height:48px;background:var(--bg);font-size:13px;font-weight:500;color:var(--tx-d);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--border)}
+.lp-head{height:60px;min-height:60px;background:var(--bg);font-size:13px;font-weight:500;color:var(--tx-d);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--border)}
 .lp-list{flex:1;overflow-y:auto;padding-bottom:60px}
 .lp-month-hdr{font-size:11px;font-weight:600;color:var(--tx-m);padding:12px 20px 5px;position:sticky;top:0;background:var(--bg);z-index:5;letter-spacing:.3px}
 
@@ -171,10 +171,10 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 
 /* ═══ Editor (PC) — v3 ═══ */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden;position:relative}
-.ed-topbar{height:48px;min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-white)}
+.ed-topbar{height:60px;min-height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-white);position:relative}
 .ed-topbar-left{display:flex;align-items:center;gap:12px}
 .ed-save-status{font-size:12px;color:var(--tx-m);font-family:'JetBrains Mono',monospace}
-.ed-header-date{font-size:12px;color:var(--tx-m);font-weight:400;position:static;transform:none}
+.ed-header-date{font-size:12px;color:var(--tx-m);font-weight:400;position:absolute;left:50%;transform:translateX(-50%)}
 .ed-topbar-right{display:flex;gap:8px;align-items:center}
 .ed-top-btn{padding:5px 12px;font-size:12px;font-weight:500;color:white;background:var(--ac);border:none;border-radius:var(--r);cursor:pointer;transition:.15s}
 .ed-top-btn:hover{opacity:.85}
