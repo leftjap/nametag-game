@@ -140,18 +140,19 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .lp-list{flex:1;overflow-y:auto;padding-bottom:60px}
 .lp-month-hdr{font-size:11px;font-weight:600;color:var(--tx-m);padding:12px 20px 5px;position:sticky;top:0;background:var(--bg);z-index:5;letter-spacing:.3px}
 
-.lp-item{display:flex;padding:12px 16px;gap:12px;cursor:pointer;border-bottom:1px solid var(--border-l);position:relative;transition:.1s;align-items:flex-start}
+.lp-item{display:flex;padding:12px 16px;gap:12px;cursor:pointer;border-bottom:1px solid var(--border-l);border-left:3px solid transparent;position:relative;transition:.1s;align-items:flex-start}
 .lp-item:hover{background:rgba(0,0,0,.015)}
-.lp-item.on{background:var(--bg-white);box-shadow:inset 3px 0 0 var(--ac)}
-.lp-date-wrap{text-align:center;min-width:26px;padding-top:1px}
-.lp-date-dow{font-size:9px;color:var(--tx-hint);font-weight:500;text-transform:uppercase}
-.lp-date-day{font-size:16px;font-weight:600;color:var(--tx-hint);line-height:1.1;margin-top:1px;font-family:'JetBrains Mono',monospace}
+.lp-item.on{background:#ede8e0;border-left:3px solid var(--ac)}
+.lp-date-wrap{text-align:center;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.lp-date-dow{font-size:11px;color:var(--tx-hint);font-weight:500;margin-bottom:1px}
+.lp-date-day{font-size:18px;font-weight:700;color:var(--tx-d);line-height:1;margin-top:1px}
 .lp-item.on .lp-date-day{color:var(--tx-m)}
 .lp-text-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.lp-item-title{font-size:13.5px;font-weight:600;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;padding-right:40px}
+.lp-item-title{font-size:14.5px;font-weight:600;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;padding-right:40px}
 .lp-item.on .lp-item-title{color:var(--tx)}
-.lp-item-preview{font-size:12px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;font-weight:400}
+.lp-item-preview{font-size:13.5px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;font-weight:400}
 .lp-item-time{font-size:10px;color:var(--tx-hint);margin-top:2px;font-weight:400}
+.lp-thumb{width:60px;min-width:60px;height:60px;object-fit:cover;border-radius:6px;margin:10px 0 10px 0;flex-shrink:0;align-self:center}
 .quote-txt{font-size:12px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 
 .lp-item-actions{position:absolute;top:10px;right:12px;display:flex;gap:1px;opacity:0;transition:opacity .15s}
@@ -310,13 +311,13 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   /* ── 2단: 리스트 — 데이원 정밀 매칭 ── */
   .col-header{height:56px;min-height:56px}
   .lp-head{background:var(--bg);border-bottom:1px solid var(--border-l);height:56px;min-height:56px}
-  .lp-head span{font-size:17px;font-weight:700;color:var(--yellow)}
+  .lp-head span{font-size:17px;font-weight:400;color:var(--tx)}
   .lp-list{padding-bottom:120px;overflow-x:hidden}
   .lp-month-hdr{font-size:13px;font-weight:800;color:var(--tx);padding:14px 16px 8px;background:var(--bg);letter-spacing:0;border-bottom:1px solid var(--border-l)}
 
   .lp-item{padding:12px 16px;gap:14px;border-bottom:1px solid var(--border-l);align-items:flex-start;overflow:visible;position:relative;transition:transform .2s ease}
   .lp-item:active{background:rgba(0,0,0,.02)}
-  .lp-item.on{box-shadow:none;background:var(--bg)}
+  .lp-item.on{background:#ede8e0;border-left:3px solid var(--ac)}
   .lp-item-actions{display:none !important}
 
   /* 스와이프 액션 패널 — 아이템 오른쪽 바깥에 고정 위치 */
@@ -328,15 +329,15 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .swipe-action span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px}
 
   /* 데이원 매칭: 날짜 */
-  .lp-date-wrap{min-width:32px;text-align:center;padding-top:2px}
-  .lp-date-dow{font-size:11px;color:#999;font-weight:600;letter-spacing:0}
-  .lp-date-day{font-size:26px;font-weight:700;color:#555;line-height:1;font-family:-apple-system,'Pretendard',sans-serif;letter-spacing:-1px;margin-top:2px}
+  .lp-date-wrap{min-width:44px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .lp-date-dow{font-size:11px;color:var(--tx-hint);font-weight:500;margin-bottom:1px}
+  .lp-date-day{font-size:18px;font-weight:700;color:var(--tx-d);line-height:1;letter-spacing:-0.5px;margin-top:2px}
 
   /* 데이원 매칭: 콘텐츠 */
   .lp-text-wrap{gap:3px}
-  .lp-item-title{font-size:17px;font-weight:700;color:var(--tx);line-height:1.35;padding-right:0;letter-spacing:-.3px}
-  .lp-item-preview{font-size:14px;color:#777;line-height:1.5;font-weight:400;-webkit-line-clamp:2}
-  .lp-item-time{font-size:12px;color:#aaa;margin-top:4px;font-weight:400}
+  .lp-item-title{font-size:14.5px;font-weight:700;color:var(--tx);line-height:1.35;padding-right:0}
+  .lp-item-preview{font-size:13.5px;color:var(--tx-m);line-height:1.5;font-weight:400;-webkit-line-clamp:2}
+  .lp-item-time{font-size:11px;color:var(--tx-hint);margin-top:3px;font-weight:400}
   .quote-txt{font-size:15px;font-weight:500}
 
   .fab-btn{display:flex;align-items:center;justify-content:center;position:fixed;bottom:32px;right:24px;width:60px;height:60px;border-radius:50%;background:var(--yellow);color:white;border:none;box-shadow:0 6px 20px rgba(251,191,36,.4);cursor:pointer;z-index:90;transition:transform .1s}
@@ -344,7 +345,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .fab-btn:active{transform:scale(.9)}
 
   /* ── 3단: 에디터 ── */
-  .ed-topbar{padding:0 16px;background:var(--yellow);border-bottom:none;height:56px;min-height:56px}
+  .ed-topbar{padding-top:calc(env(safe-area-inset-top) + 10px);padding-bottom:10px;padding-left:16px;padding-right:16px;background:var(--yellow);border-bottom:none;height:auto;min-height:calc(env(safe-area-inset-top) + 56px);align-items:center}
   .ed-header-date{font-size:15px;font-weight:700;color:white}
   .ed-top-btn.pc-only{display:none}
   .ed-save-status{display:none}
@@ -1181,7 +1182,15 @@ function renderListPanel(){
     return (b.pinned===true) - (a.pinned===true) || new Date(d2) - new Date(d1);
   });
 
+  // 썸네일 추출 함수
+  function getThumb(content) {
+    if(!content) return '';
+    const m = content.match(/<img[^>]+src=["'](data:image[^"']+|https?:[^"']+)["'][^>]*>/i);
+    return m ? m[1] : '';
+  }
+
   let currentMonthStr = '';
+  let lastDateKey = ''; // 날짜 중복 생략용
   let html = '';
 
   items.forEach(item => {
@@ -1190,42 +1199,50 @@ function renderListPanel(){
     if (mStr !== currentMonthStr) {
       html += `<div class="lp-month-hdr">${mStr}</div>`;
       currentMonthStr = mStr;
+      lastDateKey = ''; // 월 바뀌면 날짜 리셋
     }
 
     const day = dt.getDate();
     const dow = weekdays[dt.getDay()];
     const time = formatTimeOnly(item.created || item.date);
-    
+    const dateKey = `${dt.getFullYear()}-${dt.getMonth()}-${day}`;
+    const hiddenDate = (dateKey === lastDateKey) ? 'style="visibility:hidden"' : '';
+    lastDateKey = dateKey;
+
+    const dateBlock = `<div class="lp-date-wrap" ${hiddenDate}><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>`;
+    const swipePin = (fn) => `<div class="swipe-action pin-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>`;
+    const swipeDel = (fn) => `<div class="swipe-action del-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>`;
+
     let isCur = false;
     let clickFn = '';
-    
+
     if(textTypes.includes(t)) {
       isCur = curIds[t]===item.id;
       clickFn = `loadDoc('${t}','${item.id}'); setMobileView('editor');`;
       const preview = stripHtml(item.content).slice(0,80) || '';
+      const thumb = getThumb(item.content);
+      const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
+        ${dateBlock}
         <div class="lp-text-wrap">
           <div class="lp-item-title">${item.title||'제목 없음'}</div>
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
           <div class="lp-item-time">${time}</div>
         </div>
+        ${thumbHtml}
         <div class="lp-item-actions">
           <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
           <button class="lp-action-btn del" onclick="delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
-        <div class="swipe-actions">
-          <div class="swipe-action pin-action" onclick="event.stopPropagation();togglePin('${t}','${item.id}',event)"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>
-          <div class="swipe-action del-action" onclick="event.stopPropagation();delDoc('${t}','${item.id}',event)"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>
-        </div>
+        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div>
       </div>`;
     } else if(t==='book') {
       isCur = curBookId===item.id;
       clickFn = `loadBook('${item.id}'); setMobileView('editor');`;
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
+        ${dateBlock}
         <div class="lp-text-wrap">
           <div class="lp-item-title">${item.title}</div>
           <div class="lp-item-preview">${item.author||''} ${item.publisher?' · '+item.publisher:''}</div>
@@ -1234,17 +1251,14 @@ function renderListPanel(){
           <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
           <button class="lp-action-btn del" onclick="delBook('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
-        <div class="swipe-actions">
-          <div class="swipe-action pin-action" onclick="event.stopPropagation();togglePin('${t}','${item.id}',event)"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>
-          <div class="swipe-action del-action" onclick="event.stopPropagation();delBook('${item.id}',event)"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>
-        </div>
+        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div>
       </div>`;
     } else if(t==='quote') {
       isCur = curQuoteId===item.id;
       clickFn = `loadQuote('${item.id}'); setMobileView('editor');`;
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
+        ${dateBlock}
         <div class="lp-text-wrap">
           <div class="quote-txt">${item.text}</div>
           ${item.by ? `<div class="lp-item-time" style="margin-top:4px;">${item.by}</div>` : ''}
@@ -1253,31 +1267,28 @@ function renderListPanel(){
           <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
           <button class="lp-action-btn del" onclick="delQuote('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
-        <div class="swipe-actions">
-          <div class="swipe-action pin-action" onclick="event.stopPropagation();togglePin('${t}','${item.id}',event)"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>
-          <div class="swipe-action del-action" onclick="event.stopPropagation();delQuote('${item.id}',event)"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>
-        </div>
+        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div>
       </div>`;
     } else if(t==='memo') {
       isCur = curMemoId===item.id;
       clickFn = `loadMemo('${item.id}'); setMobileView('editor');`;
       const preview = stripHtml(item.content).slice(0,80) || '';
+      const thumb = getThumb(item.content);
+      const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        <div class="lp-date-wrap"><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>
+        ${dateBlock}
         <div class="lp-text-wrap">
           <div class="lp-item-title">${item.title||'제목 없음'}</div>
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
           <div class="lp-item-time">${time}</div>
         </div>
+        ${thumbHtml}
         <div class="lp-item-actions">
           <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
           <button class="lp-action-btn del" onclick="delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
-        <div class="swipe-actions">
-          <div class="swipe-action pin-action" onclick="event.stopPropagation();togglePin('${t}','${item.id}',event)"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>
-          <div class="swipe-action del-action" onclick="event.stopPropagation();delMemo('${item.id}',event)"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>
-        </div>
+        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div>
       </div>`;
     }
   });
