@@ -227,6 +227,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .mobile-nav-btn{display:none}
 .mobile-back-btn{display:none}
 
+
 /* ═══════════════════════════════════════
    MOBILE (≤768px)
    ═══════════════════════════════════════ */
@@ -1481,23 +1482,22 @@ function setupSwipeActions(){
 const GAS_URL='https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec';
 const SYNC = {
   dbTimer: null, timer: null, checksTimer: null, isDbLoaded: false,
-  savingDocs: {}, dirtyDocs: {}, quoteSyncHistory: {}, // PATCH #6
+  savingDocs: {}, dirtyDocs: {}, quoteSyncHistory: {},
 
-  setSyncStatus(text, type) { 
-    const el = document.getElementById('syncStatus'); 
-    const dot = document.getElementById('syncDot'); 
-    if(el) { el.textContent = text; } 
-    if(dot) { 
-        dot.style.background = type === 'error' ? 'var(--red)' : type === 'syncing' ? 'var(--yellow)' : '#7a9968'; 
-        dot.style.animation = type === 'syncing' ? 'pulse 1s infinite' : 'none'; 
-    } 
+  setSyncStatus(text, type) {
+    const el = document.getElementById('syncStatus');
+    const dot = document.getElementById('syncDot');
+    if(el) { el.textContent = text; }
+    if(dot) {
+        dot.style.background = type === 'error' ? 'var(--red)' : type === 'syncing' ? 'var(--yellow)' : '#7a9968';
+        dot.style.animation = type === 'syncing' ? 'pulse 1s infinite' : 'none';
+    }
   },
-  
+
   async _post(data) {
     data.token = APP_TOKEN;
     data.idToken = localStorage.getItem('gb_id_token');
-    
-    // 미리보기 테스트용: 토큰이 없으면 무한 새로고침을 막기 위해 로컬 모드로 간주
+
     if (!data.idToken) {
       throw new Error('LocalMode');
     }
@@ -1507,9 +1507,7 @@ const SYNC = {
       const json = await res.json();
       if (json.status === 'error') {
         if (json.message === 'Unauthorized') {
-          // 미리보기 오류 방지를 위해 임시 주석 처리 (실제 배포 시에는 해제하셔도 됩니다)
-          // alert('구글 로그인 세션이 만료되었습니다.\n새로고침하여 다시 로그인합니다.');
-          // localStorage.removeItem('gb_auth'); localStorage.removeItem('gb_id_token'); location.reload(); 
+          // localStorage.removeItem('gb_auth'); localStorage.removeItem('gb_id_token'); location.reload();
           throw new Error('Unauthorized');
         } else { throw new Error(json.message); }
       }
@@ -1533,19 +1531,27 @@ const SYNC = {
         this.isDbLoaded = true;
         this.setSyncStatus('동기화 완료', 'ok');
       } else {
-        this.isDbLoaded = true; 
+        this.isDbLoaded = true;
         this.setSyncStatus('신규 상태', 'ok');
       }
-    } catch(e) { this.setSyncStatus('불러오기 실패', 'error'); }
+    } catch(e) {
+        if(e.message === 'LocalMode') this.setSyncStatus('로컬 전용', 'error');
+        else this.setSyncStatus('불러오기 실패', 'error');
+    }
   },
 
   async saveDatabase() {
     if (!this.isDbLoaded) return;
     const dbData = { [K.docs]: L(K.docs) || [], [K.books]: L(K.books) || [], [K.memos]: L(K.memos) || [], [K.quotes]: L(K.quotes) || [], [K.checks]: L(K.checks) || {} };
-    try { await this._post({ action: 'save_db', dbData: dbData }); } catch(e) { console.error('DB 저장 실패', e); }
+    await this._post({ action: 'save_db', dbData: dbData });
   },
 
-  scheduleDatabaseSave() { clearTimeout(this.dbTimer); this.dbTimer = setTimeout(() => this.saveDatabase(), 3000); },
+  scheduleDatabaseSave() {
+    clearTimeout(this.dbTimer);
+    this.dbTimer = setTimeout(async () => {
+       try { await this.saveDatabase(); } catch(e) {}
+    }, 3000);
+  },
 
   async uploadImage(base64, filename, mimeType) {
     if(!GAS_URL) throw new Error("No GAS URL");
@@ -1553,7 +1559,11 @@ const SYNC = {
     try {
       const res = await this._post({ action: 'upload_image', bytes: base64, filename: filename, mimeType: mimeType });
       this.setSyncStatus('저장 완료', 'ok'); return res;
-    } catch(e) { this.setSyncStatus('업로드 실패', 'error'); throw e; }
+    } catch(e) {
+      if(e.message === 'LocalMode') this.setSyncStatus('로컬 전용', 'error');
+      else this.setSyncStatus('업로드 실패', 'error');
+      throw e;
+    }
   },
 
   async saveDocToGDrive(id, type) {
@@ -1565,7 +1575,6 @@ const SYNC = {
     const doc = items.find(d => d.id === id);
     if (!doc || !stripHtml(doc.content).trim()) { this.savingDocs[id] = false; return; }
 
-    this.setSyncStatus('동기화 중', 'syncing');
     try {
       const res = await this._post({ action: 'save_doc', id: doc.id, driveId: doc.driveId || null, type: type, title: doc.title || today(), content: stripHtml(doc.content) });
       if (res && res.driveId) {
@@ -1576,32 +1585,95 @@ const SYNC = {
           if (type === 'memo') saveMemos(freshItems); else saveDocs(freshItems);
         }
       }
-      this.setSyncStatus('저장 완료', 'ok'); setTimeout(() => this.setSyncStatus('완료됨', 'ok'), 2000);
-    } catch(e) { this.setSyncStatus('저장 실패', 'error');
-    } finally { this.savingDocs[id] = false; if (this.dirtyDocs[id]) { const nextType = this.dirtyDocs[id]; delete this.dirtyDocs[id]; this.saveDocToGDrive(id, nextType); } }
+    } finally {
+      this.savingDocs[id] = false;
+      if (this.dirtyDocs[id]) {
+        const nextType = this.dirtyDocs[id];
+        delete this.dirtyDocs[id];
+        this.saveDocToGDrive(id, nextType).catch(()=>{});
+      }
+    }
   },
 
-  scheduleChecksSave(){ clearTimeout(this.checksTimer); this.checksTimer=setTimeout(()=>{ this.saveChecksToSheet(); this.scheduleDatabaseSave(); },400) },
-  async saveChecksToSheet(dateStr, checkData){if(!GAS_URL || !this.isDbLoaded)return;const dStr=dateStr||today();const dData=checkData||getChk();const p={action:'save_routine',date:dStr,checks:dData};const pk=JSON.stringify(p);if(this.checksSaving){this.checksPending=true;return}if(pk===this.lastChecksPayload)return;this.checksSaving=true;try{await this._post(p);this.lastChecksPayload=pk}catch(e){console.error(e)}finally{this.checksSaving=false;if(this.checksPending){this.checksPending=false;this.scheduleChecksSave()}}},
-  
-  scheduleBookSave(book) { clearTimeout(this.bookTimer); this.bookTimer = setTimeout(() => { this.saveBooksToSheet(book); this.scheduleDatabaseSave(); }, 5000); },
-  scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(() => { if (!this.quoteSyncHistory[id]) { this.saveQuotesToSheet(text, by); this.quoteSyncHistory[id] = true; } this.scheduleDatabaseSave(); }, 5000); },
-  async saveQuotesToSheet(text,by){if(!GAS_URL || !this.isDbLoaded)return;try{await this._post({action:'save_quote',text:text||'',by:by||''})}catch(e){console.error(e)}},
-  
+  scheduleChecksSave(){
+      clearTimeout(this.checksTimer);
+      this.checksTimer=setTimeout(async ()=>{
+          try { await this.saveChecksToSheet(); } catch(e){}
+          this.scheduleDatabaseSave();
+      },400)
+  },
+
+  async saveChecksToSheet(dateStr, checkData){
+      if(!GAS_URL || !this.isDbLoaded)return;
+      const dStr=dateStr||today();
+      const dData=checkData||getChk();
+      const p={action:'save_routine',date:dStr,checks:dData};
+      const pk=JSON.stringify(p);
+      if(this.checksSaving){this.checksPending=true;return}
+      if(pk===this.lastChecksPayload)return;
+
+      this.checksSaving=true;
+      try{
+          await this._post(p);
+          this.lastChecksPayload=pk;
+      }finally{
+          this.checksSaving=false;
+          if(this.checksPending){
+              this.checksPending=false;
+              try { await this.saveChecksToSheet(); } catch(e){}
+          }
+      }
+  },
+
+  scheduleBookSave(book) { clearTimeout(this.bookTimer); this.bookTimer = setTimeout(async () => { try{await this.saveBooksToSheet(book);}catch(e){} this.scheduleDatabaseSave(); }, 5000); },
+  scheduleQuoteSave(text, by, id) { clearTimeout(this.quoteTimer); this.quoteTimer = setTimeout(async () => { if (!this.quoteSyncHistory[id]) { try{await this.saveQuotesToSheet(text, by);}catch(e){} this.quoteSyncHistory[id] = true; } this.scheduleDatabaseSave(); }, 5000); },
+
+  async saveQuotesToSheet(text,by){
+      if(!GAS_URL || !this.isDbLoaded)return;
+      await this._post({action:'save_quote',text:text||'',by:by||''});
+  },
+
   async saveBooksToSheet(book) {
     if(!GAS_URL || !book || !this.isDbLoaded) return;
-    try {
-      const res = await this._post({ action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title, content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'') });
-      if (res && res.driveId) {
-        const books = getBooks(); const idx = books.findIndex(b => b.id === book.id);
-        if (idx !== -1 && books[idx].driveId !== res.driveId) { books[idx].driveId = res.driveId; saveBooks(books); }
-      }
-    } catch(e) { console.error(e); }
+    const res = await this._post({ action:'save_doc', id: book.id, driveId: book.driveId, type:'book', title:book.title, content:'저자: '+(book.author||'')+'\n출판사: '+(book.publisher||'')+'\n읽은 양: '+(book.pages||0)+'p\n\n'+stripHtml(book.memo||'') });
+    if (res && res.driveId) {
+      const books = getBooks(); const idx = books.findIndex(b => b.id === book.id);
+      if (idx !== -1 && books[idx].driveId !== res.driveId) { books[idx].driveId = res.driveId; saveBooks(books); }
+    }
   },
 
-  scheduleDocSave(type){ clearTimeout(this.timer); this.timer = setTimeout(() => { let id = (type === 'memo') ? curMemoId : curIds[type]; if(id) this.saveDocToGDrive(id, type); this.scheduleDatabaseSave(); }, 5000); },
+  scheduleDocSave(type){
+      clearTimeout(this.timer);
+      this.timer = setTimeout(async () => {
+          let id = (type === 'memo') ? curMemoId : curIds[type];
+          if(id) { try { await this.saveDocToGDrive(id, type); } catch(e){} }
+          this.scheduleDatabaseSave();
+      }, 5000);
+  },
 
-  syncAll(){ if(!this.isDbLoaded) return; clearTimeout(this.timer); this.setSyncStatus('동기화 중', 'syncing'); for(const type of textTypes){ if(curIds[type]) this.saveDocToGDrive(curIds[type], type); } if(curMemoId) this.saveDocToGDrive(curMemoId, 'memo'); this.saveDatabase(); }
+  async syncAll() {
+    if(!this.isDbLoaded) return;
+    clearTimeout(this.timer);
+    this.setSyncStatus('동기화 중', 'syncing');
+
+    try {
+      const promises = [];
+      for(const type of textTypes){
+        if(curIds[type]) promises.push(this.saveDocToGDrive(curIds[type], type));
+      }
+      if(curMemoId) promises.push(this.saveDocToGDrive(curMemoId, 'memo'));
+      promises.push(this.saveDatabase());
+
+      await Promise.all(promises);
+      this.setSyncStatus('완료됨', 'ok');
+    } catch (e) {
+      if(e.message === 'LocalMode') {
+        this.setSyncStatus('로컬 전용', 'error');
+      } else {
+        this.setSyncStatus('통신 지연', 'error');
+      }
+    }
+  }
 };
 
 // ═══ Auto-save ═══
