@@ -230,7 +230,6 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .mobile-nav-btn{display:none}
 .mobile-back-btn{display:none}
 
-
 /* ═══════════════════════════════════════
    MOBILE (≤768px)
    ═══════════════════════════════════════ */
@@ -1119,7 +1118,6 @@ function switchTab(t){
 }
 
 // ═══ List Panel (PC & Mobile 데이원 스타일 반응형) ═══
-// PATCH #2: renderListPanel - swipe actions 추가
 function renderListPanel(){
   renderWritingGrid();
   const t=activeTab, el=document.getElementById('lpList');
@@ -1278,7 +1276,46 @@ function setupEnterKey() {
   });
 }
 
-// ═══ Image Paste Handler ═══
+// ═══ Copy & Paste Handlers ═══
+
+// PATCH: 복사 이벤트 가로채기 (카카오톡 붙여넣기 시 줄바꿈 누락 버그 방지)
+function setupCopyHandler() {
+  document.addEventListener('copy', function(e) {
+    const activeEl = document.activeElement;
+    if (activeEl && activeEl.isContentEditable) {
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0 && !selection.isCollapsed) {
+        e.preventDefault();
+        
+        const range = selection.getRangeAt(0);
+        const tempDiv = document.createElement('div');
+        tempDiv.appendChild(range.cloneContents());
+        
+        // 1. HTML 형식 추출 및 보정
+        // 빈 블록 태그(<div><br></div> 등)를 강제로 <br><br>로 치환하여 카카오톡이 빈 줄을 인식하도록 유도
+        let htmlData = tempDiv.innerHTML;
+        htmlData = htmlData.replace(/<(div|p)[^>]*>\s*(<br\s*\/?>)?\s*<\/\1>/gi, '<br><br>');
+        
+        // 2. 순수 텍스트(Plain Text) 추출
+        // innerText를 활용해 브라우저 렌더링 엔진이 인식하는 실제 시각적 줄바꿈을 추출
+        document.body.appendChild(tempDiv);
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.whiteSpace = 'pre-wrap';
+        let plainText = tempDiv.innerText;
+        document.body.removeChild(tempDiv);
+        
+        // 브라우저 엣지 케이스 방어
+        if (!plainText) plainText = selection.toString();
+        
+        // 클립보드에 데이터 덮어쓰기
+        e.clipboardData.setData('text/plain', plainText);
+        e.clipboardData.setData('text/html', htmlData);
+      }
+    }
+  });
+}
+
 async function handlePaste(e) {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   let hasImage = false;
@@ -1322,7 +1359,7 @@ async function handlePaste(e) {
     }
   }
   if(!hasImage) {
-    // 텍스트 붙여넣기: 서식 제거하고 plain text로 삽입하되, 줄바꿈(\n)을 <br>로 일괄 변환하여 간격 보존
+    // 텍스트 붙여넣기 시 기존의 일괄 치환 방식을 유지하되 줄바꿈 통일성 유지
     e.preventDefault();
     const text = (e.clipboardData || e.originalEvent.clipboardData).getData('text/plain');
     if(text) {
@@ -1426,7 +1463,6 @@ function setupGesturesAndUI() {
   }, { passive: true });
 }
 
-// PATCH #3: 스와이프 액션
 function setupSwipeActions(){
   const listEl=document.getElementById('lpList');
   if(!listEl)return;
@@ -1514,7 +1550,6 @@ const SYNC = {
       const json = await res.json();
       if (json.status === 'error') {
         if (json.message === 'Unauthorized') {
-          // localStorage.removeItem('gb_auth'); localStorage.removeItem('gb_id_token'); location.reload();
           throw new Error('Unauthorized');
         } else { throw new Error(json.message); }
       }
@@ -1714,6 +1749,10 @@ function init(){
     }
 
     renderChk();updateBookStats();updateWritingStats();showRandomQuote();setupAutoSave();setupEnterKey();setupSwipeActions();
+    
+    // 복사(Copy) 핸들러 등록
+    setupCopyHandler();
+    
     document.getElementById('edBody').addEventListener('paste', handlePaste); document.getElementById('memo-body').addEventListener('paste', handlePaste);
     setupEditorImageSelection();
     setupGesturesAndUI();
