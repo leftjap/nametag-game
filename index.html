@@ -32,9 +32,6 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow:hidden}
 
-/* 팝업 메뉴 열릴 때 본문 커서 숨김 처리 (오버랩 방지) */
-body.hide-caret .ed-body, body.hide-caret .sf-input { caret-color: transparent !important; }
-
 /* ═══ LOGIN & LOADING ═══ */
 #lockScreen,#loadingScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .3s}
 #lockScreen.hidden,#loadingScreen.hidden{display:none;opacity:0;pointer-events:none}
@@ -229,11 +226,6 @@ body.hide-caret .ed-body, body.hide-caret .sf-input { caret-color: transparent !
 /* PC 모바일 전용 숨김 */
 .mobile-nav-btn{display:none}
 .mobile-back-btn{display:none}
-.mob-tool-bar{display:none}
-.fs-popup{display:none}
-.fs-overlay{display:none}
-.fs-sheet{display:none}
-
 
 /* ═══════════════════════════════════════
    MOBILE (≤768px)
@@ -380,85 +372,6 @@ body.hide-caret .ed-body, body.hide-caret .sf-input { caret-color: transparent !
 
   /* 모바일 하단 글자수 */
   .ed-foot{padding:12px 20px;font-size:13px;gap:20px;background:var(--bg-white);border-top:1px solid var(--border)}
-
-  /* ✨ 모바일 하단 편집 툴바 — Aa만 (터치 하이라이트 완전히 제거) */
-  .mob-tool-bar{
-    display:flex;
-    position:fixed;left:0;right:0;z-index:80;
-    flex-direction:row;align-items:center;justify-content:flex-end;
-    padding:6px 16px 6px;
-    background:var(--bg-card);
-    border-top:1px solid var(--border-l);
-    box-sizing:border-box;
-    -webkit-tap-highlight-color: transparent;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.15s;
-  }
-  .mob-tool-bar.visible{opacity: 1; pointer-events: auto;}
-  .mob-fmt-btn{
-    width:36px;height:32px;
-    border:none;background:none;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .mob-fmt-btn.aa-btn{
-    font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;
-    color:var(--tx);
-  }
-
-  /* 편집 팝업 — Aa 툴바 바로 위 (강제 오버라이딩 적용 및 렌더링 분리) */
-  .fs-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s; -webkit-tap-highlight-color: transparent;}
-  .fs-overlay.on{opacity:1 !important;pointer-events:auto !important}
-
-  .fs-popup{
-    position:fixed;left:0;right:0;
-    background:var(--bg-card);
-    border-radius:14px 14px 0 0;
-    box-shadow:0 -4px 20px rgba(0,0,0,.1);
-    z-index:101;
-    display:none;
-    flex-direction:column;
-    max-height:55vh;
-    -webkit-tap-highlight-color: transparent;
-    transform: translateZ(1px); /* 커서 겹침 방지를 위한 레이어 강제 분리 */
-  }
-  .fs-popup.on{display:flex !important}
-  .fs-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 4px;flex-shrink:0}
-
-  /* 기본: 최근 5개 위 / 더 보기 아래 고정 */
-  .fs-default{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
-  .fs-default-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
-
-  /* 확장: 접기 위 고정 / 전체 목록 아래 스크롤 */
-  .fs-expanded{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
-  .fs-expanded.on{display:flex}
-  .fs-expanded-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
-
-  /* 더 보기 / 접기 버튼 공통 */
-  .fs-toggle-btn{
-    display:flex;align-items:center;
-    padding:12px 20px;
-    border:none;background:none;width:100%;cursor:pointer;
-    flex-shrink:0;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .fs-more-btn{border-top:1px solid var(--border-l)}
-  .fs-fold-btn{border-bottom:1px solid var(--border-l)}
-  .fs-toggle-arrow{font-size:11px;color:var(--ac);font-weight:700;margin-right:10px}
-  .fs-toggle-label{font-size:14px;font-weight:500;color:var(--tx-m)}
-
-  /* 행 (클릭 시 배경색 어두워지는 효과 제거) */
-  .fs-row{display:flex;align-items:center;padding:14px 20px;border:none;background:none;width:100%;cursor:pointer;-webkit-tap-highlight-color: transparent;}
-  .fs-name{flex:1;text-align:left;font-size:16px;font-weight:400;color:var(--tx)}
-  .fs-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .fs-icon svg{width:20px;height:20px;stroke:var(--tx-d);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .fs-icon-txt{font-size:15px;font-weight:700;color:var(--tx-d);font-family:-apple-system,sans-serif;line-height:1}
-  .fs-sep{height:1px;background:var(--border-l);margin:0 20px}
-  .fs-last-pad{height:8px}
-  .fs-row.active .fs-name{color:var(--ac)}
-  .fs-row.active .fs-icon svg{stroke:var(--ac)}
-  .fs-row.active .fs-icon-txt{color:var(--ac)}
 }
 </style>
 </head>
@@ -622,35 +535,6 @@ body.hide-caret .ed-body, body.hide-caret .sf-input { caret-color: transparent !
         <input class="ed-title" id="memo-title" placeholder="메모 제목">
         <div class="ed-body" id="memo-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
-    </div>
-  </div>
-  
-  <!-- 터치 피드백 깜빡임 완벽 제거 및 정확한 클릭 이벤트를 위해 pointerdown 사용 (포커스 유지) -->
-  <div class="mob-tool-bar" id="mobToolbar">
-    <button class="mob-fmt-btn aa-btn" id="aaBtn" onpointerdown="event.preventDefault()" onclick="toggleFormatMenu()">Aa</button>
-  </div>
-
-  <div id="formatSheetOverlay" class="fs-overlay" onclick="closeFormatMenu()"></div>
-  <div id="formatPopup" class="fs-popup">
-    <div class="fs-handle"></div>
-
-    <!-- 기본: 최근 5개 + 더 보기(맨 아래) -->
-    <div class="fs-default" id="fmtDefault">
-      <div class="fs-default-list" id="fmtRecentList"></div>
-      <!-- 더 보기/접기 버튼 작동을 위해 pointerdown으로 포커스 손실을 막고 onclick 실행 -->
-      <button class="fs-toggle-btn fs-more-btn" onpointerdown="event.preventDefault()" onclick="fmtExpand()">
-        <span class="fs-toggle-arrow">▶</span>
-        <span class="fs-toggle-label">더 보기</span>
-      </button>
-    </div>
-
-    <!-- 확장: 접기(맨 위) + 전체 목록 -->
-    <div class="fs-expanded" id="fmtExpanded">
-      <button class="fs-toggle-btn fs-fold-btn" onpointerdown="event.preventDefault()" onclick="fmtCollapse()">
-        <span class="fs-toggle-arrow">▼</span>
-        <span class="fs-toggle-label">접기</span>
-      </button>
-      <div class="fs-expanded-list" id="fmtFullList"></div>
     </div>
   </div>
 
@@ -1378,124 +1262,6 @@ function insertChecklist(){
   document.execCommand('insertHTML', false, '<ul style="list-style:none;padding-left:0;"><li><input type="checkbox" style="margin-right:8px;transform:scale(1.2);"> </li></ul>');
 }
 
-// 모바일 바텀시트
-let isFormatMenuOpen = false;
-// ═══ 편집 팝업 ═══
-const FMT_ITEMS = [
-  { cmd:'bold',       name:'굵게',       toggle:true,  exec:()=>execCmd('bold') },
-  { cmd:'italic',     name:'기울임',     toggle:true,  exec:()=>execCmd('italic') },
-  { cmd:'strike',     name:'취소선',     toggle:true,  exec:()=>execCmd('strikeThrough') },
-  { cmd:'h1',         name:'제목',       toggle:false, exec:()=>execCmd('formatBlock','h1') },
-  { cmd:'h2',         name:'부제목',     toggle:false, exec:()=>execCmd('formatBlock','h2') },
-  { cmd:'h3',         name:'소제목',     toggle:false, exec:()=>execCmd('formatBlock','h3') },
-  { cmd:'blockquote', name:'인용',       toggle:false, exec:()=>execCmd('formatBlock','blockquote') },
-  { cmd:'hr',         name:'구분선',     toggle:false, exec:()=>execCmd('insertHorizontalRule') },
-  { cmd:'ul',         name:'목록',       toggle:false, exec:()=>execCmd('insertUnorderedList') },
-  { cmd:'ol',         name:'순서 목록',  toggle:false, exec:()=>execCmd('insertOrderedList') },
-  { cmd:'checklist',  name:'체크리스트', toggle:false, exec:()=>insertChecklist() },
-];
-const FMT_ICONS = {
-  bold:       '<span class="fs-icon-txt"><b>B</b></span>',
-  italic:     '<span class="fs-icon-txt"><i>I</i></span>',
-  strike:     '<span class="fs-icon-txt"><s>S</s></span>',
-  h1:         '<span class="fs-icon-txt">H1</span>',
-  h2:         '<span class="fs-icon-txt" style="font-size:13px">H2</span>',
-  h3:         '<span class="fs-icon-txt" style="font-size:11px">H3</span>',
-  blockquote: '<svg viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3M14 17h3l2-4V7h-6v6h3"/></svg>',
-  hr:         '<svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/></svg>',
-  ul:         '<svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>',
-  ol:         '<svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="9" font-size="7" stroke="none" fill="currentColor" font-weight="600">1</text><text x="2" y="15" font-size="7" stroke="none" fill="currentColor" font-weight="600">2</text><text x="2" y="21" font-size="7" stroke="none" fill="currentColor" font-weight="600">3</text></svg>',
-  checklist:  '<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
-};
-const FMT_RECENT_KEY = 'fmt_recent';
-
-function fmtGetRecent() {
-  try { return JSON.parse(localStorage.getItem(FMT_RECENT_KEY)) || FMT_ITEMS.slice(0,5).map(i=>i.cmd); }
-  catch { return FMT_ITEMS.slice(0,5).map(i=>i.cmd); }
-}
-function fmtSaveRecent(cmd) {
-  let r = fmtGetRecent().filter(c=>c!==cmd);
-  r.unshift(cmd);
-  if(r.length>5) r=r.slice(0,5);
-  localStorage.setItem(FMT_RECENT_KEY, JSON.stringify(r));
-}
-function fmtMakeRows(container, items) {
-  container.innerHTML='';
-  items.forEach((item,idx) => {
-    const btn = document.createElement('button');
-    btn.className='fs-row';
-    btn.dataset.cmd=item.cmd;
-    btn.innerHTML=`<span class="fs-name">${item.name}</span><span class="fs-icon">${FMT_ICONS[item.cmd]}</span>`;
-    
-    // onpointerdown을 통해 터치 포커스 손실을 막고(preventDefault), 클릭 이벤트로 실행
-    btn.addEventListener('pointerdown', e=>e.preventDefault());
-    btn.addEventListener('click', ()=>{
-      fmtSaveRecent(item.cmd);
-      item.exec();
-      if(item.toggle){ btn.classList.toggle('active'); }
-      else { closeFormatMenu(); }
-    });
-    container.appendChild(btn);
-    if(idx<items.length-1){ const sep=document.createElement('div'); sep.className='fs-sep'; container.appendChild(sep); }
-  });
-  const pad=document.createElement('div'); pad.className='fs-last-pad'; container.appendChild(pad);
-}
-
-function toggleFormatMenu(){
-  if(isFormatMenuOpen) closeFormatMenu();
-  else openFormatMenu();
-}
-
-function openFormatMenu(){
-  const popup=document.getElementById('formatPopup');
-  const overlay=document.getElementById('formatSheetOverlay');
-  
-  // 팝업 열릴 때 캐럿(커서) 투명하게 변경
-  document.body.classList.add('hide-caret');
-  
-  const vv = window.visualViewport;
-  const mobToolbar = document.getElementById('mobToolbar');
-  
-  if(vv && mobToolbar) {
-    const offsetTop = vv.offsetTop;
-    const keyboardHeight = window.innerHeight - vv.height;
-    // 툴바 바로 위쪽(키보드 바로 위)으로 팝업 위치 세팅
-    popup.style.bottom = Math.max(0, keyboardHeight - offsetTop + mobToolbar.offsetHeight) + 'px';
-  } else {
-    popup.style.bottom = '44px';
-  }
-  
-  document.getElementById('fmtDefault').style.display='flex';
-  document.getElementById('fmtExpanded').classList.remove('on');
-  
-  const recent=fmtGetRecent();
-  const recentItems=FMT_ITEMS.filter(i=>recent.includes(i.cmd)).sort((a,b)=>recent.indexOf(a.cmd)-recent.indexOf(b.cmd));
-  fmtMakeRows(document.getElementById('fmtRecentList'), recentItems);
-  
-  popup.classList.add('on');
-  overlay.classList.add('on');
-  isFormatMenuOpen=true;
-}
-
-function closeFormatMenu(){
-  // 캐럿 다시 보이게 복구
-  document.body.classList.remove('hide-caret');
-  document.getElementById('formatPopup').classList.remove('on');
-  document.getElementById('formatSheetOverlay').classList.remove('on');
-  isFormatMenuOpen=false;
-}
-
-function fmtExpand(){
-  fmtMakeRows(document.getElementById('fmtFullList'), FMT_ITEMS);
-  document.getElementById('fmtDefault').style.display='none';
-  document.getElementById('fmtExpanded').classList.add('on');
-}
-function fmtCollapse(){
-  document.getElementById('fmtExpanded').classList.remove('on');
-  document.getElementById('fmtDefault').style.display='flex';
-}
-function toggleExtraFormats(){} // 호환성 유지
-
 function setupEnterKey() {
   document.querySelectorAll('.ed-title, .sf-input').forEach(input => {
     input.addEventListener('keydown', e => {
@@ -1593,69 +1359,7 @@ function handleDone() {
 // ═══ Mobile Gestures & UI ═══
 function setupGesturesAndUI() {
   const app = document.getElementById('mainApp');
-  const mobToolbar = document.getElementById('mobToolbar');
-  const editableIds = ['edBody', 'memo-body', 'quote-body', 'book-body', 'edTitle', 'memo-title', 'book-title', 'quote-by'];
   
-  // 키보드 활성화 시 편집 툴바 제어 - 모바일 키보드 완벽 동기화 로직
-  const adjustToolbar=()=>{
-    if(window.innerWidth>768)return;
-    const vv = window.visualViewport;
-    if(!vv) return;
-
-    if(!app.classList.contains('view-editor')){
-      mobToolbar.style.display = 'none';
-      return;
-    }
-    
-    const isFocused = document.activeElement && editableIds.includes(document.activeElement.id);
-    
-    // 키보드가 띄워졌거나(포커스), 메뉴가 열려있을 때 툴바 표시
-    if(isFocused || isFormatMenuOpen){
-      mobToolbar.style.display = 'flex';
-      // 투명도 등 트랜지션을 위해 클래스 추가
-      setTimeout(() => mobToolbar.classList.add('visible'), 10); 
-      
-      const offsetTop = vv.offsetTop;
-      const keyboardHeight = window.innerHeight - vv.height;
-      
-      // 화면 하단( bottom )을 키보드 높이만큼 밀어올리고 스크롤 오프셋을 뺌
-      // 이 방식이 iOS에서 스크롤 시 화면이 떨리는 것을 최소화함
-      mobToolbar.style.bottom = Math.max(0, keyboardHeight - offsetTop) + 'px';
-
-      // 팝업이 열려있다면 툴바와 같이 위치 조정
-      if(isFormatMenuOpen){
-        const popup = document.getElementById('formatPopup');
-        popup.style.bottom = Math.max(0, keyboardHeight - offsetTop + mobToolbar.offsetHeight) + 'px';
-      }
-    } else {
-      mobToolbar.classList.remove('visible');
-      setTimeout(() => { if(!mobToolbar.classList.contains('visible')) mobToolbar.style.display = 'none'; }, 150);
-    }
-  };
-
-  editableIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('focus', () => setTimeout(adjustToolbar, 50));
-      el.addEventListener('blur', () => setTimeout(adjustToolbar, 50));
-    }
-  });
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => requestAnimationFrame(adjustToolbar));
-    window.visualViewport.addEventListener('scroll', () => requestAnimationFrame(adjustToolbar));
-  }
-
-  // 뷰 전환 시 툴바 상태 관리
-  const viewObs=new MutationObserver(()=>{
-    if(!app.classList.contains('view-editor')) {
-      mobToolbar.classList.remove('visible');
-      mobToolbar.style.display = 'none';
-      if(isFormatMenuOpen) closeFormatMenu();
-    }
-  });
-  viewObs.observe(app,{attributes:true,attributeFilter:['class']});
-
   // 당겨서 닫기 & 좌측 스와이프 제스처
   let startX = 0, startY = 0;
   let isPulling = false;
