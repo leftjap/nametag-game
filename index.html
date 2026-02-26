@@ -211,6 +211,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .ed-body ul,.ed-body ol{padding-left:20px;margin:10px 0}
 .ed-body img{max-width:100%;height:auto;display:block;margin:1.5em auto;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);border:1px solid var(--border)}
 
+/* 에디터 내부 문단 기본 여백 제거 (복붙 및 엔터 간격 일관성 유지) */
+.ed-body p, .ed-body div { margin: 0; padding: 0; }
+
 /* PC 하단 글자수 */
 .ed-foot{padding:12px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:24px;font-size:12px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;font-weight:400;background:var(--bg);z-index:10}
 .ed-foot span{color:var(--tx-d);font-weight:500}
@@ -1319,10 +1322,14 @@ async function handlePaste(e) {
     }
   }
   if(!hasImage) {
-    // 텍스트 붙여넣기: 서식 제거하고 plain text로 삽입
+    // 텍스트 붙여넣기: 서식 제거하고 plain text로 삽입하되, 줄바꿈(\n)을 <br>로 일괄 변환하여 간격 보존
     e.preventDefault();
     const text = (e.clipboardData || e.originalEvent.clipboardData).getData('text/plain');
-    if(text) document.execCommand('insertText', false, text);
+    if(text) {
+      const escapedText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const htmlText = escapedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
+      document.execCommand('insertHTML', false, htmlText);
+    }
     setTimeout(() => { if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo(); updateWC(); }, 100);
   }
 }
