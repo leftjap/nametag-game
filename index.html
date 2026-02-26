@@ -14,9 +14,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 /* ═══════════════════════════════════════
-   PATCH v2 — 전체 <style> 내용 교체용
-   PC: v3 프로토타입 기반
-   Mobile: 데이원 정밀 매칭 + 루틴 프로토타입
+   기본 테마 및 레이아웃 설정
    ═══════════════════════════════════════ */
 
 :root{
@@ -85,7 +83,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 }
 
 /* ═══════════════════════════════════════
-   PC LAYOUT — v3 프로토타입 기반
+   PC LAYOUT 
    ═══════════════════════════════════════ */
 .app{display:flex;height:100vh}
 .col-header{height:60px;min-height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px}
@@ -111,7 +109,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .sec-border{border-bottom:1px solid var(--border)}
 .sec-t{font-size:12px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--tx-m);margin-bottom:8px}
 
-/* PC 어구록 — v3 스타일 */
+/* PC 어구록 */
 .quote-section{padding:16px 20px}
 .q-card{cursor:pointer;transition:.2s;padding:14px 20px;border-left:none;background:none;box-shadow:none;border-radius:0;display:block}
 .q-card:hover{opacity:.8}
@@ -120,7 +118,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .quote-mark{display:none}
 .quote-label{display:none}
 
-/* PC 글쓰기 메뉴 — v3 */
+/* PC 글쓰기 메뉴 */
 .side-nav{padding:0;border-bottom:1px solid var(--border)}
 .writing-grid{display:flex;flex-direction:column;padding:14px 20px}
 .side-menu{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:var(--r);cursor:pointer;transition:.12s;font-size:14px;font-family:'Pretendard',sans-serif;color:var(--tx-d);background:none;border:none;width:100%;text-align:left;font-weight:400;margin-bottom:0;position:relative}
@@ -132,7 +130,12 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .wi-arrow{display:none}
 .side-menu::before{display:none}
 
-/* PC 루틴 — blob 원형 게이지 */
+/* 태그 클라우드 */
+.tag-cloud { display:flex; flex-wrap:wrap; gap:6px; padding: 2px 4px; }
+.tag-pill { font-size:11px; color:var(--tx-d); background:var(--bg-white); border:1px solid var(--border); padding:5px 10px; border-radius:14px; cursor:pointer; transition:.15s; font-family:'Pretendard', sans-serif; font-weight:500;}
+.tag-pill:hover { border-color:var(--ac-light); color:var(--ac-d); background:#fdf8f4; }
+
+/* PC 루틴 */
 .chk-table{display:flex;flex-direction:column;gap:4px}
 .chk-week-hdr{display:flex;margin-bottom:3px}
 .chk-week-hdr-spacer{width:100px;flex-shrink:0}
@@ -142,12 +145,8 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .chk-row:hover{border-color:var(--border)}
 .chk-blob{position:absolute;border-radius:50%;pointer-events:none;opacity:.22}
 .chk-pct{position:absolute;top:6px;left:9px;font-size:7px;font-weight:700;font-family:'JetBrains Mono',monospace;color:rgba(0,0,0,.25);z-index:2}
-.routine-progress{display:none}
-.routine-box{display:none}
 .chk-left{width:100px;flex-shrink:0;z-index:1;padding:0 4px 0 11px;display:flex;align-items:center}
 .chk-lb{font-size:12px;font-weight:400;color:var(--tx);white-space:nowrap}
-.chk-total{display:none}
-.chk-info{display:none}
 .chk-dots{display:flex;flex:1;z-index:1;align-items:center;justify-content:space-around;padding-right:6px}
 .chk-dot{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer}
 .chk-dot::before{content:'';display:block;width:4px;height:4px;border-radius:50%;border:1px solid #bbb}
@@ -157,10 +156,8 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .chk-dot.today.done::before{display:none}
 .chk-dot.today.done::after{color:var(--ac)}
 
-/* PC 기록 — 2분할 구분선 */
+/* PC 기록 */
 .st-card{background:none;border-radius:0;padding:0;box-shadow:none;border:none;margin-bottom:0}
-.st-row{display:block;font-size:10px;font-weight:500;color:var(--tx-m);margin-bottom:6px}
-.st-lb{display:block}
 .stats-wrap{display:flex;gap:0}
 .stat-col{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:0 12px}
 .stat-col+.stat-col{border-left:1px solid var(--border-l)}
@@ -168,19 +165,42 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .stat-big{font-size:22px;font-weight:400;font-family:'JetBrains Mono',monospace;color:var(--tx);line-height:1.1;letter-spacing:-1px}
 .stat-sub{font-size:11px;color:var(--tx-hint);margin-top:4px}
 .stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
-.st-sub{display:none}
-.st-bar{display:none}
-.more-btn{display:none}
-.book-mini{display:none}
 
 /* PC 사이드바 토글 버튼 */
 .pc-sidebar-toggle{display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:6px;color:var(--tx-m);border-radius:6px;transition:0.15s;margin-right:6px}
 .pc-sidebar-toggle:hover{background:rgba(0,0,0,0.05);color:var(--tx)}
 .pc-sidebar-toggle svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
-/* ═══ List Panel (PC) — v3 ═══ */
+/* ═══ List Panel (PC) ═══ */
 .list-panel{width:var(--list-w);min-width:340px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative}
 .lp-head{height:60px;min-height:60px;background:var(--bg);font-size:13px;font-weight:500;color:var(--tx-d);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--border)}
+
+/* 변경된 검색창 UI (아이콘 확장 방식) */
+.search-bar { 
+  margin-left:auto; display:flex; align-items:center; background:transparent; border-radius:16px; 
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow:hidden; border:1px solid transparent; 
+}
+.search-bar.active { 
+  background:var(--bg-white); border-color:var(--border); padding-right:8px; box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);
+}
+.search-icon-btn { 
+  width:36px; height:36px; display:flex; align-items:center; justify-content:center; 
+  background:none; border:none; cursor:pointer; color:var(--tx-m); transition:color 0.2s; flex-shrink:0;
+}
+.search-icon-btn:hover { color:var(--tx); }
+.search-bar.active .search-icon-btn { color:var(--ac); }
+.search-bar input { 
+  width:0; border:none; background:transparent; outline:none; font-size:13px; color:var(--tx); 
+  font-family:'Pretendard',sans-serif; transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding:0; 
+}
+.search-bar.active input { width:130px; padding-left:2px; }
+.search-bar input::placeholder { color:var(--tx-hint); }
+#clearSearchBtn { 
+  display:none; background:var(--border); border:none; cursor:pointer; color:var(--tx-d); 
+  font-size:10px; width:16px; height:16px; border-radius:50%; margin-left:4px; 
+  align-items:center; justify-content:center; flex-shrink:0;
+}
+
 .lp-list{flex:1;overflow-y:auto;padding-bottom:60px}
 .lp-month-hdr{font-size:11px;font-weight:600;color:var(--tx-m);padding:0 20px;height:40px;min-height:40px;display:flex;align-items:center;position:sticky;top:0;background:var(--bg);z-index:5;letter-spacing:.3px;border-bottom:1px solid var(--border-l)}
 
@@ -195,6 +215,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .lp-item-title{font-size:14.5px;font-weight:600;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;padding-right:40px}
 .lp-item.on .lp-item-title{color:var(--tx)}
 .lp-item-preview{font-size:13.5px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;font-weight:400}
+.lp-item-tags{font-size:11.5px;color:#8ba57c;margin-top:2px;font-weight:500; letter-spacing: -0.2px;}
 .lp-item-time{font-size:10px;color:var(--tx-hint);margin-top:2px;font-weight:400}
 .lp-thumb{width:60px;min-width:60px;height:60px;object-fit:cover;border-radius:6px;margin:10px 0 10px 0;flex-shrink:0;align-self:center}
 .quote-txt{font-size:12px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -212,7 +233,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .swipe-actions{display:none}
 .fab-btn{display:none}
 
-/* ═══ Editor (PC) — v3 ═══ */
+/* ═══ Editor (PC) ═══ */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden;position:relative}
 .ed-topbar{height:60px;min-height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-white);position:relative}
 .ed-topbar-left{display:flex;align-items:center;gap:12px}
@@ -231,8 +252,16 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 
 .editor-scroll-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center}
 .editor-content-wrap{width:100%;max-width:720px;padding:32px 40px 100px;display:flex;flex-direction:column;flex:1}
-.ed-title{width:100%;background:none;border:none;font-family:'Pretendard',sans-serif;font-size:22px;font-weight:600;color:var(--tx);outline:none;letter-spacing:-.02em;margin-bottom:20px;line-height:1.35}
+
+.ed-title{width:100%;background:none;border:none;font-family:'Pretendard',sans-serif;font-size:24px;font-weight:700;color:var(--tx);outline:none;letter-spacing:-.02em;margin-bottom:6px;line-height:1.35}
 .ed-title::placeholder{color:var(--border-l)}
+
+/* 태그 입력 필드 */
+.ed-tags-wrap { display:flex; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px dashed var(--border-l); gap:8px;}
+.ed-tags-wrap svg { width:16px; height:16px; stroke:#8ba57c; stroke-width:2.5; fill:none; flex-shrink:0; }
+.ed-tags{width:100%;background:none;border:none;outline:none;font-family:'Pretendard',sans-serif;font-size:14px;color:#8ba57c; font-weight:500; line-height:1.2;}
+.ed-tags::placeholder{color:var(--border); font-weight:400;}
+
 .ed-body{width:100%;min-height:100%;outline:none;font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:16px;line-height:2.0;letter-spacing:0;color:var(--tx);flex:1;word-break:keep-all;font-weight:400;font-feature-settings:'kern' 1}
 .ed-body:empty::before{content:attr(data-placeholder);color:var(--border-l)}
 .ed-body blockquote{border-left:3px solid var(--ac-light);padding:6px 14px;margin:12px 0;color:var(--tx-d);font-style:italic;background:var(--bg);border-radius:0 6px 6px 0}
@@ -244,8 +273,6 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .ed-body hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .ed-body ul,.ed-body ol{padding-left:20px;margin:10px 0}
 .ed-body img{max-width:100%;height:auto;display:block;margin:1.5em auto;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);border:1px solid var(--border)}
-
-/* 에디터 내부 문단 기본 여백 제거 (복붙 및 엔터 간격 일관성 유지) */
 .ed-body p, .ed-body div { margin: 0; padding: 0; }
 
 /* PC 하단 글자수 */
@@ -323,7 +350,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .badge-pill{font-size:20px;font-weight:800;color:var(--tx-hint);font-family:'Pretendard',sans-serif}
   .wi-arrow{display:block;position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--tx-hint);opacity:.5}
 
-  /* ── 모바일 루틴 — blob 원형 게이지 ── */
+  /* ── 모바일 루틴 ── */
   .chk-table{gap:4px}
   .chk-week-hdr{display:flex !important;margin-bottom:3px}
   .chk-week-hdr-spacer{width:90px;flex-shrink:0}
@@ -332,8 +359,6 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .chk-row{background:var(--bg-card);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);height:48px;padding:0;border:none;gap:0;position:relative}
   .chk-blob{position:absolute;border-radius:50%;pointer-events:none;opacity:.25}
   .chk-pct{position:absolute;top:5px;left:8px;font-size:7px;font-weight:700;color:rgba(0,0,0,.25);z-index:2}
-  .routine-progress{display:none}
-  .routine-box{display:none !important}
   .chk-left{width:90px;flex-shrink:0;z-index:1;padding:0 4px 0 10px;display:flex;align-items:center;min-width:unset;gap:0}
   .chk-info{display:none}
   .chk-lb{font-size:12px;font-weight:400;color:var(--tx);width:auto;min-width:auto;white-space:nowrap}
@@ -357,10 +382,10 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .stat-sub{font-size:11px;color:var(--tx-hint);margin-top:4px}
   .stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
 
-  /* ── 2단: 리스트 — 데이원 정밀 매칭 ── */
+  /* ── 2단: 리스트 ── */
   .col-header{height:56px;min-height:56px}
   .lp-head{background:var(--bg);border-bottom:1px solid var(--border-l);height:56px;min-height:56px}
-  .lp-head span{font-size:17px;font-weight:400;color:var(--tx)}
+  .lp-head span#lpHeadTitleText{font-size:17px;font-weight:400;color:var(--tx);display:none;} /* 모바일 검색창 위해 텍스트 숨김 */
   .lp-list{padding-bottom:120px;overflow-x:hidden}
   .lp-month-hdr{font-size:13px;font-weight:800;color:var(--tx);padding:14px 16px 8px;background:var(--bg);letter-spacing:0;border-bottom:1px solid var(--border-l)}
 
@@ -369,7 +394,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .lp-item.on{background:#ede8e0;border-left:3px solid transparent}
   .lp-item-actions{display:none !important}
 
-  /* 스와이프 액션 패널 — 아이템 오른쪽 바깥에 고정 위치 */
+  /* 스와이프 액션 패널 */
   .swipe-actions{display:flex;position:absolute;top:0;left:100%;height:100%;z-index:1}
   .swipe-action{display:flex;align-items:center;justify-content:center;width:80px;height:100%;color:white;font-size:13px;font-weight:700;cursor:pointer}
   .swipe-action.pin-action{background:var(--ac)}
@@ -403,7 +428,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .toolbar{display:none !important}
 
   .editor-content-wrap{padding:20px 20px 200px}
-  .ed-title{font-size:24px;font-weight:700;margin-bottom:14px}
+  .ed-title{font-size:26px;font-weight:700;margin-bottom:8px}
   .ed-body{font-size:16px;line-height:2.0;letter-spacing:0}
   .sf-row{flex-direction:column;gap:12px}
 
@@ -474,13 +499,17 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
       <div id="sideNav" class="writing-grid"></div>
     </div>
 
+    <!-- 사이드바 태그 클라우드 제거됨 -->
+
     <div class="sec sec-border">
       <div class="sec-t">데일리 루틴</div>
       <div class="chk-table" id="chkTable"></div>
     </div>
     
     <div class="sec" style="padding-bottom:40px;">
-      <div class="sec-t">기록</div>
+      <div class="sec-t" style="display:flex; justify-content:space-between; align-items:center;">
+        기록
+      </div>
       <div class="stats-wrap">
         <div class="stat-col">
           <div class="stat-label">오늘 쓴 글</div>
@@ -506,6 +535,15 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
       <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
     <span id="lpHeadTitleText">글 목록</span>
+    
+    <!-- 통합 검색 (아이콘 확장 방식) -->
+    <div class="search-bar" id="searchBar">
+      <button class="search-icon-btn" onclick="toggleSearch()" title="검색">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+      <input type="text" id="searchInput" placeholder="#태그 또는 검색어" oninput="handleSearch(event)">
+      <button id="clearSearchBtn" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    </div>
   </div>
   <div class="lp-list" id="lpList"></div>
   
@@ -550,6 +588,10 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <input class="ed-title" id="edTitle" placeholder="제목">
+        <div class="ed-tags-wrap">
+          <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          <input class="ed-tags" id="edTags" placeholder="태그 추가 (스페이스로 구분, 예: #일기 #아이디어)">
+        </div>
         <div class="ed-body" id="edBody" contenteditable="true" spellcheck="false" translate="no" data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
     </div>
@@ -581,6 +623,10 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
         <input class="ed-title" id="memo-title" placeholder="메모 제목">
+        <div class="ed-tags-wrap">
+          <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          <input class="ed-tags" id="memoTags" placeholder="태그 추가 (스페이스로 구분, 예: #회의 #자료)">
+        </div>
         <div class="ed-body" id="memo-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
     </div>
@@ -612,25 +658,8 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  // 캔버스 미리보기 테스트를 위해 임시로 로그인을 건너뛰고 앱을 바로 실행합니다.
   document.getElementById('lockScreen').classList.add('hidden');
   showApp();
-
-  /* 실제 운영 시에는 아래의 원래 코드를 사용하세요.
-  if (localStorage.getItem('gb_auth') === '1' && localStorage.getItem('gb_id_token')) {
-    showApp();
-  } else {
-    document.getElementById('lockScreen').classList.remove('hidden');
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse
-    });
-    google.accounts.id.renderButton(
-      document.getElementById("googleSignInBtn"),
-      { theme: "outline", size: "large", type: "standard", shape: "pill", text: "continue_with" }
-    );
-  }
-  */
 };
 
 async function showApp(){
@@ -639,6 +668,9 @@ async function showApp(){
 
   SYNC.setSyncStatus('동기화 중', 'syncing');
   await SYNC.loadDatabase();
+  
+  injectMockData(); // 시안 확인용 더미 데이터 주입
+  
   init();
 
   loading.style.opacity = '0';
@@ -655,6 +687,26 @@ const APP_TOKEN='nametag2026';
 const K={docs:'gb_docs',checks:'gb_chk',books:'gb_books',quotes:'gb_quotes',memos:'gb_memos'};
 const L=k=>{try{return JSON.parse(localStorage.getItem(k))||null}catch{return null}};
 const S=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+// 검색 및 태그 시안용 더미 데이터 생성 함수
+function injectMockData() {
+    if(L(K.docs) && L(K.docs).length > 0) return; // 기존 데이터가 있으면 덮어쓰지 않음
+    
+    const docs = [
+        { id: 'm1', type: 'blog', title: '바이브 코딩 체험기', tags: '#AI #개발 #에세이', content: '바이브 코딩은 처음 해보는데 그야말로 신세계다.<br><br>말로 이렇게 저렇게 구현됐으면 좋겠다고 말하면 AI가 뚝딱 결과물을 내놓는다. 불과 몇 년 전만 하더라도 이런 웹사이트 하나 만들려고 하면 기획자/개발자/디자이너 등 여러 명이 붙어야 했다. 지금은 내가 기획만 하면 나머지는 알아서 처리해 준다.', created: new Date(Date.now() - 86400000).toISOString(), updated: new Date().toISOString(), pinned: false }
+    ];
+    S(K.docs, docs);
+
+    const memos = [
+        { id: 'mem1', title: '제천음악영화제 시청 기록', tags: '#영화 #장항준 #인사이트', content: '영화 &lt;왕의 남자&gt;가 흥행하면서 관련 콘텐츠가 많이 올라온다. 장항준 감독은 지난 제천음악영화제 집행위원장을 맡게 되었는데 개막식 브이로그가 꽤나 인상적이다.<br><br>"영화제 집행위원장은 처음이신데 긴장되진 않으세요?"<br><br>"지금 개막식 2시간 전인데... 하지만 긴장하면 지고 설레면 이긴다 이렇게 생각합니다."', created: new Date().toISOString(), updated: new Date().toISOString(), pinned: true }
+    ];
+    S(K.memos, memos);
+
+    const quotes = [
+        { id: 'q1', text: '긴장하면 지고 설레면 이긴다.', by: '장항준', created: new Date().toISOString(), pinned: false }
+    ];
+    S(K.quotes, quotes);
+}
 
 const getLocalYMD=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const today=()=>getLocalYMD(new Date());
@@ -699,7 +751,7 @@ function fixDriveImageUrls(html) {
   return html.replace(/https:\/\/drive\.google\.com\/uc\?export=view(&amp;|&)id=([a-zA-Z0-9_-]+)/g, 'https://drive.google.com/thumbnail?id=$2&sz=w1000');
 }
 
-// ═══ State & Mobile View ═══
+// ═══ State, Search & Mobile View ═══
 let activeTab='navi';
 const textTypes=['navi','fiction','blog'];
 const TAB_META={navi:'오늘의 네비',fiction:'단편 습작',blog:'블로그',book:'서재',quote:'어구',memo:'메모'};
@@ -708,6 +760,7 @@ let curQuoteId = null;
 let curBookId=null;
 let curMemoId=null;
 let currentLoadedDoc = { type: null, id: null };
+let currentSearchQuery = '';
 
 function toggleSidebar() {
   const app = document.getElementById('mainApp');
@@ -720,6 +773,43 @@ function setMobileView(view) {
   app.classList.remove('view-side', 'view-list', 'view-editor');
   app.classList.add('view-' + view);
   if(view === 'list') renderListPanel();
+}
+
+function toggleSearch() {
+  const bar = document.getElementById('searchBar');
+  const input = document.getElementById('searchInput');
+  bar.classList.toggle('active');
+  if(bar.classList.contains('active')) {
+    input.focus();
+  } else {
+    clearSearch();
+  }
+}
+
+function handleSearch(e) {
+  currentSearchQuery = e.target.value.trim();
+  document.getElementById('clearSearchBtn').style.display = currentSearchQuery ? 'flex' : 'none';
+  renderListPanel();
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  currentSearchQuery = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  document.getElementById('searchBar').classList.remove('active');
+  renderListPanel();
+}
+
+function setTagSearch(tag) {
+  const bar = document.getElementById('searchBar');
+  const input = document.getElementById('searchInput');
+  bar.classList.add('active');
+  input.value = tag;
+  currentSearchQuery = tag;
+  document.getElementById('clearSearchBtn').style.display = 'flex';
+  if(window.innerWidth <= 768) setMobileView('list');
+  renderListPanel();
 }
 
 // ═══ Checks (Routine) ═══
@@ -737,7 +827,6 @@ function getChk(){return(L(K.checks)||{})[today()]||{}}
 function saveChk(id,v){const d=L(K.checks)||{};if(!d[today()])d[today()]={};d[today()][id]=v;S(K.checks,d)}
 function getAllChk(){return L(K.checks)||{}}
 
-// PATCH #1: renderChk — blob 원형 게이지
 function renderChk(){
   const chk=getChk(), all=getAllChk(), week=getWeekDates(), td=today();
   const container=document.getElementById('chkTable');
@@ -845,7 +934,7 @@ function getDocs(type){return allDocs().filter(d=>d.type===type)}
 function saveDocs(docs){S(K.docs,docs)}
 
 function newDoc(type){
-  const doc={id:Date.now().toString(), driveId: null, type,title:'',content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
+  const doc={id:Date.now().toString(), driveId: null, type,title:'', tags:'', content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
   const docs=allDocs();docs.unshift(doc);saveDocs(docs);
   return doc;
 }
@@ -857,6 +946,7 @@ function loadDoc(type, id, force=false){
   curIds[type]=id;
   currentLoadedDoc = { type, id };
   document.getElementById('edTitle').value=doc.title;
+  document.getElementById('edTags').value=doc.tags || '';
   document.getElementById('edBody').innerHTML=fixDriveImageUrls(doc.content);
   document.getElementById('edDate').textContent=formatTopDate(doc.created);
   updateWC();
@@ -866,10 +956,12 @@ function loadDoc(type, id, force=false){
 function saveCurDoc(type){
   if(!curIds[type])return;
   const title=document.getElementById('edTitle').value.trim();
+  const tags=document.getElementById('edTags').value.trim();
   const content=document.getElementById('edBody').innerHTML;
   const docs=allDocs();const idx=docs.findIndex(d=>d.id===curIds[type]);
   if(idx!==-1){
     docs[idx].title=title;
+    docs[idx].tags=tags;
     docs[idx].content=content;
     docs[idx].updated=new Date().toISOString();
     saveDocs(docs);
@@ -1026,14 +1118,15 @@ function getMemos(){return L(K.memos)||[]}
 function saveMemos(m){S(K.memos,m)}
 function saveMemo(){
   const title=document.getElementById('memo-title').value.trim();
+  const tags=document.getElementById('memoTags').value.trim();
   const body=document.getElementById('memo-body').innerHTML;
   if(!title&&!stripHtml(body).trim())return;
   const memos=getMemos();
   if(curMemoId){
     const idx=memos.findIndex(m=>m.id===curMemoId);
-    if(idx!==-1){memos[idx].title=title;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}
+    if(idx!==-1){memos[idx].title=title;memos[idx].tags=tags;memos[idx].content=body;memos[idx].updated=new Date().toISOString()}
   }else{
-    const memo={id:Date.now().toString(), driveId: null, title,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
+    const memo={id:Date.now().toString(), driveId: null, title,tags,content:body,created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
     memos.unshift(memo);curMemoId=memo.id;
   }
   saveMemos(memos);
@@ -1045,6 +1138,7 @@ function loadMemo(id, force=false){
   curMemoId=id;
   currentLoadedDoc = { type: 'memo', id };
   document.getElementById('memo-title').value=m.title||'';
+  document.getElementById('memoTags').value=m.tags||'';
   document.getElementById('memo-body').innerHTML=fixDriveImageUrls(m.content);
   document.getElementById('edDate').textContent=formatTopDate(m.created);
 }
@@ -1052,6 +1146,7 @@ function newMemoForm(){
   curMemoId=null;
   currentLoadedDoc = { type: 'memo', id: null };
   document.getElementById('memo-title').value='';
+  document.getElementById('memoTags').value='';
   document.getElementById('memo-body').innerHTML='';
   document.getElementById('edDate').textContent=formatTopDate(new Date().toISOString());
 }
@@ -1150,6 +1245,9 @@ function switchTab(t){
   
   document.getElementById('lpHeadTitleText').textContent = TAB_META[t] || '목록';
 
+  // 탭 이동 시 검색어 초기화
+  clearSearch(); 
+
   if(textTypes.includes(t)){
     const docs=getDocs(t);
     if(curIds[t]) loadDoc(t,curIds[t], true);
@@ -1173,6 +1271,20 @@ function renderListPanel(){
   else if(t==='book') items = getBooks();
   else if(t==='quote') items = getQuotes();
   else if(t==='memo') items = getMemos();
+
+  // 통합 검색어 필터 적용
+  if(currentSearchQuery) {
+    const q = currentSearchQuery.toLowerCase();
+    items = items.filter(it => {
+        const title = (it.title || '').toLowerCase();
+        const content = (stripHtml(it.content || '')).toLowerCase();
+        const tags = (it.tags || '').toLowerCase();
+        const text = (it.text || '').toLowerCase();
+        const by = (it.by || '').toLowerCase();
+        const author = (it.author || '').toLowerCase();
+        return title.includes(q) || content.includes(q) || tags.includes(q) || text.includes(q) || by.includes(q) || author.includes(q);
+    });
+  }
 
   if(!items.length) { el.innerHTML = emptyState; return; }
 
@@ -1222,11 +1334,13 @@ function renderListPanel(){
       const preview = stripHtml(item.content).slice(0,80) || '';
       const thumb = getThumb(item.content);
       const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
+      const tagHtml = item.tags ? `<div class="lp-item-tags">${item.tags}</div>` : '';
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
         ${dateBlock}
         <div class="lp-text-wrap">
           <div class="lp-item-title">${item.title||'제목 없음'}</div>
+          ${tagHtml}
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
           <div class="lp-item-time">${time}</div>
         </div>
@@ -1275,11 +1389,13 @@ function renderListPanel(){
       const preview = stripHtml(item.content).slice(0,80) || '';
       const thumb = getThumb(item.content);
       const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
+      const tagHtml = item.tags ? `<div class="lp-item-tags">${item.tags}</div>` : '';
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
         ${dateBlock}
         <div class="lp-text-wrap">
           <div class="lp-item-title">${item.title||'제목 없음'}</div>
+          ${tagHtml}
           ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
           <div class="lp-item-time">${time}</div>
         </div>
@@ -1310,20 +1426,27 @@ function insertChecklist(){
 }
 
 function setupEnterKey() {
-  document.querySelectorAll('.ed-title, .sf-input').forEach(input => {
+  document.querySelectorAll('.ed-title, .ed-tags, .sf-input').forEach(input => {
     input.addEventListener('keydown', e => {
       if(e.key === 'Enter') {
         e.preventDefault();
-        const nextTarget = e.target.closest('.editor-content-wrap').querySelector('.ed-body');
-        if(nextTarget) nextTarget.focus();
+        const wrapper = e.target.closest('.editor-content-wrap');
+        
+        // 엔터 시 흐름: 제목 -> 태그 -> 본문
+        if(e.target.classList.contains('ed-title')) {
+            const tagInput = wrapper.querySelector('.ed-tags');
+            if(tagInput) tagInput.focus();
+            else { const body = wrapper.querySelector('.ed-body'); if(body) body.focus(); }
+        } else if (e.target.classList.contains('ed-tags') || e.target.classList.contains('sf-input')) {
+            const body = wrapper.querySelector('.ed-body');
+            if(body) body.focus();
+        }
       }
     });
   });
 }
 
 // ═══ Copy & Paste Handlers ═══
-
-// PATCH: 복사 이벤트 가로채기 (카카오톡 붙여넣기 시 줄바꿈 누락 버그 방지)
 function setupCopyHandler() {
   document.addEventListener('copy', function(e) {
     const activeEl = document.activeElement;
@@ -1334,12 +1457,10 @@ function setupCopyHandler() {
         const tempDiv = document.createElement('div');
         tempDiv.appendChild(range.cloneContents());
         
-        // 복사한 내용에 이미지가 포함되어 있다면 브라우저 기본 복사 동작 허용
         if (tempDiv.querySelector('img')) return;
         
         e.preventDefault();
         
-        // DOM 트리를 직접 순회하여 정확한 텍스트 줄바꿈 계산
         let text = '';
         function traverse(el) {
             if (el.nodeType === Node.TEXT_NODE) {
@@ -1348,23 +1469,18 @@ function setupCopyHandler() {
                 const tag = el.tagName.toLowerCase();
                 const isBlock = ['div', 'p', 'h1', 'h2', 'h3', 'li', 'blockquote', 'ul', 'ol'].includes(tag);
                 
-                // 블록 시작 시 개행 추가
                 if (isBlock && text.length > 0 && !text.endsWith('\n')) text += '\n';
                 if (tag === 'br') text += '\n';
                 
                 for (let child of el.childNodes) traverse(child);
                 
-                // 블록 종료 시 개행 추가
                 if (isBlock && text.length > 0 && !text.endsWith('\n')) text += '\n';
             }
         }
         
         traverse(tempDiv);
-        
-        // 3개 이상의 연속된 개행(엔터)을 실제 보이는 빈 줄 한 칸(\n\n)으로 변환
         text = text.replace(/\n{3,}/g, '\n\n').trim();
         
-        // 클립보드에 정제된 텍스트와 단순화된 HTML 덮어쓰기
         e.clipboardData.setData('text/plain', text);
         e.clipboardData.setData('text/html', text.replace(/\n/g, '<br>'));
       }
@@ -1415,7 +1531,6 @@ async function handlePaste(e) {
     }
   }
   if(!hasImage) {
-    // 텍스트 붙여넣기 시 기존의 일괄 치환 방식을 유지하되 줄바꿈 통일성 유지
     e.preventDefault();
     const text = (e.clipboardData || e.originalEvent.clipboardData).getData('text/plain');
     if(text) {
@@ -1461,7 +1576,6 @@ function handleDone() {
 function setupGesturesAndUI() {
   const app = document.getElementById('mainApp');
   
-  // 당겨서 닫기 & 좌측 스와이프 제스처
   let startX = 0, startY = 0;
   let isPulling = false;
   const editorEl = document.querySelector('.editor');
@@ -1483,10 +1597,9 @@ function setupGesturesAndUI() {
       let dy = e.touches[0].screenY - startY;
       let dx = Math.abs(e.touches[0].screenX - startX);
       
-      // 세로로 당길 때만 작동
       if (dy > 0 && dy > dx) {
         e.preventDefault(); 
-        editorEl.style.transform = `translateX(0) translateY(${dy * 0.8}px)`; // 고무줄 저항
+        editorEl.style.transform = `translateX(0) translateY(${dy * 0.8}px)`; 
         editorEl.style.transition = 'none';
       }
     }
@@ -1497,18 +1610,15 @@ function setupGesturesAndUI() {
     const dx = e.changedTouches[0].screenX - startX;
     const dy = e.changedTouches[0].screenY - startY;
     
-    // 왼쪽에서 오른쪽 스와이프 (뒤로가기)
     if (Math.abs(dx) > Math.abs(dy) * 1.5 && dx > 50 && startX < 40) {
       if (app.classList.contains('view-editor')) handleDone();
       else if (app.classList.contains('view-list')) setMobileView('side');
     }
     
-    // 당겨서 닫기 종료 판정
     if (isPulling) {
       isPulling = false;
       editorEl.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
       
-      // 화면 높이의 약 35% 이상(또는 200px 이상) 당겼으면 닫기
       if (dy > window.innerHeight * 0.35 || dy > 200) {
         handleDone(); 
       } else {
@@ -1529,7 +1639,6 @@ function setupSwipeActions(){
     if(window.innerWidth>768)return;
     const item=e.target.closest('.lp-item');
     if(!item)return;
-    // 이전에 열린 아이템 닫기
     if(currentItem&&currentItem!==item){
       currentItem.style.transform='';
       currentItem.classList.remove('swiped');
@@ -1548,7 +1657,7 @@ function setupSwipeActions(){
     if(!swiping&&Math.abs(mx)>Math.abs(my)&&Math.abs(mx)>10)swiping=true;
     if(!swiping)return;
     e.preventDefault();
-    dx=Math.min(0,mx); // 왼쪽만
+    dx=Math.min(0,mx);
     if(currentItem.classList.contains('swiped'))dx=Math.min(0,mx-160);
     currentItem.style.transform=`translateX(${dx}px)`;
   },{passive:false});
@@ -1566,7 +1675,6 @@ function setupSwipeActions(){
     swiping=false;
   },{passive:true});
 
-  // 리스트 외부 터치 시 닫기
   document.addEventListener('touchstart',e=>{
     if(currentItem&&!e.target.closest('.lp-item')&&!e.target.closest('.swipe-action')){
       currentItem.style.transition='transform .25s ease';
@@ -1791,7 +1899,8 @@ function setupAutoSave(){
 
   const onInput = () => { showSaving(); clearTimeout(_at); _at = setTimeout(doSaveAndSync, 800); updateWC(); };
 
-  const els = ['edBody', 'edTitle', 'memo-body', 'memo-title', 'book-title', 'book-author', 'book-publisher', 'book-pages', 'book-body', 'quote-by', 'quote-body'];
+  // edTags 와 memoTags 도 자동 저장 이벤트에 포함
+  const els = ['edBody', 'edTitle', 'edTags', 'memo-body', 'memo-title', 'memoTags', 'book-title', 'book-author', 'book-publisher', 'book-pages', 'book-body', 'quote-by', 'quote-body'];
   els.forEach(id => { const el = document.getElementById(id); if(el) { el.addEventListener('input', onInput); el.addEventListener('blur', () => { setTimeout(() => { saveLocalOnly(); }, 200); }); } });
 
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { clearTimeout(_at); saveLocalOnly(); SYNC.syncAll(); } });
@@ -1815,6 +1924,8 @@ function init(){
     
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id,true);else{const nd=newDoc('navi');loadDoc('navi',nd.id,true)}
     if(GAS_URL)SYNC.setSyncStatus('완료됨','ok');else SYNC.setSyncStatus('로컬 전용','error');
+    
+    // 사이드바 태그 클라우드가 제거되었으므로 renderTags() 호출은 안전하게 무시됩니다.
     
     renderListPanel();
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
