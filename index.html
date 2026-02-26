@@ -128,45 +128,94 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .stat-sub{font-size:11px;color:var(--tx-hint);margin-top:4px}
 .stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
 
-/* PC 사이드바 토글 버튼 */
-.pc-sidebar-toggle{display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:6px;color:var(--tx-m);border-radius:6px;transition:0.15s;margin-right:6px}
-.pc-sidebar-toggle:hover{background:rgba(0,0,0,0.05);color:var(--tx)}
-.pc-sidebar-toggle svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-
-/* ═══ List Panel (PC) ═══ */
+/* ═══ List Panel (PC & Mobile) ═══ */
 .list-panel{width:var(--list-w);min-width:340px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative}
-.lp-head{height:60px;min-height:60px;background:var(--bg);font-size:13px;font-weight:500;color:var(--tx-d);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--border)}
+
+/* 헤더: 사이드바토글 | [뷰스위처] 중앙 | 검색 */
+.lp-hdr{
+  height:60px;min-height:60px;
+  display:flex;align-items:center;
+  padding:0 8px;gap:0;
+  border-bottom:1px solid var(--border);
+  background:var(--bg);
+}
+.sb-toggle{
+  width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;
+  color:var(--tx-m);border-radius:8px;transition:.12s;flex-shrink:0;
+}
+.sb-toggle:hover{background:rgba(0,0,0,.05);color:var(--tx-d);}
+.sb-toggle svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+.view-switcher{
+  display:flex;align-items:center;
+  background:rgba(0,0,0,.07);border-radius:9px;
+  padding:3px;gap:1px;margin:0 auto;
+}
+.vs-btn{
+  width:38px;height:30px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:7px;border:none;background:transparent;
+  cursor:pointer;color:var(--tx-m);transition:.15s;
+}
+.vs-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.vs-btn.on{background:var(--bg-white);color:var(--tx-d);box-shadow:0 1px 4px rgba(0,0,0,.12);}
 
 /* 변경된 검색창 UI (아이콘 확장 방식) */
 .search-bar { margin-left:auto; display:flex; align-items:center; background:transparent; border-radius:16px; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow:hidden; border:1px solid transparent; }
 .search-bar.active { background:var(--bg-white); border-color:var(--border); padding-right:8px; box-shadow:inset 0 1px 2px rgba(0,0,0,0.02); }
-.search-icon-btn { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; color:var(--tx-m); transition:color 0.2s; flex-shrink:0; }
-.search-icon-btn:hover { color:var(--tx); }
-.search-bar.active .search-icon-btn { color:var(--ac); }
+.search-icon-btn { width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; color:var(--tx-m); border-radius:8px; transition:all 0.2s; flex-shrink:0; }
+.search-icon-btn:hover { background:rgba(0,0,0,.05); color:var(--tx-d); }
+.search-bar.active .search-icon-btn { color:var(--ac); background:transparent; }
 .search-bar input { width:0; border:none; background:transparent; outline:none; font-size:13px; color:var(--tx); font-family:'Pretendard',sans-serif; transition:width 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding:0; }
 .search-bar.active input { width:130px; padding-left:2px; }
 .search-bar input::placeholder { color:var(--tx-hint); }
 #clearSearchBtn { display:none; background:var(--border); border:none; cursor:pointer; color:var(--tx-d); font-size:10px; width:16px; height:16px; border-radius:50%; margin-left:4px; align-items:center; justify-content:center; flex-shrink:0; }
 
-.lp-list{flex:1;overflow-y:auto;padding-bottom:60px}
-.lp-month-hdr{font-size:11px;font-weight:600;color:var(--tx-m);padding:0 20px;height:40px;min-height:40px;display:flex;align-items:center;position:sticky;top:0;background:var(--bg);z-index:5;letter-spacing:.3px;border-bottom:1px solid var(--border-l)}
+/* 뷰 컨테이너 */
+.view-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:60px;}
+.view-photo{flex:1;overflow-y:auto;display:none;padding-bottom:60px;}
+.view-calendar{flex:1;overflow-y:auto;display:none;padding-bottom:60px;}
 
-.lp-item{display:flex;padding:12px 16px;gap:12px;cursor:pointer;border-bottom:1px solid var(--border-l);border-left:3px solid transparent;position:relative;transition:.1s;align-items:flex-start}
-.lp-item:hover{background:rgba(0,0,0,.015)}
-.lp-item.on{background:#ede8e0;border-left:3px solid transparent}
-.lp-date-wrap{text-align:center;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.lp-date-dow{font-size:11px;color:var(--tx-hint);font-weight:500;margin-bottom:1px}
-.lp-date-day{font-size:18px;font-weight:700;color:var(--tx-d);line-height:1;margin-top:1px}
-.lp-item.on .lp-date-day{color:var(--tx-m)}
-.lp-text-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.lp-item-title{font-size:14.5px;font-weight:600;color:var(--tx-d);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;padding-right:40px}
-.lp-item.on .lp-item-title{color:var(--tx)}
-.lp-item-preview{font-size:13.5px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;font-weight:400}
-.lp-item-tags{font-size:11.5px;color:#8ba57c;margin-top:2px;font-weight:500; letter-spacing: -0.2px;}
-.lp-item-time{font-size:10px;color:var(--tx-hint);margin-top:2px;font-weight:400}
-.lp-thumb{width:60px;min-width:60px;height:60px;object-fit:cover;border-radius:6px;margin:10px 0 10px 0;flex-shrink:0;align-self:center}
-.quote-txt{font-size:12px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* 목록 뷰 (v2 시안) */
+.lp-pin-hdr{
+  font-size:10.5px;font-weight:600;color:var(--tx-hint);
+  padding:0 14px;height:34px;min-height:34px;
+  display:flex;align-items:center;gap:5px;
+  position:sticky;top:0;background:var(--bg);z-index:5;
+  border-bottom:1px solid var(--border-l);letter-spacing:.3px;
+}
+.lp-month-hdr{
+  font-size:10.5px;font-weight:600;color:var(--tx-m);
+  padding:0 14px;height:34px;min-height:34px;
+  display:flex;align-items:center;
+  position:sticky;top:0;background:var(--bg);z-index:5;
+  border-bottom:1px solid var(--border-l);
+}
+.lp-item{
+  display:flex;padding:11px 14px;gap:11px;
+  cursor:pointer;border-bottom:1px solid var(--border-l);
+  border-left:3px solid transparent;transition:.1s;align-items:flex-start;position:relative;
+}
+.lp-item:hover{background:rgba(0,0,0,.015);}
+.lp-item.on{background:rgba(176,137,104,.1);}
+.lp-date-wrap{text-align:center;min-width:40px;display:flex;flex-direction:column;align-items:center;}
+.lp-dow{font-size:10px;color:var(--tx-hint);font-weight:500;}
+.lp-day{font-size:18px;font-weight:700;color:var(--tx-d);line-height:1.1;}
+.lp-text-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.lp-item-title{font-size:13.5px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lp-item-tags{font-size:11px;color:#8ba57c;font-weight:600;letter-spacing:-.2px;}
+.lp-item-preview{font-size:12.5px;color:var(--tx-m);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;}
+.lp-item-meta{font-size:10px;color:var(--tx-hint);margin-top:2px;}
+.lp-thumb{
+  width:52px;min-width:52px;height:52px;border-radius:6px;
+  align-self:center;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.quote-txt{font-size:12.5px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
+/* 리스트 아이템 액션 */
 .lp-item-actions{position:absolute;top:10px;right:12px;display:flex;gap:1px;opacity:0;transition:opacity .15s}
 .lp-item:hover .lp-item-actions{opacity:1}
 .lp-action-btn{width:24px;height:24px;border-radius:4px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx-hint);transition:.12s;padding:0}
@@ -176,9 +225,98 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .lp-action-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .lp-action-btn.pin.on svg{fill:currentColor}
 
-/* PC 환경에서 스와이프 액션 숨김 */
+/* PC 환경 스와이프 숨김 */
 .swipe-actions{display:none}
 .fab-btn{display:none}
+
+/* ══ 사진 뷰 (v2 시안) ══ */
+.photo-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px;
+  background:#ccc;
+}
+.photo-cell{
+  position:relative;
+  aspect-ratio:1;
+  overflow:hidden;
+  cursor:pointer;
+}
+.photo-cell-bg{
+  position:absolute;inset:0;
+  background-size:cover;
+  background-position:center;
+  transition:transform .3s ease;
+}
+.photo-cell:hover .photo-cell-bg{transform:scale(1.05);}
+.photo-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom, transparent 35%, rgba(0,0,0,.15) 65%, rgba(0,0,0,.6) 100%);
+  pointer-events:none;
+}
+.photo-date-block{
+  position:absolute;
+  right:10px;bottom:8px;
+  text-align:right;
+  pointer-events:none;
+  line-height:1;
+}
+.photo-day-num{
+  display:block;
+  font-size:42px;
+  font-weight:200;
+  color:rgba(255,255,255,.97);
+  font-family:'Pretendard',sans-serif;
+  text-shadow:0 2px 8px rgba(0,0,0,.4);
+  letter-spacing:-2px;
+  line-height:1;
+}
+.photo-ym{
+  display:block;
+  font-size:10.5px;
+  color:rgba(255,255,255,.82);
+  font-weight:400;
+  margin-top:2px;
+  text-shadow:0 1px 4px rgba(0,0,0,.4);
+  letter-spacing:.2px;
+}
+
+/* ══ 캘린더 뷰 (v2 시안) ══ */
+.cal-wrap{padding:0 0 40px;}
+.cal-month-title{
+  font-size:17px;font-weight:700;color:var(--tx);
+  padding:18px 14px 8px;
+}
+.cal-dow-row{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  padding:0 8px 4px;
+}
+.cal-dow{
+  font-size:10px;color:var(--tx-hint);text-align:center;
+  height:22px;display:flex;align-items:center;justify-content:center;font-weight:500;
+}
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:3px;padding:0 8px 14px;
+}
+.cal-day{
+  aspect-ratio:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:8px;cursor:pointer;
+  font-size:13px;color:var(--tx-d);font-weight:400;
+  transition:.1s;position:relative;overflow:hidden;
+}
+.cal-day:hover:not(.empty){background:rgba(0,0,0,.04);}
+.cal-day.empty{cursor:default;}
+.cal-day.has-entry{background:#42C2E8;color:white;font-weight:600;}
+.cal-day.has-entry:hover{background:#31b1d8;}
+.cal-day.today{border:2px solid #42C2E8;color:#2aa8cc;font-weight:700;}
+.cal-day.today.has-entry{background:#42C2E8;color:white;border-color:#2aa8cc;}
+.cal-photo-bg{position:absolute;inset:0;}
+.cal-day-num{position:relative;z-index:2;font-size:13px;}
+.cal-day.has-photo .cal-day-num{color:white;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+.cal-separator{height:1px;background:var(--border-l);margin:0 14px;}
+
 
 /* ═══ Editor (PC) ═══ */
 .editor{flex:1;display:flex;flex-direction:column;background:var(--bg-white);overflow:hidden;position:relative}
@@ -293,8 +431,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .app.view-editor .list-panel{transform:translateX(0);opacity:1}
 
   .pc-sidebar-toggle{display:none !important}
-  .mobile-nav-btn{display:flex !important;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:8px;color:var(--tx-d)}
-  .mobile-nav-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .mobile-nav-btn{display:flex !important;}
 
   /* ── 1단: 대시보드 ── */
   .side-hdr{padding:16px 20px 12px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border-l);height:auto;min-height:auto}
@@ -368,10 +505,9 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 
   /* ── 2단: 리스트 ── */
   .col-header{height:56px;min-height:56px}
-  .lp-head{background:var(--bg);border-bottom:1px solid var(--border-l);height:56px;min-height:56px}
-  .lp-head span#lpHeadTitleText{font-size:17px;font-weight:400;color:var(--tx);display:none;} /* 모바일 검색창 위해 텍스트 숨김 */
-  .lp-list{padding-bottom:120px;overflow-x:hidden}
-  .lp-month-hdr{font-size:13px;font-weight:800;color:var(--tx);padding:14px 16px 8px;background:var(--bg);letter-spacing:0;border-bottom:1px solid var(--border-l)}
+  .lp-hdr{background:var(--bg);border-bottom:1px solid var(--border-l);height:56px;min-height:56px}
+
+  .lp-month-hdr{font-size:12.5px;font-weight:800;color:var(--tx);padding:14px 16px 8px;background:var(--bg);letter-spacing:0;border-bottom:1px solid var(--border-l)}
 
   .lp-item{padding:12px 16px;gap:14px;border-bottom:1px solid var(--border-l);align-items:flex-start;overflow:visible;position:relative;transition:transform .2s ease}
   .lp-item:active{background:rgba(0,0,0,.02)}
@@ -386,16 +522,11 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .swipe-action svg{width:20px;height:20px;stroke:white;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px}
   .swipe-action span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px}
 
-  /* 데이원 매칭: 날짜 */
-  .lp-date-wrap{min-width:44px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .lp-date-dow{font-size:11px;color:var(--tx-hint);font-weight:500;margin-bottom:1px}
-  .lp-date-day{font-size:18px;font-weight:700;color:var(--tx-d);line-height:1;letter-spacing:-0.5px;margin-top:2px}
-
   /* 데이원 매칭: 콘텐츠 */
   .lp-text-wrap{gap:3px}
   .lp-item-title{font-size:14.5px;font-weight:700;color:var(--tx);line-height:1.35;padding-right:0}
   .lp-item-preview{font-size:13.5px;color:var(--tx-m);line-height:1.5;font-weight:400;-webkit-line-clamp:2}
-  .lp-item-time{font-size:11px;color:var(--tx-hint);margin-top:3px;font-weight:400}
+  .lp-item-meta{font-size:11px;color:var(--tx-hint);margin-top:3px;font-weight:400}
   .quote-txt{font-size:15px;font-weight:500}
 
   .fab-btn{display:flex;align-items:center;justify-content:center;position:fixed;bottom:32px;right:24px;width:60px;height:60px;border-radius:50%;background:var(--yellow);color:white;border:none;box-shadow:0 6px 20px rgba(251,191,36,.4);cursor:pointer;z-index:90;transition:transform .1s}
@@ -518,24 +649,44 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 </div>
 
 <div class="list-panel">
-  <div class="col-header lp-head">
-    <button class="pc-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 열기/닫기">
+  <div class="lp-hdr">
+    <button class="sb-toggle pc-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 열기/닫기">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
     </button>
-    <button class="mobile-nav-btn" onclick="setMobileView('side')" title="메뉴 열기">
+    <button class="sb-toggle mobile-nav-btn" onclick="setMobileView('side')" title="메뉴 열기">
       <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
-    <span id="lpHeadTitleText">글 목록</span>
-    
+
+    <div class="view-switcher" id="viewSwitcher">
+      <button class="vs-btn on" id="btn-list" onclick="switchListView('list')" title="목록">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+      <button class="vs-btn" id="btn-photo" onclick="switchListView('photo')" title="사진">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <button class="vs-btn" id="btn-calendar" onclick="switchListView('calendar')" title="캘린더">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </button>
+    </div>
+
     <div class="search-bar" id="searchBar">
-      <button class="search-icon-btn" onclick="toggleSearch()" title="검색">
+      <button class="search-icon-btn lp-search-btn" onclick="toggleSearch()" title="검색">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       </button>
       <input type="text" id="searchInput" placeholder="#태그 또는 검색어" oninput="handleSearch(event)">
       <button id="clearSearchBtn" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
     </div>
   </div>
-  <div class="lp-list" id="lpList"></div>
+
+  <div class="view-list" id="view-list"></div>
+  
+  <div class="view-photo" id="view-photo">
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <div class="view-calendar" id="view-calendar">
+    <div class="cal-wrap" id="calWrap"></div>
+  </div>
   
   <button class="fab-btn" onclick="handleNew()" title="새 글 작성">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -787,6 +938,20 @@ let curBookId=null;
 let curMemoId=null;
 let currentLoadedDoc = { type: null, id: null };
 let currentSearchQuery = '';
+let currentListView = 'list';
+
+function switchListView(view) {
+  currentListView = view;
+  ['list', 'photo', 'calendar'].forEach(v => {
+    document.getElementById('view-' + v).style.display = 'none';
+    document.getElementById('btn-' + v).classList.remove('on');
+  });
+  const target = document.getElementById('view-' + view);
+  target.style.display = (view === 'list') ? 'flex' : 'block';
+  document.getElementById('btn-' + view).classList.add('on');
+  
+  renderListPanel();
+}
 
 function toggleSidebar() {
   const app = document.getElementById('mainApp');
@@ -824,6 +989,17 @@ function clearSearch() {
   currentSearchQuery = '';
   document.getElementById('clearSearchBtn').style.display = 'none';
   document.getElementById('searchBar').classList.remove('active');
+  renderListPanel();
+}
+
+function setTagSearch(tag) {
+  const bar = document.getElementById('searchBar');
+  const input = document.getElementById('searchInput');
+  bar.classList.add('active');
+  input.value = tag;
+  currentSearchQuery = tag;
+  document.getElementById('clearSearchBtn').style.display = 'flex';
+  if(window.innerWidth <= 768) setMobileView('list');
   renderListPanel();
 }
 
@@ -1253,9 +1429,8 @@ function switchTab(t){
   document.getElementById('editorMemo').style.display=t==='memo'?'flex':'none';
   document.getElementById('edToolbar').style.display=['book','quote'].includes(t)?'none':'flex';
   
-  document.getElementById('lpHeadTitleText').textContent = TAB_META[t] || '목록';
-
   clearSearch(); 
+  switchListView('list');
 
   if(textTypes.includes(t)){
     const docs=getDocs(t);
@@ -1269,10 +1444,254 @@ function switchTab(t){
   renderListPanel();
 }
 
-// ═══ List Panel (PC & Mobile 데이원 스타일 반응형) ═══
+// ═══ List Panel & Sub Views (PC & Mobile) ═══
+
+function getThumb(content) {
+  if(!content) return '';
+  const m = content.match(/<img[^>]+src=["'](data:image[^"']+|https?:[^"']+)["'][^>]*>/i);
+  return m ? m[1] : '';
+}
+
+const hl = (txt) => {
+  if (!txt || !currentSearchQuery) return txt || '';
+  const safeQuery = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${safeQuery})`, 'gi');
+  return String(txt).replace(regex, '<mark class="highlight">$1</mark>');
+};
+
+const getPreviewText = (htmlContent) => {
+  let raw = stripHtml(htmlContent) || '';
+  if(!currentSearchQuery) return raw.slice(0,80);
+  const idx = raw.toLowerCase().indexOf(currentSearchQuery.toLowerCase());
+  if(idx !== -1) {
+    const start = Math.max(0, idx - 30);
+    const end = Math.min(raw.length, idx + currentSearchQuery.length + 30);
+    return (start > 0 ? '...' : '') + raw.substring(start, end) + (end < raw.length ? '...' : '');
+  }
+  return raw.slice(0, 80);
+};
+
+function generateItemHtml(item, t) {
+  const dt = new Date(item.created || item.date || Date.now());
+  const day = dt.getDate();
+  const dow = weekdays[dt.getDay()];
+  const time = formatTimeOnly(item.created || item.date);
+  
+  const swipePin = (fn) => `<div class="swipe-action pin-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>`;
+  const swipeDel = (fn) => `<div class="swipe-action del-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>`;
+  
+  const dateBlock = `<div class="lp-date-wrap"><div class="lp-dow">${dow}</div><div class="lp-day">${day}</div></div>`;
+  
+  let isCur = false;
+  let clickFn = '';
+  
+  if(textTypes.includes(t)) {
+    isCur = curIds[t]===item.id;
+    clickFn = `loadDoc('${t}','${item.id}'); setMobileView('editor');`;
+    const rawPreview = getPreviewText(item.content);
+    const preview = hl(rawPreview);
+    const thumb = getThumb(item.content);
+    const thumbHtml = thumb ? `<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>` : '';
+    const tagHtml = item.tags ? `<div class="lp-item-tags">${hl(item.tags)}</div>` : '';
+    return `
+    <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
+      ${dateBlock}
+      <div class="lp-text-wrap">
+        <div class="lp-item-title">${hl(item.title||'제목 없음')}</div>
+        ${tagHtml}
+        ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
+        <div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div>
+      </div>
+      ${thumbHtml}
+      <div class="lp-item-actions">
+        <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
+        <button class="lp-action-btn del" onclick="delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div>
+    </div>`;
+  } 
+  else if(t==='book') {
+    isCur = curBookId===item.id;
+    clickFn = `loadBook('${item.id}'); setMobileView('editor');`;
+    const authorPub = [item.author, item.publisher].filter(Boolean).join(' · ');
+    return `
+    <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
+      ${dateBlock}
+      <div class="lp-text-wrap">
+        <div class="lp-item-title">${hl(item.title)}</div>
+        <div class="lp-item-preview">${hl(authorPub)}</div>
+        <div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div>
+      </div>
+      <div class="lp-item-actions">
+        <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
+        <button class="lp-action-btn del" onclick="delBook('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div>
+    </div>`;
+  } 
+  else if(t==='quote') {
+    isCur = curQuoteId===item.id;
+    clickFn = `loadQuote('${item.id}'); setMobileView('editor');`;
+    return `
+    <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
+      ${dateBlock}
+      <div class="lp-text-wrap">
+        <div class="quote-txt">${hl(item.text)}</div>
+        ${item.by ? `<div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'📌 ':''}${hl(item.by)}</div>` : ''}
+      </div>
+      <div class="lp-item-actions">
+        <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
+        <button class="lp-action-btn del" onclick="delQuote('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div>
+    </div>`;
+  } 
+  else if(t==='memo') {
+    isCur = curMemoId===item.id;
+    clickFn = `loadMemo('${item.id}'); setMobileView('editor');`;
+    const rawPreview = getPreviewText(item.content);
+    const preview = hl(rawPreview);
+    const thumb = getThumb(item.content);
+    const thumbHtml = thumb ? `<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>` : '';
+    const tagHtml = item.tags ? `<div class="lp-item-tags">${hl(item.tags)}</div>` : '';
+    return `
+    <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
+      ${dateBlock}
+      <div class="lp-text-wrap">
+        <div class="lp-item-title">${hl(item.title||'제목 없음')}</div>
+        ${tagHtml}
+        ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
+        <div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div>
+      </div>
+      ${thumbHtml}
+      <div class="lp-item-actions">
+        <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
+        <button class="lp-action-btn del" onclick="delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div>
+    </div>`;
+  }
+}
+
+function renderPhotoView(items, t) {
+  const grid = document.getElementById('photoGrid');
+  let html = '';
+  items.forEach(item => {
+    let thumb = '';
+    if(textTypes.includes(t) || t==='memo') thumb = getThumb(item.content);
+    
+    if(!thumb) return;
+
+    const dt = new Date(item.created || item.date || Date.now());
+    const day = dt.getDate();
+    const ym = `${dt.getFullYear()}년 ${dt.getMonth()+1}월`;
+
+    let clickFn = `loadDoc('${t}','${item.id}'); setMobileView('editor');`;
+    if(t==='memo') clickFn = `loadMemo('${item.id}'); setMobileView('editor');`;
+
+    html += `
+      <div class="photo-cell" onclick="${clickFn}">
+        <div class="photo-cell-bg" style="background-image:url('${thumb}');"></div>
+        <div class="photo-overlay"></div>
+        <div class="photo-date-block">
+          <span class="photo-day-num">${day}</span>
+          <span class="photo-ym">${ym}</span>
+        </div>
+      </div>
+    `;
+  });
+  if(!html) html = '<div style="padding:40px 20px;text-align:center;color:var(--tx-hint);grid-column:1/-1;font-size:13px;">사진이 포함된 기록이 없습니다</div>';
+  grid.innerHTML = html;
+}
+
+function renderCalendarView(items, t) {
+  const calWrap = document.getElementById('calWrap');
+  if(items.length === 0) {
+    calWrap.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--tx-hint);font-size:13px;">기록이 없습니다</div>';
+    return;
+  }
+  
+  let minDate = new Date();
+  let maxDate = new Date(0);
+  const entriesMap = {};
+  const photoDays = {};
+
+  items.forEach(item => {
+    const dt = new Date(item.created || item.date || Date.now());
+    if(dt < minDate) minDate = dt;
+    if(dt > maxDate) maxDate = dt;
+    
+    const y = dt.getFullYear(), m = dt.getMonth()+1, d = dt.getDate();
+    const key = `${y}-${m}`;
+    const pKey = `${y}-${m}-${d}`;
+    
+    if(!entriesMap[key]) entriesMap[key] = new Set();
+    entriesMap[key].add(d);
+
+    let thumb = '';
+    if(textTypes.includes(t) || t==='memo') thumb = getThumb(item.content);
+    if(thumb && !photoDays[pKey]) photoDays[pKey] = thumb;
+  });
+
+  const today = new Date();
+  if(minDate > today) minDate = today;
+  if(maxDate < today) maxDate = today;
+
+  let startY = minDate.getFullYear(), startM = minDate.getMonth()+1;
+  let endY = maxDate.getFullYear(), endM = maxDate.getMonth()+1;
+  
+  const months = [];
+  let cy = startY, cm = startM;
+  while(cy < endY || (cy === endY && cm <= endM)) {
+     months.push({y: cy, m: cm, label: `${cy}년 ${cm}월`});
+     cm++;
+     if(cm > 12) { cm = 1; cy++; }
+  }
+  months.reverse();
+
+  const DOW = ['일','월','화','수','목','금','토'];
+  let html = '';
+  
+  months.forEach((mo, mi) => {
+    const first = new Date(mo.y, mo.m-1, 1).getDay();
+    const days = new Date(mo.y, mo.m, 0).getDate();
+    const key = `${mo.y}-${mo.m}`;
+    const entries = entriesMap[key] ? Array.from(entriesMap[key]) : [];
+    let cells = '';
+    for(let i=0; i<first; i++) cells += `<div class="cal-day empty"></div>`;
+    for(let d=1; d<=days; d++){
+      const has = entries.includes(d);
+      const isToday = (mo.y === today.getFullYear() && mo.m === today.getMonth()+1 && d === today.getDate());
+      const pk = `${mo.y}-${mo.m}-${d}`;
+      const thumb = photoDays[pk];
+      
+      let cls = 'cal-day';
+      if(has) cls += ' has-entry';
+      if(isToday) cls += ' today';
+      
+      let inner = '';
+      if(thumb) {
+        cls += ' has-photo';
+        inner = `<div class="cal-photo-bg" style="background-image:url('${thumb}');background-size:cover;background-position:center;"></div>`;
+      }
+      
+      const targetDateStr = `${mo.y}-${String(mo.m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const clickFn = has ? `onclick="switchListView('list'); setTagSearch('${targetDateStr}');"` : '';
+      
+      cells += `<div class="${cls}" ${clickFn}>${inner}<span class="cal-day-num">${d}</span></div>`;
+    }
+    html += `${mi>0?'<div class="cal-separator"></div>':''}
+      <div class="cal-month-title">${mo.label}</div>
+      <div class="cal-dow-row">${DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('')}</div>
+      <div class="cal-grid">${cells}</div>`;
+  });
+
+  calWrap.innerHTML = html;
+}
+
 function renderListPanel(){
   renderWritingGrid();
-  const t=activeTab, el=document.getElementById('lpList');
+  const t = activeTab, el = document.getElementById('view-list');
   const emptyState = '<div style="text-align:center;padding:80px 20px;color:var(--tx-hint);font-size:15px">기록이 없습니다</div>';
 
   let items = [];
@@ -1290,151 +1709,41 @@ function renderListPanel(){
         const text = (it.text || '').toLowerCase();
         const by = (it.by || '').toLowerCase();
         const author = (it.author || '').toLowerCase();
-        return title.includes(q) || content.includes(q) || tags.includes(q) || text.includes(q) || by.includes(q) || author.includes(q);
+        const dt = new Date(it.created || it.date || Date.now());
+        const dStr = getLocalYMD(dt);
+        return title.includes(q) || content.includes(q) || tags.includes(q) || text.includes(q) || by.includes(q) || author.includes(q) || dStr.includes(q);
     });
   }
 
+  // Update Photo & Calendar views with filtered items
+  if(currentListView === 'photo') renderPhotoView(items, t);
+  if(currentListView === 'calendar') renderCalendarView(items, t);
+
   if(!items.length) { el.innerHTML = emptyState; return; }
 
-  items.sort((a,b) => {
-    let d1 = a.created || a.date || 0;
-    let d2 = b.created || b.date || 0;
-    return (b.pinned===true) - (a.pinned===true) || new Date(d2) - new Date(d1);
-  });
+  const pinnedItems = items.filter(i => i.pinned);
+  const unpinnedItems = items.filter(i => !i.pinned);
+  
+  const sortFn = (a,b) => new Date(b.created||b.date||0) - new Date(a.created||a.date||0);
+  pinnedItems.sort(sortFn);
+  unpinnedItems.sort(sortFn);
 
-  function getThumb(content) {
-    if(!content) return '';
-    const m = content.match(/<img[^>]+src=["'](data:image[^"']+|https?:[^"']+)["'][^>]*>/i);
-    return m ? m[1] : '';
-  }
-
-  const hl = (txt) => {
-    if (!txt || !currentSearchQuery) return txt || '';
-    const safeQuery = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${safeQuery})`, 'gi');
-    return String(txt).replace(regex, '<mark class="highlight">$1</mark>');
-  };
-
-  const getPreviewText = (htmlContent) => {
-    let raw = stripHtml(htmlContent) || '';
-    if(!currentSearchQuery) return raw.slice(0,80);
-    const idx = raw.toLowerCase().indexOf(currentSearchQuery.toLowerCase());
-    if(idx !== -1) {
-      const start = Math.max(0, idx - 30);
-      const end = Math.min(raw.length, idx + currentSearchQuery.length + 30);
-      return (start > 0 ? '...' : '') + raw.substring(start, end) + (end < raw.length ? '...' : '');
-    }
-    return raw.slice(0, 80);
-  };
-
-  let currentMonthStr = '';
-  let lastDateKey = '';
   let html = '';
 
-  items.forEach(item => {
+  if(pinnedItems.length > 0) {
+    html += `<div class="lp-pin-hdr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ac-light)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> 고정됨</div>`;
+    pinnedItems.forEach(item => { html += generateItemHtml(item, t); });
+  }
+
+  let currentMonthStr = '';
+  unpinnedItems.forEach(item => {
     const dt = new Date(item.created || item.date || Date.now());
     const mStr = getMonthYearStr(dt.toISOString());
     if (mStr !== currentMonthStr) {
       html += `<div class="lp-month-hdr">${mStr}</div>`;
       currentMonthStr = mStr;
-      lastDateKey = '';
     }
-
-    const day = dt.getDate();
-    const dow = weekdays[dt.getDay()];
-    const time = formatTimeOnly(item.created || item.date);
-    const dateKey = `${dt.getFullYear()}-${dt.getMonth()}-${day}`;
-    const hiddenDate = (dateKey === lastDateKey) ? 'style="visibility:hidden"' : '';
-    lastDateKey = dateKey;
-
-    const dateBlock = `<div class="lp-date-wrap" ${hiddenDate}><div class="lp-date-dow">${dow}</div><div class="lp-date-day">${day}</div></div>`;
-    const swipePin = (fn) => `<div class="swipe-action pin-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>`;
-    const swipeDel = (fn) => `<div class="swipe-action del-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>`;
-
-    let isCur = false;
-    let clickFn = '';
-
-    if(textTypes.includes(t)) {
-      isCur = curIds[t]===item.id;
-      clickFn = `loadDoc('${t}','${item.id}'); setMobileView('editor');`;
-      const rawPreview = getPreviewText(item.content);
-      const preview = hl(rawPreview);
-      const thumb = getThumb(item.content);
-      const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
-      const tagHtml = item.tags ? `<div class="lp-item-tags">${hl(item.tags)}</div>` : '';
-      html += `
-      <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        ${dateBlock}
-        <div class="lp-text-wrap">
-          <div class="lp-item-title">${hl(item.title||'제목 없음')}</div>
-          ${tagHtml}
-          ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
-          <div class="lp-item-time">${time}</div>
-        </div>
-        ${thumbHtml}
-        <div class="lp-item-actions">
-          <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
-          <button class="lp-action-btn del" onclick="delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        </div>
-        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div>
-      </div>`;
-    } else if(t==='book') {
-      isCur = curBookId===item.id;
-      clickFn = `loadBook('${item.id}'); setMobileView('editor');`;
-      const authorPub = [item.author, item.publisher].filter(Boolean).join(' · ');
-      html += `
-      <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        ${dateBlock}
-        <div class="lp-text-wrap">
-          <div class="lp-item-title">${hl(item.title)}</div>
-          <div class="lp-item-preview">${hl(authorPub)}</div>
-        </div>
-        <div class="lp-item-actions">
-          <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
-          <button class="lp-action-btn del" onclick="delBook('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        </div>
-        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div>
-      </div>`;
-    } else if(t==='quote') {
-      isCur = curQuoteId===item.id;
-      clickFn = `loadQuote('${item.id}'); setMobileView('editor');`;
-      html += `
-      <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        ${dateBlock}
-        <div class="lp-text-wrap">
-          <div class="quote-txt">${hl(item.text)}</div>
-          ${item.by ? `<div class="lp-item-time" style="margin-top:4px;">${hl(item.by)}</div>` : ''}
-        </div>
-        <div class="lp-item-actions">
-          <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
-          <button class="lp-action-btn del" onclick="delQuote('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        </div>
-        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div>
-      </div>`;
-    } else if(t==='memo') {
-      isCur = curMemoId===item.id;
-      clickFn = `loadMemo('${item.id}'); setMobileView('editor');`;
-      const rawPreview = getPreviewText(item.content);
-      const preview = hl(rawPreview);
-      const thumb = getThumb(item.content);
-      const tagHtml = item.tags ? `<div class="lp-item-tags">${hl(item.tags)}</div>` : '';
-      html += `
-      <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
-        ${dateBlock}
-        <div class="lp-text-wrap">
-          <div class="lp-item-title">${hl(item.title||'제목 없음')}</div>
-          ${tagHtml}
-          ${preview ? `<div class="lp-item-preview">${preview}</div>` : ''}
-          <div class="lp-item-time">${time}</div>
-        </div>
-        ${thumbHtml}
-        <div class="lp-item-actions">
-          <button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button>
-          <button class="lp-action-btn del" onclick="delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        </div>
-        <div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div>
-      </div>`;
-    }
+    html += generateItemHtml(item, t);
   });
 
   el.innerHTML = html;
@@ -1771,7 +2080,9 @@ function setupGesturesAndUI() {
 }
 
 function setupSwipeActions(){
-  const listEl=document.getElementById('lpList');
+  // Event delegation from main view to handle swiping on .lp-item across all views 
+  // (if needed, but mainly for view-list)
+  const listEl=document.getElementById('view-list');
   if(!listEl)return;
   let startX=0,startY=0,currentItem=null,swiping=false,dx=0;
   const THRESHOLD=60;
@@ -2069,7 +2380,7 @@ function init(){
     const naviDocs=getDocs('navi');if(naviDocs.length)loadDoc('navi',naviDocs[0].id,true);else{const nd=newDoc('navi');loadDoc('navi',nd.id,true)}
     if(GAS_URL)SYNC.setSyncStatus('완료됨','ok');else SYNC.setSyncStatus('로컬 전용','error');
     
-    renderListPanel();
+    switchListView('list');
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message)}
 }
 </script>
