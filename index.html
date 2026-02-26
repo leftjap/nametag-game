@@ -134,10 +134,11 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 /* 헤더: 사이드바토글 | [뷰스위처] 중앙 | 검색 */
 .lp-hdr{
   height:60px;min-height:60px;
-  display:flex;align-items:center;
-  padding:0 8px;gap:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px;gap:0;
   border-bottom:1px solid var(--border);
   background:var(--bg);
+  position:relative;
 }
 .sb-toggle{
   width:38px;height:38px;
@@ -151,7 +152,11 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .view-switcher{
   display:flex;align-items:center;
   background:rgba(0,0,0,.07);border-radius:9px;
-  padding:3px;gap:1px;margin:0 auto;
+  padding:3px;gap:1px;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:2;
 }
 .vs-btn{
   width:38px;height:30px;
@@ -163,7 +168,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .vs-btn.on{background:var(--bg-white);color:var(--tx-d);box-shadow:0 1px 4px rgba(0,0,0,.12);}
 
 /* 변경된 검색창 UI (아이콘 확장 방식) */
-.search-bar { margin-left:auto; display:flex; align-items:center; background:transparent; border-radius:16px; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow:hidden; border:1px solid transparent; }
+.search-bar { display:flex; align-items:center; background:transparent; border-radius:16px; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow:hidden; border:1px solid transparent; position:relative; z-index:3; }
 .search-bar.active { background:var(--bg-white); border-color:var(--border); padding-right:8px; box-shadow:inset 0 1px 2px rgba(0,0,0,0.02); }
 .search-icon-btn { width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:none; border:none; cursor:pointer; color:var(--tx-m); border-radius:8px; transition:all 0.2s; flex-shrink:0; }
 .search-icon-btn:hover { background:rgba(0,0,0,.05); color:var(--tx-d); }
@@ -431,7 +436,8 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .app.view-editor .list-panel{transform:translateX(0);opacity:1}
 
   .pc-sidebar-toggle{display:none !important}
-  .mobile-nav-btn{display:flex !important;}
+  .mobile-nav-btn{display:flex !important;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:8px;color:var(--tx-d)}
+  .mobile-nav-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
   /* ── 1단: 대시보드 ── */
   .side-hdr{padding:16px 20px 12px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border-l);height:auto;min-height:auto}
@@ -506,6 +512,8 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   /* ── 2단: 리스트 ── */
   .col-header{height:56px;min-height:56px}
   .lp-hdr{background:var(--bg);border-bottom:1px solid var(--border-l);height:56px;min-height:56px}
+
+  .view-list, .view-photo, .view-calendar { padding-bottom:120px !important; overflow-x:hidden; }
 
   .lp-month-hdr{font-size:12.5px;font-weight:800;color:var(--tx);padding:14px 16px 8px;background:var(--bg);letter-spacing:0;border-bottom:1px solid var(--border-l)}
 
@@ -1452,11 +1460,21 @@ function getThumb(content) {
   return m ? m[1] : '';
 }
 
+const escapeHtml = (unsafe) => {
+    return (unsafe || '').toString()
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+};
+
 const hl = (txt) => {
-  if (!txt || !currentSearchQuery) return txt || '';
-  const safeQuery = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  let escaped = escapeHtml(txt);
+  if (!currentSearchQuery) return escaped;
+  const safeQuery = escapeHtml(currentSearchQuery).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const regex = new RegExp(`(${safeQuery})`, 'gi');
-  return String(txt).replace(regex, '<mark class="highlight">$1</mark>');
+  return escaped.replace(regex, '<mark class="highlight">$1</mark>');
 };
 
 const getPreviewText = (htmlContent) => {
