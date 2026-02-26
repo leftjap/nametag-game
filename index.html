@@ -136,7 +136,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .tag-pill:hover { border-color:var(--ac-light); color:var(--ac-d); background:#fdf8f4; }
 
 /* 검색 하이라이트 */
-mark.highlight { background-color: rgba(251, 191, 36, 0.4); color: var(--tx); padding: 0 2px; border-radius: 2px; }
+mark.highlight { background-color: rgba(251, 191, 36, 0.4); color: inherit; padding: 0 2px; border-radius: 3px; }
 
 /* PC 루틴 */
 .chk-table{display:flex;flex-direction:column;gap:4px}
@@ -1309,7 +1309,7 @@ function renderListPanel(){
     if (!txt || !currentSearchQuery) return txt || '';
     const safeQuery = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`(${safeQuery})`, 'gi');
-    return txt.toString().replace(regex, '<mark class="highlight">$1</mark>');
+    return String(txt).replace(regex, '<mark class="highlight">$1</mark>');
   };
 
   let currentMonthStr = '';
