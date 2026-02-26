@@ -38,13 +38,35 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .lock-desc{font-size:13px;color:var(--tx-m);margin-bottom:12px}
 .lock-err{font-size:12px;color:var(--red);min-height:18px;font-weight:500}
 
-/* Orbital Loading Animation */
-.loading-wrapper { position: relative; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; }
-.loading-cat { width: 120px; height: 120px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 20px rgba(0,0,0,.1); object-fit: cover; z-index: 2; }
-.orbit-spinner { position: absolute; top: 0; left: 0; right: 0; bottom: 0; animation: spin 1.5s linear infinite; z-index: 1; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-.orbit-dot { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
-.orbit-dot::before { content: ''; position: absolute; top: 0; left: calc(50% - var(--s) / 2); width: var(--s); height: var(--s); background: var(--color); border-radius: 50%; opacity: var(--o); box-shadow: 0 0 4px rgba(0,0,0,0.1); }
+/* Bouncing Loading Animation */
+.loading-scene { position: relative; height: 180px; width: 120px; display: flex; align-items: flex-start; justify-content: center; }
+.bounce-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid white; box-shadow: 0 6px 20px rgba(0,0,0,.12); object-fit: cover; position: absolute; top: 0; animation: bounce 1.80s cubic-bezier(.36,.07,.19,.97) infinite; transform-origin: center bottom; }
+.bounce-shadow { width: 60px; height: 12px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(150,114,78,.35) 0%, transparent 75%); position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); animation: shadow-pulse 1.80s cubic-bezier(.36,.07,.19,.97) infinite; }
+.loading-text { font-size: 13px; color: var(--tx-m); letter-spacing: .5px; margin-top: 16px; animation: fade-text 1.4s ease-in-out infinite; }
+@keyframes bounce {
+  0%   { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
+  8%   { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
+  30%  { top: 0px;  transform: scaleX(0.95) scaleY(1.05); }
+  50%  { top: 0px;  transform: scaleX(0.95) scaleY(1.05); }
+  72%  { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
+  80%  { top: 68px; transform: scaleX(1.04) scaleY(0.97); }
+  90%  { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
+  100% { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
+}
+@keyframes shadow-pulse {
+  0%   { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
+  8%   { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
+  30%  { transform: translateX(-50%) scaleX(0.45); opacity: .28; }
+  50%  { transform: translateX(-50%) scaleX(0.45); opacity: .28; }
+  72%  { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
+  80%  { transform: translateX(-50%) scaleX(1.08); opacity: .65; }
+  90%  { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
+  100% { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
+}
+@keyframes fade-text {
+  0%, 100% { opacity: .4; }
+  50%      { opacity: .9; }
+}
 
 /* ═══════════════════════════════════════
    PC LAYOUT 
@@ -178,10 +200,10 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .search-bar input::placeholder { color:var(--tx-hint); }
 #clearSearchBtn { display:none; background:var(--border); border:none; cursor:pointer; color:var(--tx-d); font-size:10px; width:16px; height:16px; border-radius:50%; margin-left:4px; align-items:center; justify-content:center; flex-shrink:0; }
 
-/* 뷰 컨테이너 */
-.view-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:60px;}
-.view-photo{flex:1;overflow-y:auto;display:none;padding-bottom:60px;}
-.view-calendar{flex:1;overflow-y:auto;display:none;padding-bottom:60px;}
+/* 뷰 컨테이너 (클래스 충돌 방지를 위해 pane-* 사용) */
+.pane-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:60px;}
+.pane-photo{flex:1;overflow-y:auto;display:none;padding-bottom:60px;}
+.pane-calendar{flex:1;overflow-y:auto;display:none;padding-bottom:60px;}
 
 /* 목록 뷰 (v2 시안) */
 .lp-pin-hdr{
@@ -436,8 +458,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .app.view-editor .list-panel{transform:translateX(0);opacity:1}
 
   .pc-sidebar-toggle{display:none !important}
-  .mobile-nav-btn{display:flex !important;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:8px;color:var(--tx-d)}
-  .mobile-nav-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .mobile-nav-btn{display:flex !important;}
 
   /* ── 1단: 대시보드 ── */
   .side-hdr{padding:16px 20px 12px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border-l);height:auto;min-height:auto}
@@ -513,7 +534,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .col-header{height:56px;min-height:56px}
   .lp-hdr{background:var(--bg);border-bottom:1px solid var(--border-l);height:56px;min-height:56px}
 
-  .view-list, .view-photo, .view-calendar { padding-bottom:120px !important; overflow-x:hidden; }
+  .pane-list, .pane-photo, .pane-calendar { padding-bottom:120px !important; overflow-x:hidden; }
 
   .lp-month-hdr{font-size:12.5px;font-weight:800;color:var(--tx);padding:14px 16px 8px;background:var(--bg);letter-spacing:0;border-bottom:1px solid var(--border-l)}
 
@@ -563,19 +584,11 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 <body>
 
 <div id="loadingScreen" class="hidden">
-  <div class="loading-wrapper">
-    <div class="orbit-spinner">
-      <div class="orbit-dot" style="--s:16px; --o:1;    --color:#FF5E5B; transform: rotate(0deg);"></div>
-      <div class="orbit-dot" style="--s:14px; --o:0.9;  --color:#FFC15E; transform: rotate(-35deg);"></div>
-      <div class="orbit-dot" style="--s:12px; --o:0.75; --color:#8EE386; transform: rotate(-70deg);"></div>
-      <div class="orbit-dot" style="--s:10px; --o:0.6;  --color:#59C9EB; transform: rotate(-105deg);"></div>
-      <div class="orbit-dot" style="--s:8px;  --o:0.45; --color:#C884F9; transform: rotate(-140deg);"></div>
-      <div class="orbit-dot" style="--s:6px;  --o:0.3;  --color:#FF5E5B; transform: rotate(-175deg);"></div>
-      <div class="orbit-dot" style="--s:4px;  --o:0.2;  --color:#FFC15E; transform: rotate(-210deg);"></div>
-      <div class="orbit-dot" style="--s:3px;  --o:0.1;  --color:#8EE386; transform: rotate(-245deg);"></div>
-    </div>
-    <img src="gio_circle_white_closeup2_512.png" alt="지오" class="loading-cat">
+  <div class="loading-scene">
+    <img src="gio_circle_white_closeup2_512.png" alt="지오" class="bounce-avatar">
+    <div class="bounce-shadow"></div>
   </div>
+  <div class="loading-text">불러오는 중</div>
 </div>
 
 <div id="lockScreen" class="hidden">
@@ -686,13 +699,13 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
     </div>
   </div>
 
-  <div class="view-list" id="view-list"></div>
+  <div class="pane-list" id="pane-list"></div>
   
-  <div class="view-photo" id="view-photo">
+  <div class="pane-photo" id="pane-photo">
     <div class="photo-grid" id="photoGrid"></div>
   </div>
 
-  <div class="view-calendar" id="view-calendar">
+  <div class="pane-calendar" id="pane-calendar">
     <div class="cal-wrap" id="calWrap"></div>
   </div>
   
@@ -951,10 +964,10 @@ let currentListView = 'list';
 function switchListView(view) {
   currentListView = view;
   ['list', 'photo', 'calendar'].forEach(v => {
-    document.getElementById('view-' + v).style.display = 'none';
+    document.getElementById('pane-' + v).style.display = 'none';
     document.getElementById('btn-' + v).classList.remove('on');
   });
-  const target = document.getElementById('view-' + view);
+  const target = document.getElementById('pane-' + view);
   target.style.display = (view === 'list') ? 'flex' : 'block';
   document.getElementById('btn-' + view).classList.add('on');
   
@@ -977,8 +990,11 @@ function setMobileView(view) {
 function toggleSearch() {
   const bar = document.getElementById('searchBar');
   const input = document.getElementById('searchInput');
+  const vs = document.getElementById('viewSwitcher');
+  
   bar.classList.toggle('active');
   if(bar.classList.contains('active')) {
+    vs.style.display = 'none'; // 작은 모바일에서 아이콘 안 겹치게 숨김 처리
     input.focus();
   } else {
     clearSearch();
@@ -997,13 +1013,17 @@ function clearSearch() {
   currentSearchQuery = '';
   document.getElementById('clearSearchBtn').style.display = 'none';
   document.getElementById('searchBar').classList.remove('active');
+  document.getElementById('viewSwitcher').style.display = 'flex';
   renderListPanel();
 }
 
 function setTagSearch(tag) {
   const bar = document.getElementById('searchBar');
   const input = document.getElementById('searchInput');
+  const vs = document.getElementById('viewSwitcher');
+  
   bar.classList.add('active');
+  vs.style.display = 'none';
   input.value = tag;
   currentSearchQuery = tag;
   document.getElementById('clearSearchBtn').style.display = 'flex';
@@ -1460,21 +1480,11 @@ function getThumb(content) {
   return m ? m[1] : '';
 }
 
-const escapeHtml = (unsafe) => {
-    return (unsafe || '').toString()
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-};
-
 const hl = (txt) => {
-  let escaped = escapeHtml(txt);
-  if (!currentSearchQuery) return escaped;
-  const safeQuery = escapeHtml(currentSearchQuery).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (!txt || !currentSearchQuery) return txt || '';
+  const safeQuery = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const regex = new RegExp(`(${safeQuery})`, 'gi');
-  return escaped.replace(regex, '<mark class="highlight">$1</mark>');
+  return String(txt).replace(regex, '<mark class="highlight">$1</mark>');
 };
 
 const getPreviewText = (htmlContent) => {
@@ -1709,7 +1719,7 @@ function renderCalendarView(items, t) {
 
 function renderListPanel(){
   renderWritingGrid();
-  const t = activeTab, el = document.getElementById('view-list');
+  const t = activeTab, el = document.getElementById('pane-list');
   const emptyState = '<div style="text-align:center;padding:80px 20px;color:var(--tx-hint);font-size:15px">기록이 없습니다</div>';
 
   let items = [];
@@ -2100,7 +2110,7 @@ function setupGesturesAndUI() {
 function setupSwipeActions(){
   // Event delegation from main view to handle swiping on .lp-item across all views 
   // (if needed, but mainly for view-list)
-  const listEl=document.getElementById('view-list');
+  const listEl=document.getElementById('pane-list');
   if(!listEl)return;
   let startX=0,startY=0,currentItem=null,swiping=false,dx=0;
   const THRESHOLD=60;
