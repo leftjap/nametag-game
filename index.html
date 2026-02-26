@@ -39,16 +39,50 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .lock-brand{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--tx)}
 .lock-desc{font-size:13px;color:var(--tx-m);margin-bottom:12px}
 .lock-err{font-size:12px;color:var(--red);min-height:18px;font-weight:500}
-.loading-dots{display:flex;gap:10px;margin-top:24px}
-.loading-dots span{width:10px;height:10px;border-radius:50%;display:inline-block;animation:dotBounce 1.4s infinite ease-in-out both}
-.loading-dots span:nth-child(1){background:#FF5E5B;animation-delay:-.32s}
-.loading-dots span:nth-child(2){background:#FFC15E;animation-delay:-.16s}
-.loading-dots span:nth-child(3){background:#8EE386;animation-delay:0s}
-.loading-dots span:nth-child(4){background:#59C9EB;animation-delay:.16s}
-.loading-dots span:nth-child(5){background:#C884F9;animation-delay:.32s}
-@keyframes dotBounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.loading-cat{width:140px;height:140px;border-radius:50%;border:3px solid white;box-shadow:0 4px 20px rgba(0,0,0,.1);object-fit:cover}
+
+/* Orbital Loading Animation */
+.loading-wrapper {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-cat {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+  object-fit: cover;
+  z-index: 2;
+}
+.orbit-spinner {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  animation: spin 1.5s linear infinite;
+  z-index: 1;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.orbit-dot {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0; left: 0;
+}
+.orbit-dot::before {
+  content: '';
+  position: absolute;
+  top: 0; 
+  left: calc(50% - var(--s) / 2);
+  width: var(--s);
+  height: var(--s);
+  background: var(--color);
+  border-radius: 50%;
+  opacity: var(--o);
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
 
 /* ═══════════════════════════════════════
    PC LAYOUT — v3 프로토타입 기반
@@ -381,8 +415,19 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 <body>
 
 <div id="loadingScreen" class="hidden">
-  <img src="gio_circle_white_closeup2_512.png" alt="지오" class="loading-cat">
-  <div class="loading-dots"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="loading-wrapper">
+    <div class="orbit-spinner">
+      <div class="orbit-dot" style="--s:16px; --o:1;    --color:#FF5E5B; transform: rotate(0deg);"></div>
+      <div class="orbit-dot" style="--s:14px; --o:0.9;  --color:#FFC15E; transform: rotate(-35deg);"></div>
+      <div class="orbit-dot" style="--s:12px; --o:0.75; --color:#8EE386; transform: rotate(-70deg);"></div>
+      <div class="orbit-dot" style="--s:10px; --o:0.6;  --color:#59C9EB; transform: rotate(-105deg);"></div>
+      <div class="orbit-dot" style="--s:8px;  --o:0.45; --color:#C884F9; transform: rotate(-140deg);"></div>
+      <div class="orbit-dot" style="--s:6px;  --o:0.3;  --color:#FF5E5B; transform: rotate(-175deg);"></div>
+      <div class="orbit-dot" style="--s:4px;  --o:0.2;  --color:#FFC15E; transform: rotate(-210deg);"></div>
+      <div class="orbit-dot" style="--s:3px;  --o:0.1;  --color:#8EE386; transform: rotate(-245deg);"></div>
+    </div>
+    <img src="gio_circle_white_closeup2_512.png" alt="지오" class="loading-cat">
+  </div>
 </div>
 
 <div id="lockScreen" class="hidden">
@@ -1285,32 +1330,43 @@ function setupCopyHandler() {
     if (activeEl && activeEl.isContentEditable) {
       const selection = window.getSelection();
       if (selection.rangeCount > 0 && !selection.isCollapsed) {
-        e.preventDefault();
-        
         const range = selection.getRangeAt(0);
         const tempDiv = document.createElement('div');
         tempDiv.appendChild(range.cloneContents());
         
-        // 1. HTML 형식 추출 및 보정
-        // 빈 블록 태그(<div><br></div> 등)를 강제로 <br><br>로 치환하여 카카오톡이 빈 줄을 인식하도록 유도
-        let htmlData = tempDiv.innerHTML;
-        htmlData = htmlData.replace(/<(div|p)[^>]*>\s*(<br\s*\/?>)?\s*<\/\1>/gi, '<br><br>');
+        // 복사한 내용에 이미지가 포함되어 있다면 브라우저 기본 복사 동작 허용
+        if (tempDiv.querySelector('img')) return;
         
-        // 2. 순수 텍스트(Plain Text) 추출
-        // innerText를 활용해 브라우저 렌더링 엔진이 인식하는 실제 시각적 줄바꿈을 추출
-        document.body.appendChild(tempDiv);
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.whiteSpace = 'pre-wrap';
-        let plainText = tempDiv.innerText;
-        document.body.removeChild(tempDiv);
+        e.preventDefault();
         
-        // 브라우저 엣지 케이스 방어
-        if (!plainText) plainText = selection.toString();
+        // DOM 트리를 직접 순회하여 정확한 텍스트 줄바꿈 계산
+        let text = '';
+        function traverse(el) {
+            if (el.nodeType === Node.TEXT_NODE) {
+                text += el.nodeValue;
+            } else if (el.nodeType === Node.ELEMENT_NODE) {
+                const tag = el.tagName.toLowerCase();
+                const isBlock = ['div', 'p', 'h1', 'h2', 'h3', 'li', 'blockquote', 'ul', 'ol'].includes(tag);
+                
+                // 블록 시작 시 개행 추가
+                if (isBlock && text.length > 0 && !text.endsWith('\n')) text += '\n';
+                if (tag === 'br') text += '\n';
+                
+                for (let child of el.childNodes) traverse(child);
+                
+                // 블록 종료 시 개행 추가
+                if (isBlock && text.length > 0 && !text.endsWith('\n')) text += '\n';
+            }
+        }
         
-        // 클립보드에 데이터 덮어쓰기
-        e.clipboardData.setData('text/plain', plainText);
-        e.clipboardData.setData('text/html', htmlData);
+        traverse(tempDiv);
+        
+        // 3개 이상의 연속된 개행(엔터)을 실제 보이는 빈 줄 한 칸(\n\n)으로 변환
+        text = text.replace(/\n{3,}/g, '\n\n').trim();
+        
+        // 클립보드에 정제된 텍스트와 단순화된 HTML 덮어쓰기
+        e.clipboardData.setData('text/plain', text);
+        e.clipboardData.setData('text/html', text.replace(/\n/g, '<br>'));
       }
     }
   });
