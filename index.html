@@ -95,7 +95,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .side-menu::before{display:none}
 
 /* 검색 하이라이트 */
-mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; padding: 0 2px; border-radius: 3px; }
+mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; padding: 0 2px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(251,191,36,.2); }
 
 /* PC 루틴 */
 .chk-table{display:flex;flex-direction:column;gap:4px}
@@ -1315,6 +1315,18 @@ function renderListPanel(){
     return String(txt).replace(regex, '<mark class="highlight">$1</mark>');
   };
 
+  const getPreviewText = (htmlContent) => {
+    let raw = stripHtml(htmlContent) || '';
+    if(!currentSearchQuery) return raw.slice(0,80);
+    const idx = raw.toLowerCase().indexOf(currentSearchQuery.toLowerCase());
+    if(idx !== -1) {
+      const start = Math.max(0, idx - 30);
+      const end = Math.min(raw.length, idx + currentSearchQuery.length + 30);
+      return (start > 0 ? '...' : '') + raw.substring(start, end) + (end < raw.length ? '...' : '');
+    }
+    return raw.slice(0, 80);
+  };
+
   let currentMonthStr = '';
   let lastDateKey = '';
   let html = '';
@@ -1345,7 +1357,7 @@ function renderListPanel(){
     if(textTypes.includes(t)) {
       isCur = curIds[t]===item.id;
       clickFn = `loadDoc('${t}','${item.id}'); setMobileView('editor');`;
-      const rawPreview = stripHtml(item.content).slice(0,80) || '';
+      const rawPreview = getPreviewText(item.content);
       const preview = hl(rawPreview);
       const thumb = getThumb(item.content);
       const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
@@ -1402,10 +1414,9 @@ function renderListPanel(){
     } else if(t==='memo') {
       isCur = curMemoId===item.id;
       clickFn = `loadMemo('${item.id}'); setMobileView('editor');`;
-      const rawPreview = stripHtml(item.content).slice(0,80) || '';
+      const rawPreview = getPreviewText(item.content);
       const preview = hl(rawPreview);
       const thumb = getThumb(item.content);
-      const thumbHtml = thumb ? `<img class="lp-thumb" src="${thumb}" alt="">` : '';
       const tagHtml = item.tags ? `<div class="lp-item-tags">${hl(item.tags)}</div>` : '';
       html += `
       <div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">
