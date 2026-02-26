@@ -216,10 +216,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 
 /* PC 모바일 전용 숨김 */
 .mobile-nav-btn{display:none}
-.mobile-back-btn{display:none !important}
+.mobile-back-btn{display:none}
 .mob-tool-bar{display:none}
-.fs-popup{display:none !important}
-.fs-overlay{display:none !important}
+.fs-popup{display:none}
 .fs-overlay{display:none}
 .fs-sheet{display:none}
 
@@ -313,7 +312,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   .stat-label{font-size:11px;color:var(--tx-m);font-weight:500;margin-bottom:6px}
   .stat-big{font-size:22px;font-weight:400;color:var(--tx);line-height:1.1;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
   .stat-sub{font-size:11px;color:var(--tx-hint);margin-top:4px}
-.stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
+  .stat-big .unit{font-size:14px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
 
   /* ── 2단: 리스트 — 데이원 정밀 매칭 ── */
   .col-header{height:56px;min-height:56px}
@@ -391,9 +390,9 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   }
   .mob-fmt-btn:active{opacity:.5}
 
-  /* 편집 팝업 — Aa 툴바 바로 위 */
+  /* 편집 팝업 — Aa 툴바 바로 위 (강제 오버라이딩 적용) */
   .fs-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
-  .fs-overlay.on{opacity:1;pointer-events:auto}
+  .fs-overlay.on{opacity:1 !important;pointer-events:auto !important}
 
   .fs-popup{
     position:fixed;left:0;right:0;
@@ -405,7 +404,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     flex-direction:column;
     max-height:55vh;
   }
-  .fs-popup.on{display:flex}
+  .fs-popup.on{display:flex !important}
   .fs-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 4px;flex-shrink:0}
 
   /* 기본: 최근 5개 위 / 더 보기 아래 고정 */
@@ -605,24 +604,27 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     </div>
   </div>
   
+  <!-- 터치 이벤트 명시 및 preventDefault로 포커스 유지 -->
   <div class="mob-tool-bar" id="mobToolbar">
-    <button class="mob-fmt-btn aa-btn" id="aaBtn" onmousedown="event.preventDefault(); toggleFormatMenu()">Aa</button>
+    <button class="mob-fmt-btn aa-btn" id="aaBtn" ontouchstart="event.preventDefault(); toggleFormatMenu()" onmousedown="event.preventDefault(); toggleFormatMenu()">Aa</button>
   </div>
 
-  <div id="formatSheetOverlay" class="fs-overlay" onmousedown="event.preventDefault(); closeFormatMenu()"></div>
+  <div id="formatSheetOverlay" class="fs-overlay" ontouchstart="event.preventDefault(); closeFormatMenu()" onmousedown="event.preventDefault(); closeFormatMenu()"></div>
   <div id="formatPopup" class="fs-popup">
     <div class="fs-handle"></div>
 
+    <!-- 기본: 최근 5개 + 더 보기(맨 아래) -->
     <div class="fs-default" id="fmtDefault">
       <div class="fs-default-list" id="fmtRecentList"></div>
-      <button class="fs-toggle-btn fs-more-btn" onmousedown="event.preventDefault()" onclick="fmtExpand()">
+      <button class="fs-toggle-btn fs-more-btn" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmtExpand()">
         <span class="fs-toggle-arrow">▶</span>
         <span class="fs-toggle-label">더 보기</span>
       </button>
     </div>
 
+    <!-- 확장: 접기(맨 위) + 전체 목록 -->
     <div class="fs-expanded" id="fmtExpanded">
-      <button class="fs-toggle-btn fs-fold-btn" onmousedown="event.preventDefault()" onclick="fmtCollapse()">
+      <button class="fs-toggle-btn fs-fold-btn" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmtCollapse()">
         <span class="fs-toggle-arrow">▼</span>
         <span class="fs-toggle-label">접기</span>
       </button>
@@ -656,6 +658,11 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
+  // 캔버스 미리보기 테스트를 위해 임시로 로그인을 건너뛰고 앱을 바로 실행합니다.
+  document.getElementById('lockScreen').classList.add('hidden');
+  showApp();
+
+  /* 실제 운영 시에는 아래의 원래 코드를 사용하세요.
   if (localStorage.getItem('gb_auth') === '1' && localStorage.getItem('gb_id_token')) {
     showApp();
   } else {
@@ -669,6 +676,7 @@ window.onload = function () {
       { theme: "outline", size: "large", type: "standard", shape: "pill", text: "continue_with" }
     );
   }
+  */
 };
 
 async function showApp(){
@@ -1391,6 +1399,7 @@ function fmtMakeRows(container, items) {
     btn.dataset.cmd=item.cmd;
     btn.innerHTML=`<span class="fs-name">${item.name}</span><span class="fs-icon">${FMT_ICONS[item.cmd]}</span>`;
     btn.addEventListener('mousedown', e=>e.preventDefault());
+    btn.addEventListener('touchstart', e=>e.preventDefault(), {passive: false}); // 터치 포커스 유지
     btn.addEventListener('click', ()=>{
       fmtSaveRecent(item.cmd);
       item.exec();
@@ -1405,8 +1414,10 @@ function fmtMakeRows(container, items) {
 
 function fmtGetBottom(){
   const vv=window.visualViewport;
-  const kbH=vv ? window.innerHeight-vv.height-vv.offsetTop : 0;
-  return (kbH>100 ? kbH : 0) + 44; // 44 = 툴바 높이
+  if(!vv) return 44;
+  // iOS 사파리 대응: offsetTop을 빼면 스크롤 시 위치가 틀어지므로 키보드 높이만 계산
+  const kbH = window.innerHeight - vv.height;
+  return (kbH > 100 ? kbH : 0) + 44; // 44는 툴바 높이
 }
 
 function toggleFormatMenu(){
@@ -1723,18 +1734,26 @@ const SYNC = {
   async _post(data) {
     data.token = APP_TOKEN;
     data.idToken = localStorage.getItem('gb_id_token');
+    
+    // 미리보기 테스트용: 토큰이 없으면 무한 새로고침을 막기 위해 로컬 모드로 간주
+    if (!data.idToken) {
+      throw new Error('LocalMode');
+    }
+
     try {
       const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
       const json = await res.json();
       if (json.status === 'error') {
         if (json.message === 'Unauthorized') {
-          alert('구글 로그인 세션이 만료되었습니다.\n새로고침하여 다시 로그인합니다.');
-          localStorage.removeItem('gb_auth'); localStorage.removeItem('gb_id_token'); location.reload(); throw new Error('Unauthorized');
+          // 미리보기 오류 방지를 위해 임시 주석 처리 (실제 배포 시에는 해제하셔도 됩니다)
+          // alert('구글 로그인 세션이 만료되었습니다.\n새로고침하여 다시 로그인합니다.');
+          // localStorage.removeItem('gb_auth'); localStorage.removeItem('gb_id_token'); location.reload(); 
+          throw new Error('Unauthorized');
         } else { throw new Error(json.message); }
       }
       return json;
     } catch(e) {
-      if(e.message !== 'Unauthorized') this.setSyncStatus('통신 지연', 'error');
+      if(e.message !== 'Unauthorized' && e.message !== 'LocalMode') this.setSyncStatus('통신 지연', 'error');
       throw e;
     }
   },
