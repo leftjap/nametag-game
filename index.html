@@ -32,6 +32,9 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow:hidden}
 
+/* 팝업 메뉴 열릴 때 본문 커서 숨김 처리 (오버랩 방지) */
+body.hide-caret .ed-body, body.hide-caret .sf-input { caret-color: transparent !important; }
+
 /* ═══ LOGIN & LOADING ═══ */
 #lockScreen,#loadingScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .3s}
 #lockScreen.hidden,#loadingScreen.hidden{display:none;opacity:0;pointer-events:none}
@@ -241,6 +244,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 
   .app{position:relative;display:block;height:100vh;height:100dvh;overflow:hidden;width:100vw}
   .side{position:absolute;top:0;left:0;width:100%;height:100%;border-right:none;transition:transform .35s ease;background:var(--bg);z-index:10}
+  .app.sidebar-closed .side{width:100% !important;min-width:100% !important;} /* 모바일에서는 사이드바 토글 무시 */
   .list-panel{position:absolute;top:0;left:0;width:100%;height:100%;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s;background:var(--bg);z-index:20;transform:translateX(100%)}
   .editor{position:absolute;top:0;left:0;width:100%;height:100%;z-index:40;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
   .app.view-list .list-panel{transform:translateX(0);opacity:1}
@@ -377,31 +381,34 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
   /* 모바일 하단 글자수 */
   .ed-foot{padding:12px 20px;font-size:13px;gap:20px;background:var(--bg-white);border-top:1px solid var(--border)}
 
-  /* ✨ 모바일 하단 편집 툴바 — Aa만 */
+  /* ✨ 모바일 하단 편집 툴바 — Aa만 (터치 하이라이트 완전히 제거) */
   .mob-tool-bar{
-    display:none;
+    display:flex;
     position:fixed;left:0;right:0;z-index:80;
     flex-direction:row;align-items:center;justify-content:flex-end;
     padding:6px 16px 6px;
     background:var(--bg-card);
     border-top:1px solid var(--border-l);
     box-sizing:border-box;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s;
   }
-  .mob-tool-bar.visible{display:flex}
+  .mob-tool-bar.visible{opacity: 1; pointer-events: auto;}
   .mob-fmt-btn{
     width:36px;height:32px;
     border:none;background:none;
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .mob-fmt-btn.aa-btn{
     font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;
     color:var(--tx);
   }
-  .mob-fmt-btn:active{opacity:.5}
 
-  /* 편집 팝업 — Aa 툴바 바로 위 (강제 오버라이딩 적용) */
-  .fs-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+  /* 편집 팝업 — Aa 툴바 바로 위 (강제 오버라이딩 적용 및 렌더링 분리) */
+  .fs-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s; -webkit-tap-highlight-color: transparent;}
   .fs-overlay.on{opacity:1 !important;pointer-events:auto !important}
 
   .fs-popup{
@@ -413,6 +420,8 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     display:none;
     flex-direction:column;
     max-height:55vh;
+    -webkit-tap-highlight-color: transparent;
+    transform: translateZ(1px); /* 커서 겹침 방지를 위한 레이어 강제 분리 */
   }
   .fs-popup.on{display:flex !important}
   .fs-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 4px;flex-shrink:0}
@@ -432,16 +441,15 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     padding:12px 20px;
     border:none;background:none;width:100%;cursor:pointer;
     flex-shrink:0;
+    -webkit-tap-highlight-color: transparent;
   }
-  .fs-toggle-btn:active{background:rgba(0,0,0,.04)}
   .fs-more-btn{border-top:1px solid var(--border-l)}
   .fs-fold-btn{border-bottom:1px solid var(--border-l)}
   .fs-toggle-arrow{font-size:11px;color:var(--ac);font-weight:700;margin-right:10px}
   .fs-toggle-label{font-size:14px;font-weight:500;color:var(--tx-m)}
 
-  /* 행 */
-  .fs-row{display:flex;align-items:center;padding:14px 20px;border:none;background:none;width:100%;cursor:pointer}
-  .fs-row:active{background:rgba(0,0,0,.04)}
+  /* 행 (클릭 시 배경색 어두워지는 효과 제거) */
+  .fs-row{display:flex;align-items:center;padding:14px 20px;border:none;background:none;width:100%;cursor:pointer;-webkit-tap-highlight-color: transparent;}
   .fs-name{flex:1;text-align:left;font-size:16px;font-weight:400;color:var(--tx)}
   .fs-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .fs-icon svg{width:20px;height:20px;stroke:var(--tx-d);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -617,19 +625,20 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
     </div>
   </div>
   
-  <!-- 터치 이벤트 명시 및 preventDefault로 포커스 유지 -->
+  <!-- 터치 피드백 깜빡임 완벽 제거 및 정확한 클릭 이벤트를 위해 pointerdown 사용 (포커스 유지) -->
   <div class="mob-tool-bar" id="mobToolbar">
-    <button class="mob-fmt-btn aa-btn" id="aaBtn" ontouchstart="event.preventDefault(); toggleFormatMenu()" onmousedown="event.preventDefault(); toggleFormatMenu()">Aa</button>
+    <button class="mob-fmt-btn aa-btn" id="aaBtn" onpointerdown="event.preventDefault()" onclick="toggleFormatMenu()">Aa</button>
   </div>
 
-  <div id="formatSheetOverlay" class="fs-overlay" ontouchstart="event.preventDefault(); closeFormatMenu()" onmousedown="event.preventDefault(); closeFormatMenu()"></div>
+  <div id="formatSheetOverlay" class="fs-overlay" onclick="closeFormatMenu()"></div>
   <div id="formatPopup" class="fs-popup">
     <div class="fs-handle"></div>
 
     <!-- 기본: 최근 5개 + 더 보기(맨 아래) -->
     <div class="fs-default" id="fmtDefault">
       <div class="fs-default-list" id="fmtRecentList"></div>
-      <button class="fs-toggle-btn fs-more-btn" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmtExpand()">
+      <!-- 더 보기/접기 버튼 작동을 위해 pointerdown으로 포커스 손실을 막고 onclick 실행 -->
+      <button class="fs-toggle-btn fs-more-btn" onpointerdown="event.preventDefault()" onclick="fmtExpand()">
         <span class="fs-toggle-arrow">▶</span>
         <span class="fs-toggle-label">더 보기</span>
       </button>
@@ -637,7 +646,7 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 
     <!-- 확장: 접기(맨 위) + 전체 목록 -->
     <div class="fs-expanded" id="fmtExpanded">
-      <button class="fs-toggle-btn fs-fold-btn" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="fmtCollapse()">
+      <button class="fs-toggle-btn fs-fold-btn" onpointerdown="event.preventDefault()" onclick="fmtCollapse()">
         <span class="fs-toggle-arrow">▼</span>
         <span class="fs-toggle-label">접기</span>
       </button>
@@ -1417,8 +1426,9 @@ function fmtMakeRows(container, items) {
     btn.className='fs-row';
     btn.dataset.cmd=item.cmd;
     btn.innerHTML=`<span class="fs-name">${item.name}</span><span class="fs-icon">${FMT_ICONS[item.cmd]}</span>`;
-    btn.addEventListener('mousedown', e=>e.preventDefault());
-    btn.addEventListener('touchstart', e=>e.preventDefault(), {passive: false}); // 터치 포커스 유지
+    
+    // onpointerdown을 통해 터치 포커스 손실을 막고(preventDefault), 클릭 이벤트로 실행
+    btn.addEventListener('pointerdown', e=>e.preventDefault());
     btn.addEventListener('click', ()=>{
       fmtSaveRecent(item.cmd);
       item.exec();
@@ -1431,40 +1441,50 @@ function fmtMakeRows(container, items) {
   const pad=document.createElement('div'); pad.className='fs-last-pad'; container.appendChild(pad);
 }
 
-function fmtGetBottom(){
-  const vv=window.visualViewport;
-  if(!vv) return 44;
-  // iOS 사파리 대응: offsetTop을 빼면 스크롤 시 위치가 틀어지므로 키보드 높이만 계산
-  const kbH = window.innerHeight - vv.height;
-  return (kbH > 100 ? kbH : 0) + 44; // 44는 툴바 높이
-}
-
 function toggleFormatMenu(){
-  const popup=document.getElementById('formatPopup');
-  if(popup.classList.contains('on')) closeFormatMenu();
+  if(isFormatMenuOpen) closeFormatMenu();
   else openFormatMenu();
 }
+
 function openFormatMenu(){
   const popup=document.getElementById('formatPopup');
   const overlay=document.getElementById('formatSheetOverlay');
-  // bottom 위치 설정
-  popup.style.bottom = fmtGetBottom()+'px';
-  // 기본 뷰
+  
+  // 팝업 열릴 때 캐럿(커서) 투명하게 변경
+  document.body.classList.add('hide-caret');
+  
+  const vv = window.visualViewport;
+  const mobToolbar = document.getElementById('mobToolbar');
+  
+  if(vv && mobToolbar) {
+    const offsetTop = vv.offsetTop;
+    const keyboardHeight = window.innerHeight - vv.height;
+    // 툴바 바로 위쪽(키보드 바로 위)으로 팝업 위치 세팅
+    popup.style.bottom = Math.max(0, keyboardHeight - offsetTop + mobToolbar.offsetHeight) + 'px';
+  } else {
+    popup.style.bottom = '44px';
+  }
+  
   document.getElementById('fmtDefault').style.display='flex';
   document.getElementById('fmtExpanded').classList.remove('on');
-  // 최근 5개
+  
   const recent=fmtGetRecent();
   const recentItems=FMT_ITEMS.filter(i=>recent.includes(i.cmd)).sort((a,b)=>recent.indexOf(a.cmd)-recent.indexOf(b.cmd));
   fmtMakeRows(document.getElementById('fmtRecentList'), recentItems);
+  
   popup.classList.add('on');
   overlay.classList.add('on');
   isFormatMenuOpen=true;
 }
+
 function closeFormatMenu(){
+  // 캐럿 다시 보이게 복구
+  document.body.classList.remove('hide-caret');
   document.getElementById('formatPopup').classList.remove('on');
   document.getElementById('formatSheetOverlay').classList.remove('on');
   isFormatMenuOpen=false;
 }
+
 function fmtExpand(){
   fmtMakeRows(document.getElementById('fmtFullList'), FMT_ITEMS);
   document.getElementById('fmtDefault').style.display='none';
@@ -1576,44 +1596,63 @@ function setupGesturesAndUI() {
   const mobToolbar = document.getElementById('mobToolbar');
   const editableIds = ['edBody', 'memo-body', 'quote-body', 'book-body', 'edTitle', 'memo-title', 'book-title', 'quote-by'];
   
-  // 키보드 활성화 시 편집 툴바 제어
+  // 키보드 활성화 시 편집 툴바 제어 - 모바일 키보드 완벽 동기화 로직
   const adjustToolbar=()=>{
     if(window.innerWidth>768)return;
-    if(!app.classList.contains('view-editor')){mobToolbar.classList.remove('visible');return;}
-    const isFocused=document.activeElement&&editableIds.includes(document.activeElement.id);
-    if(isFocused&&window.visualViewport){
-      const vv=window.visualViewport;
-      const kbHeight=window.innerHeight-vv.height-vv.offsetTop;
-      if(kbHeight>100){
-        mobToolbar.classList.add('visible');
-        mobToolbar.style.bottom=kbHeight+'px';
-      } else {
-        mobToolbar.classList.remove('visible');
+    const vv = window.visualViewport;
+    if(!vv) return;
+
+    if(!app.classList.contains('view-editor')){
+      mobToolbar.style.display = 'none';
+      return;
+    }
+    
+    const isFocused = document.activeElement && editableIds.includes(document.activeElement.id);
+    
+    // 키보드가 띄워졌거나(포커스), 메뉴가 열려있을 때 툴바 표시
+    if(isFocused || isFormatMenuOpen){
+      mobToolbar.style.display = 'flex';
+      // 투명도 등 트랜지션을 위해 클래스 추가
+      setTimeout(() => mobToolbar.classList.add('visible'), 10); 
+      
+      const offsetTop = vv.offsetTop;
+      const keyboardHeight = window.innerHeight - vv.height;
+      
+      // 화면 하단( bottom )을 키보드 높이만큼 밀어올리고 스크롤 오프셋을 뺌
+      // 이 방식이 iOS에서 스크롤 시 화면이 떨리는 것을 최소화함
+      mobToolbar.style.bottom = Math.max(0, keyboardHeight - offsetTop) + 'px';
+
+      // 팝업이 열려있다면 툴바와 같이 위치 조정
+      if(isFormatMenuOpen){
+        const popup = document.getElementById('formatPopup');
+        popup.style.bottom = Math.max(0, keyboardHeight - offsetTop + mobToolbar.offsetHeight) + 'px';
       }
     } else {
       mobToolbar.classList.remove('visible');
+      setTimeout(() => { if(!mobToolbar.classList.contains('visible')) mobToolbar.style.display = 'none'; }, 150);
     }
   };
 
   editableIds.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener('focus', () => setTimeout(adjustToolbar, 100));
-      el.addEventListener('blur', () => setTimeout(adjustToolbar, 100));
+      el.addEventListener('focus', () => setTimeout(adjustToolbar, 50));
+      el.addEventListener('blur', () => setTimeout(adjustToolbar, 50));
     }
   });
 
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', adjustToolbar);
-    window.visualViewport.addEventListener('scroll', adjustToolbar);
-    window.visualViewport.addEventListener('resize', ()=>{
-      if(isFormatMenuOpen) document.getElementById('formatPopup').style.bottom=fmtGetBottom()+'px';
-    });
+    window.visualViewport.addEventListener('resize', () => requestAnimationFrame(adjustToolbar));
+    window.visualViewport.addEventListener('scroll', () => requestAnimationFrame(adjustToolbar));
   }
 
   // 뷰 전환 시 툴바 상태 관리
   const viewObs=new MutationObserver(()=>{
-    if(!app.classList.contains('view-editor'))mobToolbar.classList.remove('visible');
+    if(!app.classList.contains('view-editor')) {
+      mobToolbar.classList.remove('visible');
+      mobToolbar.style.display = 'none';
+      if(isFormatMenuOpen) closeFormatMenu();
+    }
   });
   viewObs.observe(app,{attributes:true,attributeFilter:['class']});
 
