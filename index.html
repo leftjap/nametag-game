@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="gio_circle_white_closeup2_512.png">
+<link rel="apple-touch-icon" href="apple-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#fbbf24">
+<meta name="apple-mobile-web-app-title" content="이름표">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>인생은 이름표 붙이기 게임</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="loadingScreen" class="hidden">
+  <div class="loading-wrapper">
+    <div class="loading-scene">
+      <img src="gio_circle_white_closeup2_512.png" alt="지오" class="bounce-avatar">
+      <div class="bounce-shadow"></div>
+    </div>
+    <div class="loading-text">불러오는 중</div>
+  </div>
+</div>
+
+<div id="lockScreen" class="hidden">
+  <div class="lock-card">
+    <div class="lock-brand">이름표 붙이기 게임</div>
+    <div class="lock-desc">개인 기록 공간입니다. 로그인해주세요.</div>
+    <div id="googleSignInBtn"></div>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+</div>
+
+<!-- 플로팅 인라인 툴바 -->
+<div id="floatingToolbar">
+  <button class="ft-btn" title="굵게" onclick="applyFormatFT('bold')"><b>B</b></button>
+  <button class="ft-btn" title="기울임" onclick="applyFormatFT('italic')"><i style="font-style:italic">I</i></button>
+  <button class="ft-btn highlight-btn" title="형광펜" onclick="applyHighlight()"><span class="hl-inner">A</span></button>
+  <button class="ft-btn" title="취소선" onclick="applyFormatFT('strikeThrough')"><s>S</s></button>
+  <button class="ft-btn" title="밑줄" onclick="applyFormatFT('underline')"><u>U</u></button>
+</div>
+
+<!-- 이미지 플로팅 버튼 -->
+<div id="imgHoverBtn" class="img-actions" style="position:fixed;">
+  <button class="img-action-btn" onclick="toggleImgMenu(event)">
+    <svg viewBox="0 0 24 24">
+      <circle cx="5"  cy="12" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="19" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+</div>
+<!-- 이미지 액션 드롭다운 -->
+<div id="imgDropdownMenu" class="img-menu" style="position:fixed;">
+  <div class="img-menu-date" id="imgMenuDate"></div>
+  <div class="img-menu-item" onclick="execImgAction('cut')">
+    <span>잘라내기</span>
+    <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+  </div>
+  <div class="img-menu-item" onclick="execImgAction('copy')">
+    <span>복사</span>
+    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </div>
+  <div class="img-menu-item danger" onclick="execImgAction('delete')">
+    <span>삭제</span>
+    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  </div>
+</div>
+
+<div class="app view-list" id="mainApp" style="display:none;">
+
+<div class="side">
+  <div class="header side-hdr">
+    <div class="header-left brand-wrap">
+      <img src="gio_circle_white_closeup2_512.png" alt="지오" class="cat-avatar avatar">
+      <div class="brand">이름표 붙이기 게임</div>
+    </div>
+    <div class="sync-row">
+      <div class="sync-status" onclick="SYNC.syncAll()">
+        <span class="sync-dot" id="syncDot"></span>
+        <span id="syncStatus">완료됨</span>
+      </div>
+      <button class="sync-btn" onclick="SYNC.syncAll()">↻</button>
+    </div>
+  </div>
+  
+  <div class="side-scroll">
+    <div class="sec sec-border quote-section">
+      <div class="sec-t">오늘의 어구</div>
+      <div class="q-card quote-card" onclick="showRandomQuote()">
+        <div class="quote-mark">"</div>
+        <div class="quote-label" style="display:none;">오늘의 어구</div>
+        <div class="q-content">
+          <div class="q-text quote-text" id="quoteText">어구록에 문장을 추가해보세요</div>
+          <div class="q-by quote-by" id="quoteBy"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec sec-border side-nav" style="padding:8px 16px 12px">
+      <div class="sec-t" style="margin-bottom:4px">글쓰기</div>
+      <div id="sideNav" class="writing-grid"></div>
+    </div>
+
+    <div class="sec sec-border">
+      <div class="sec-t">데일리 루틴</div>
+      <div class="chk-table" id="chkTable"></div>
+    </div>
+    
+    <div class="sec" style="padding-bottom:40px;">
+      <div class="sec-t" style="display:flex; justify-content:space-between; align-items:center;">
+        기록
+      </div>
+      <div class="stats-wrap">
+        <div class="stat-col">
+          <div class="stat-label">오늘 쓴 글</div>
+          <div class="stat-big" id="wToday">0</div>
+          <div class="stat-sub">월간 <span id="wMonth">0</span></div>
+        </div>
+        <div class="stat-col">
+          <div class="stat-label">읽은 책</div>
+          <div class="stat-big" id="bToday">0</div>
+          <div class="stat-sub">월간 <span id="bMonth">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="list-panel">
+  <div class="lp-hdr">
+    <button class="sb-toggle pc-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 열기/닫기">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+    </button>
+    <button class="sb-toggle mobile-nav-btn" onclick="setMobileView('side')" title="메뉴 열기">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+
+    <div class="view-switcher" id="viewSwitcher">
+      <button class="vs-btn on" id="btn-list" onclick="switchListView('list')" title="목록">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+      <button class="vs-btn" id="btn-photo" onclick="switchListView('photo')" title="사진">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <button class="vs-btn" id="btn-calendar" onclick="switchListView('calendar')" title="캘린더">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </button>
+    </div>
+
+    <div class="search-bar" id="searchBar">
+      <button class="search-icon-btn lp-search-btn" onclick="toggleSearch()" title="검색">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+      <input type="text" id="searchInput" placeholder="#태그 또는 검색어" oninput="handleSearch(event)">
+      <button id="clearSearchBtn" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    </div>
+  </div>
+
+  <div class="pane-list" id="pane-list"></div>
+  
+  <div class="pane-photo" id="pane-photo">
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <div class="pane-calendar" id="pane-calendar">
+    <div class="cal-wrap" id="calWrap"></div>
+  </div>
+  
+  <button class="fab-btn" onclick="handleNew()" title="새 글 작성">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+  </button>
+</div>
+
+<div class="editor">
+  <div class="col-header ed-topbar">
+    <div class="ed-topbar-left">
+      <button class="mobile-nav-btn mobile-back-btn" onclick="setMobileView('list')" title="목록으로 가기">
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
+      <span class="ed-header-date" id="edDate"></span>
+      <span class="ed-save-status" id="edSaveStatus">저장됨</span>
+    </div>
+    <div class="ed-topbar-right">
+      <button class="ed-top-btn pc-only" onclick="handleNew()">+ 새 글</button>
+      <button class="ed-btn-done" onclick="handleDone()">완료</button>
+    </div>
+  </div>
+  
+  <div class="toolbar" id="edToolbar">
+    <div style="position:relative;flex-shrink:0;">
+      <button class="tb-heading-btn" id="headingBtn" onclick="toggleHeadingMenu()">
+        <svg viewBox="0 0 24 24"><text x="2" y="18" font-size="18" font-weight="900" fill="currentColor" stroke="none" font-family="serif">H</text></svg>
+        <svg class="caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="heading-dropdown" id="headingDropdown">
+        <div class="heading-opt" onclick="applyHeading('h1')">
+          <span class="h-label h1">제목</span><span class="h-size">H1</span>
+        </div>
+        <div class="heading-opt" onclick="applyHeading('h2')">
+          <span class="h-label h2">부제목</span><span class="h-size">H2</span>
+        </div>
+        <div class="heading-opt" onclick="applyHeading('h3')">
+          <span class="h-label h3">소제목</span><span class="h-size">H3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <button class="tb-btn" title="순서 없는 목록" onclick="execCmd('insertUnorderedList')">
+      <svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <button class="tb-btn" title="순서 있는 목록" onclick="execCmd('insertOrderedList')">
+      <svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="9" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">1.</text><text x="2" y="15" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">2.</text><text x="2" y="21" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">3.</text></svg>
+    </button>
+    <button class="tb-btn" title="체크리스트" onclick="insertChecklist()">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </button>
+
+    <div class="tb-sep"></div>
+
+    <button class="tb-btn" title="인용" onclick="execCmd('formatBlock','blockquote')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+    </button>
+    <button class="tb-btn" title="구분선" onclick="execCmd('insertHorizontalRule')">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+    </button>
+
+    <div class="tb-sep"></div>
+
+    <button class="tb-btn media" title="파일 첨부" onclick="document.getElementById('fileInput').click()">
+      <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+    </button>
+    <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleMediaUpload(event)">
+    <input type="file" id="fileInput" style="display:none" onchange="handleMediaUpload(event)">
+  </div>
+  
+  <div id="editorText" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="editor-scroll-area">
+      <div class="editor-content-wrap">
+        <input class="ed-title" id="edTitle" placeholder="제목">
+        <div class="ed-body" id="edBody" contenteditable="true" spellcheck="false" translate="no" data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
+      </div>
+    </div>
+    <div class="ed-foot">
+      <button class="ed-foot-loc" id="edFootLoc" onclick="openLocationModal(currentLocProfile())">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <span id="edFootLocText">위치 정보 없음</span>
+      </button>
+      <div class="ed-foot-stats-wrap">
+        <div class="ed-foot-stats">
+          <span id="edChars">0자</span>
+          <div class="fs-sep"></div>
+          <span id="edWords">0단어</span>
+          <div class="fs-sep"></div>
+          <span id="edPages">0.0매</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="editorBook" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="editor-scroll-area">
+      <div class="editor-content-wrap">
+        <div class="special-form">
+          <div class="sf-field"><span class="sf-label">제목</span><input class="sf-input" id="book-title" placeholder="책 제목"></div>
+          <div class="sf-row">
+            <div class="sf-field" style="flex:2"><span class="sf-label">저자</span><input class="sf-input" id="book-author" placeholder="저자명"></div>
+            <div class="sf-field" style="flex:2"><span class="sf-label">출판사</span><input class="sf-input" id="book-publisher" placeholder="출판사명"></div>
+            <div class="sf-field" style="flex:1"><span class="sf-label">읽은 양 (p)</span><input class="sf-input" id="book-pages" placeholder="숫자만" type="number"></div>
+          </div>
+        </div>
+        <div class="ed-body" id="book-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="책에 대한 메모..."></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="editorQuote" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="editor-scroll-area">
+      <div class="editor-content-wrap">
+        <div class="special-form"><div class="sf-field"><span class="sf-label">출처</span><input class="sf-input" id="quote-by" placeholder="책 제목, 저자 등"></div></div>
+        <div class="ed-body" id="quote-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="인상 깊은 문장을 기록하세요..."></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="editorMemo" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="editor-scroll-area">
+      <div class="editor-content-wrap">
+        <input class="ed-title" id="memo-title" placeholder="메모 제목">
+        <div class="ed-body" id="memo-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 위치 모달 -->
+<div class="modal-overlay" id="modalOverlay" onclick="onLocationOverlayClick(event)">
+  <div class="modal-card">
+    <div class="modal-hdr">
+      <div class="modal-title">항목 정보</div>
+      <button class="modal-close" onclick="closeLocationModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-addr">
+      <div class="addr-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      </div>
+      <div class="addr-texts">
+        <div class="addr-main" id="addrMain"></div>
+        <div class="addr-sub"  id="addrSub"></div>
+      </div>
+    </div>
+    <div class="modal-map-wrap">
+      <div class="modal-map">
+        <canvas id="mapCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JS 로딩 순서: 의존성 순서대로 -->
+<script src="storage.js"></script>
+<script src="data.js"></script>
+<script src="ui.js"></script>
+<script src="editor.js"></script>
+<script src="sync.js"></script>
+
+</body>
+</html>
