@@ -321,60 +321,72 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .photo-cell.solo .photo-ym { font-size: 13px; }
 
 /* ══ [FIX] 캘린더 ══ */
-.cal-wrap{padding:0 0 40px;}
-.cal-month-title{ font-size:17px;font-weight:700;color:var(--tx); padding:18px 14px 8px; }
-.cal-dow-row{ display:grid;grid-template-columns:repeat(7,1fr); padding:0 8px 4px; }
-.cal-dow{ font-size:10px;color:var(--tx-hint);text-align:center; height:22px;display:flex;align-items:center;justify-content:center;font-weight:500; }
-.cal-grid{
+.cal-wrap { padding: 0 0 10px; }
+.cal-month-title { font-size: 18px; font-weight: 700; color: var(--tx); padding: 20px 16px 12px; }
+.cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px 8px; }
+.cal-dow { font-size: 11px; color: var(--tx-hint); text-align: center; font-weight: 500; }
+
+.cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  padding: 0 8px 14px;
+  gap: 5px;
+  padding: 0 12px 14px;
 }
+
 .cal-day {
   aspect-ratio: 1;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; position: relative;
-  overflow: visible;
-  padding: 0;
-  border-radius: 9px;
-  border: 2.5px solid transparent;
-  transition: border-color .15s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  background: transparent;
+  font-size: 14px;
+  color: var(--tx-d);
+  transition: transform .1s ease;
 }
+.cal-day:active { transform: scale(.92); }
 .cal-day.empty { cursor: default; }
 .cal-day:hover:not(.empty):not(.selected) { background: rgba(0,0,0,.04); }
 
-.cal-day-inner {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 6px;
-  position: relative; overflow: hidden;
-  font-size: 12px; color: var(--tx-d);
+.cal-day.selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2.5px solid #82c4b0;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 5;
 }
 
-/* 글 있는 날 */
-.cal-day.has-entry .cal-day-inner { background: #a8d8c8; color: white; font-weight: 600; }
-.cal-day.has-entry:hover:not(.selected) .cal-day-inner { background: #82c4b0; }
+.cal-day.has-entry { background: #a8d8c8; color: white; font-weight: 600; }
+.cal-day.today.has-entry { background: #82c4b0; }
+.cal-day.today:not(.has-entry) { color: #82c4b0; font-weight: 700; }
 
-/* 오늘 */
-.cal-day.today { border-color: #82c4b0; }
-.cal-day.today .cal-day-inner { color: #82c4b0; font-weight: 700; }
-.cal-day.today.has-entry .cal-day-inner { background: #82c4b0; color: white; }
-
-/* 클릭 선택 — 민트 테두리 + 어두운 민트 배경 */
-.cal-day.selected { border-color: #82c4b0; }
-.cal-day.selected .cal-day-inner { background: #82c4b0 !important; color: white !important; }
-
-/* 이미지 있는 날 — 이미지 유지, 텍스트쉐도우만 */
-.cal-photo-bg { position: absolute; inset: 0; background-size: cover; background-position: center; border-radius: 5px; }
-.cal-day-num { position: relative; z-index: 2; font-size: 12px; font-weight: 600; }
+.cal-photo-bg {
+  position: absolute; 
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+.cal-day.has-photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
 .cal-day.has-photo .cal-day-num {
-  color: white; font-weight: 800; font-size: 13px;
-  text-shadow: 0 1px 3px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.4);
+  position: relative;
+  z-index: 3;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
-/* 이미지+선택: 이미지 그대로 + 민트 테두리만 */
-.cal-day.has-photo.selected { border-color: #82c4b0; }
-.cal-day.has-photo.selected .cal-day-inner { background: none !important; }
 .cal-separator{height:1px;background:var(--border-l);margin:0 14px;}
 
 /* ═══ Editor (PC) ═══ */
@@ -1765,7 +1777,7 @@ function renderCalendarView(items, t) {
     const first=new Date(mo.y,mo.m-1,1).getDay(), days=new Date(mo.y,mo.m,0).getDate();
     const key=`${mo.y}-${mo.m}`, entries=entriesMap[key]?Array.from(entriesMap[key]):[];
     let cells='';
-    for(let i=0;i<first;i++) cells+=`<div class="cal-day empty"><div class="cal-day-inner"></div></div>`;
+    for(let i=0;i<first;i++) cells+=`<div class="cal-day empty"></div>`;
     for(let d=1;d<=days;d++){
       const has=entries.includes(d);
       const isToday=(mo.y===todayD.getFullYear()&&mo.m===todayD.getMonth()+1&&d===todayD.getDate());
@@ -1773,10 +1785,15 @@ function renderCalendarView(items, t) {
       let cls='cal-day';
       if(has)cls+=' has-entry'; if(isToday)cls+=' today';
       let inner='';
-      if(thumb){cls+=' has-photo';inner=`<div class="cal-photo-bg" style="background-image:url('${thumb}');background-size:cover;background-position:center;"></div>`;}
+      let numHtml=d;
+      if(thumb){
+        cls+=' has-photo';
+        inner=`<div class="cal-photo-bg" style="background-image:url('${thumb}');"></div>`;
+        numHtml=`<span class="cal-day-num">${d}</span>`;
+      }
       const targetDateStr=`${mo.y}-${String(mo.m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const clickFn=has?`onclick="switchListView('list'); setTagSearch('${targetDateStr}');"` :'';
-      cells+=`<div class="${cls}" ${clickFn}>${inner}<div class="cal-day-inner">${d}</div></div>`;
+      cells+=`<div class="${cls}" ${clickFn}>${inner}${numHtml}</div>`;
     }
     html+=`${mi>0?'<div class="cal-separator"></div>':''}
       <div class="cal-month-title">${mo.label}</div>
