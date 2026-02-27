@@ -246,16 +246,24 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   padding: 6px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
 }
 .photo-cell{
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #e8e4dc;
   transition: transform .15s;
+}
+.photo-cell::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 40%,transparent 60%);
+  z-index:1;
+  pointer-events:none;
 }
 /* 단독 이미지 → 전체 너비 */
 .photo-cell.solo {
@@ -285,7 +293,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 /* [FIX] 날짜 - Pretendard 800, text-shadow 없음 */
 .photo-date-block{
   position: absolute;
-  right: 10px; bottom: 8px;
+  right: 12px; bottom: 10px;
   text-align: right;
   pointer-events: none;
   line-height: 1;
@@ -294,11 +302,12 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .photo-day-num{
   display: block;
   font-family: 'Pretendard', sans-serif;
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 34px;
+  font-weight: 400;
   color: white;
   letter-spacing: -1.5px;
   line-height: 1;
+  text-shadow: none;
 }
 .photo-cell.solo .photo-day-num { font-size: 56px; }
 .photo-ym{
@@ -1693,7 +1702,7 @@ function renderPhotoView(items, t) {
   photoItems.forEach((item, idx) => {
     const thumb = getThumb(item.content);
     const dt = new Date(item.created || item.date || Date.now());
-    const day = dt.getDate();
+    const day = String(dt.getDate()).padStart(2,'0');
     const ym = `${dt.getFullYear()}년 ${dt.getMonth()+1}월`;
     const isSolo = photoItems.length === 1;
     const isSelected = selectedPhotoId === item.id;
