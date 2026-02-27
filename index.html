@@ -469,6 +469,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   color: var(--tx-m);
   background: var(--bg);
   z-index: 10;
+  position: relative;
 }
 
 /* 위치 버튼 (pill 형태) */
@@ -486,12 +487,25 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 
 /* 글자수 영역 */
 .ed-foot-stats {
-  margin-left: auto;
   display: flex; align-items: center; gap: 0;
   font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--tx-m);
 }
 .ed-foot-stats span { color: var(--tx-d); font-weight: 500; }
 .ed-foot-stats .fs-sep { width: 1px; height: 11px; background: var(--border-l); margin: 0 10px; }
+
+.ed-foot-stats-wrap {
+  position: absolute;
+  left: 0; right: 0;
+  display: flex; 
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.ed-foot-stats {
+  pointer-events: auto;
+  background: var(--bg);
+  padding: 0 10px;
+}
 
 .special-form{padding:20px 0;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--border);margin-bottom:20px}
 .sf-field{display:flex;flex-direction:column;gap:6px}.sf-row{display:flex;gap:16px}
@@ -722,7 +736,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
     justify-content:center;
     background:var(--bg-white);
   }
-  .ed-foot-stats{display:none;}
+  .ed-foot-stats-wrap{display:none;}
   .ed-foot-loc{
     max-width:100%;
     padding:6px 16px;
@@ -962,32 +976,21 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
         <input class="ed-title" id="edTitle" placeholder="제목">
         <!-- [FIX] 태그 입력란 제거 -->
         <div class="ed-body" id="edBody" contenteditable="true" spellcheck="false" translate="no" data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
-        <div class="meta-bar-wrap" id="editorMetaBarWrap" style="display:none;">
-          <div class="meta-bar">
-            <span class="meta-bar-type" id="metaType">기록</span>
-            <span class="meta-bar-dot"></span>
-            <div class="meta-bar-info" id="metaInfo">
-              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-              위치 정보 없음
-            </div>
-            <button class="meta-bar-more" onclick="openLocationModal('gio')">
-              <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
     <div class="ed-foot">
-      <button class="ed-foot-loc" id="edFootLoc" onclick="openLocationModal(currentLocProfile())">
+      <button class="ed-foot-loc" id="edFootLoc" onclick="openGoogleMap()">
         <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
         <span id="edFootLocText">위치 정보 없음</span>
       </button>
-      <div class="ed-foot-stats">
-        <span id="edChars">0자</span>
-        <div class="fs-sep"></div>
-        <span id="edWords">0단어</span>
-        <div class="fs-sep"></div>
-        <span id="edPages">0.0매</span>
+      <div class="ed-foot-stats-wrap">
+        <div class="ed-foot-stats">
+          <span id="edChars">0자</span>
+          <div class="fs-sep"></div>
+          <span id="edWords">0단어</span>
+          <div class="fs-sep"></div>
+          <span id="edPages">0.0매</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1019,19 +1022,6 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
         <input class="ed-title" id="memo-title" placeholder="메모 제목">
         <!-- [FIX] 태그 입력란 제거 -->
         <div class="ed-body" id="memo-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
-        <div class="meta-bar-wrap" id="memoMetaBarWrap" style="display:none;">
-          <div class="meta-bar">
-            <span class="meta-bar-type" id="memoMetaType">메모</span>
-            <span class="meta-bar-dot"></span>
-            <div class="meta-bar-info" id="memoMetaInfo">
-              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-              위치 정보 없음
-            </div>
-            <button class="meta-bar-more" onclick="openLocationModal('gio')">
-              <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -1371,36 +1361,7 @@ function newDoc(type){
   return doc;
 }
 
-// [FIX] updateMetaBar - 메타바가 항상 표시되도록 수정
 function updateMetaBar(type, title) {
-  const isMemo = type === 'memo';
-  const el = document.getElementById(isMemo ? 'memoMetaBarWrap' : 'editorMetaBarWrap');
-  
-  // textTypes + memo 에서 메타바 표시
-  if (!el || (!textTypes.includes(type) && !isMemo)) {
-    if(el) el.style.display = 'none';
-    return;
-  }
-  
-  // display:flex 로 강제 설정
-  el.style.display = 'flex';
-  el.style.cssText = 'display:flex !important; margin-top:auto; padding-top:24px; justify-content:center; width:100%;';
-  
-  const typeName = TAB_META[type] || '기록';
-  const typeEl = document.getElementById(isMemo ? 'memoMetaType' : 'metaType');
-  if(typeEl) typeEl.textContent = typeName;
-  
-  const metaInfo = document.getElementById(isMemo ? 'memoMetaInfo' : 'metaInfo');
-  const moreBtn = el.querySelector('.meta-bar-more');
-  
-  if(type === 'fiction') {
-    if(metaInfo) metaInfo.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> 18°C Cloudy · Shinjuku, Tokyo`;
-    if(moreBtn) moreBtn.setAttribute('onclick', "openLocationModal('soyeon')");
-  } else {
-    if(metaInfo) metaInfo.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> 10°C 지우기 · 와우산로37길 Mapo-gu`;
-    if(moreBtn) moreBtn.setAttribute('onclick', "openLocationModal('gio')");
-  }
-
   // 하단 위치 pill 텍스트 업데이트
   const footLocText = document.getElementById('edFootLocText');
   if (footLocText) {
@@ -2322,6 +2283,25 @@ function init(){
     if(GAS_URL)SYNC.setSyncStatus('완료됨','ok');else SYNC.setSyncStatus('로컬 전용','error');
     switchListView('list');
   }catch(e){console.error('init error:',e);alert('초기화 오류: '+e.message);}
+}
+
+function openGoogleMap() {
+  const locEl = document.getElementById('edFootLocText');
+  if(!locEl) return;
+
+  const locText = locEl.innerText;
+  if(locText === '위치 정보 없음' || !locText.trim()) {
+    alert("위치 정보가 없습니다.");
+    return;
+  }
+
+  const parts = locText.split('·');
+  const address = parts[parts.length - 1].trim();
+
+  if(address) {
+    const googleMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    window.open(googleMapUrl, '_blank');
+  }
 }
 </script>
 </body>
