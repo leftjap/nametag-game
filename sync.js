@@ -3,7 +3,8 @@
 // ═══════════════════════════════════════
 
 // ═══ GAS Sync ═══
-const GAS_URL = '[https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec](https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec)';
+// 마크다운 형식 오류 수정
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec';
 
 const SYNC = {
   dbTimer:null, timer:null, checksTimer:null, isDbLoaded:false,
@@ -136,19 +137,32 @@ function openLocationModal(key) {
   const mapContainer = document.querySelector('.modal-map');
   const searchQuery = encodeURIComponent(loc.addrSub + ' ' + loc.addrMain);
   
+  // 구글 맵 URL 마크다운 오류 수정
   mapContainer.innerHTML = `<iframe 
     width="100%" 
     height="100%" 
     frameborder="0" 
     style="border:0;" 
-    src="[https://maps.google.com/maps?q=$](https://maps.google.com/maps?q=$){searchQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed">
+    src="https://maps.google.com/maps?q=${searchQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed">
   </iframe>`;
 
   document.getElementById('modalOverlay').classList.add('open');
 }
 
-function closeLocationModal() { document.getElementById('modalOverlay').classList.remove('open'); }
-function onLocationOverlayClick(e) { if(e.target===document.getElementById('modalOverlay')) closeLocationModal(); }
+function closeLocationModal() { 
+  document.getElementById('modalOverlay').classList.remove('open'); 
+  // 리소스 최적화: 모달 닫힐 때 iframe 내용 비우기
+  setTimeout(() => {
+    const mapContainer = document.querySelector('.modal-map');
+    if(mapContainer) mapContainer.innerHTML = '';
+  }, 250);
+}
+
+function onLocationOverlayClick(e) { 
+  if(e.target===document.getElementById('modalOverlay')) {
+    closeLocationModal(); 
+  }
+}
 
 // ═══ 이미지 호버 메뉴 ═══
 let currentHoverImg = null;
