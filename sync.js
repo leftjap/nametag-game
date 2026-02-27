@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════
 
 // ═══ GAS Sync ═══
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec';
+const GAS_URL = '[https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec](https://script.google.com/macros/s/AKfycbw3WUMJJyab2uZ33OtZVU1Rv4kvo47cqTaRecEZta4gAtaizN667CV4oZLS8q4nNUTY/exec)';
 
 const SYNC = {
   dbTimer:null, timer:null, checksTimer:null, isDbLoaded:false,
@@ -124,40 +124,29 @@ const SYNC = {
 
 // ═══ 지도 ═══
 const LOCATIONS = {
-  gio:{addrMain:'Mapo-gu, South Korea',addrSub:'와우산로37길 Mapo-gu',
-    roads:[{w:3,color:'#d8d0c4',pts:[[0,0.45],[0.15,0.45],[0.35,0.38],[0.6,0.38],[0.85,0.42],[1,0.42]]},{w:3,color:'#d8d0c4',pts:[[0,0.62],[0.25,0.62],[0.5,0.58],[0.75,0.6],[1,0.62]]},{w:2.5,color:'#d8d0c4',pts:[[0.3,0],[0.28,0.2],[0.3,0.38],[0.34,0.58],[0.38,0.8],[0.4,1]]},{w:2.5,color:'#d8d0c4',pts:[[0.6,0],[0.58,0.25],[0.6,0.38],[0.62,0.58],[0.6,1]]},{w:1.2,color:'#e0d8cc',pts:[[0,0.3],[0.5,0.28],[1,0.3]]},{w:1.2,color:'#e0d8cc',pts:[[0,0.75],[0.5,0.74],[1,0.76]]},{w:1,color:'#e0d8cc',pts:[[0.15,0],[0.14,0.45],[0.16,1]]},{w:1,color:'#e0d8cc',pts:[[0.45,0],[0.44,0.38],[0.46,0.62],[0.45,1]]},{w:1,color:'#e0d8cc',pts:[[0.78,0],[0.77,0.42],[0.79,1]]},{w:1,color:'#e0d8cc',pts:[[0,0.88],[1,0.87]]},{w:1,color:'#e0d8cc',pts:[[0,0.15],[1,0.13]]}],
-    parks:[{x:0.04,y:0.48,w:0.1,h:0.14,r:6},{x:0.66,y:0.28,w:0.14,h:0.1,r:5}],marker:{x:0.42,y:0.45}},
-  soyeon:{addrMain:'Shinjuku, Tokyo',addrSub:'新宿区, 東京都, Japan',
-    roads:[{w:4,color:'#d8d0c4',pts:[[0,0.5],[1,0.5]]},{w:3.5,color:'#d8d0c4',pts:[[0,0.28],[0.3,0.3],[0.6,0.28],[1,0.3]]},{w:3,color:'#d8d0c4',pts:[[0.5,0],[0.5,0.5],[0.48,0.75],[0.5,1]]},{w:3,color:'#d8d0c4',pts:[[0.25,0],[0.24,0.3],[0.26,0.5],[0.25,1]]},{w:3,color:'#d8d0c4',pts:[[0.75,0],[0.74,0.3],[0.76,0.5],[0.75,1]]},{w:2,color:'#d8d0c4',pts:[[0,0.68],[0.5,0.7],[1,0.68]]},{w:1.5,color:'#e0d8cc',pts:[[0,0.12],[1,0.13]]},{w:1.5,color:'#e0d8cc',pts:[[0,0.85],[1,0.86]]},{w:1,color:'#e0d8cc',pts:[[0.12,0],[0.11,1]]},{w:1,color:'#e0d8cc',pts:[[0.38,0],[0.38,1]]},{w:1,color:'#e0d8cc',pts:[[0.62,0],[0.63,1]]},{w:1,color:'#e0d8cc',pts:[[0.88,0],[0.87,1]]}],
-    parks:[{x:0.52,y:0.52,w:0.22,h:0.3,r:4}],marker:{x:0.5,y:0.5}}
+  gio:{addrMain:'Mapo-gu, South Korea',addrSub:'와우산로37길'},
+  soyeon:{addrMain:'Shinjuku, Tokyo',addrSub:'新宿区, 東京都'}
 };
-
-function roundRectMap(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
-function drawPinMap(ctx,x,y){const R=12,tail=8;ctx.save();ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=8;ctx.shadowOffsetY=3;ctx.beginPath();ctx.arc(x,y-tail,R,Math.PI*0.85,Math.PI*0.15,true);ctx.lineTo(x,y+tail);ctx.closePath();ctx.fillStyle='#1a1714';ctx.fill();ctx.restore();ctx.beginPath();ctx.arc(x,y-tail,R*0.42,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();}
-
-function drawMap(key) {
-  const canvas=document.getElementById('mapCanvas'), wrap=canvas.parentElement;
-  const W=wrap.clientWidth, H=wrap.clientHeight;
-  canvas.width=W*devicePixelRatio; canvas.height=H*devicePixelRatio;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d'); ctx.scale(devicePixelRatio,devicePixelRatio);
-  const loc=LOCATIONS[key];
-  ctx.fillStyle='#ede8df'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#e6e0d6';
-  for(let bx=0;bx<W;bx+=60) for(let by=0;by<H;by+=60) if((Math.floor(bx/60)+Math.floor(by/60))%3===0) ctx.fillRect(bx+2,by+2,56,56);
-  loc.parks.forEach(p=>{const x=p.x*W,y=p.y*H,w=p.w*W,h=p.h*H;ctx.fillStyle='#c8d8b8';roundRectMap(ctx,x,y,w,h,p.r);ctx.fill();ctx.strokeStyle='#b8c8a8';ctx.lineWidth=0.8;ctx.stroke();});
-  loc.roads.forEach(road=>{ctx.beginPath();road.pts.forEach(([rx,ry],i)=>{const x=rx*W,y=ry*H;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.strokeStyle=road.color;ctx.lineWidth=road.w;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();});
-  const mx=loc.marker.x*W, my=loc.marker.y*H; drawPinMap(ctx,mx,my);
-  ctx.font='9px Pretendard, sans-serif';ctx.fillStyle='rgba(0,0,0,.3)';ctx.textAlign='right';ctx.fillText('© OpenStreetMap',W-8,H-6);
-}
 
 function openLocationModal(key) {
   const loc=LOCATIONS[key]; if(!loc) return;
   document.getElementById('addrMain').textContent=loc.addrMain;
   document.getElementById('addrSub').textContent=loc.addrSub;
+  
+  const mapContainer = document.querySelector('.modal-map');
+  const searchQuery = encodeURIComponent(loc.addrSub + ' ' + loc.addrMain);
+  
+  mapContainer.innerHTML = `<iframe 
+    width="100%" 
+    height="100%" 
+    frameborder="0" 
+    style="border:0;" 
+    src="[https://maps.google.com/maps?q=$](https://maps.google.com/maps?q=$){searchQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed">
+  </iframe>`;
+
   document.getElementById('modalOverlay').classList.add('open');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>drawMap(key)));
 }
+
 function closeLocationModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 function onLocationOverlayClick(e) { if(e.target===document.getElementById('modalOverlay')) closeLocationModal(); }
 
