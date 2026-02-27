@@ -1715,6 +1715,7 @@ function renderCalendarView(items, t) {
   if(items.length === 0) { calWrap.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--tx-hint);font-size:13px;">기록이 없습니다</div>'; return; }
   let minDate = new Date(), maxDate = new Date(0);
   const entriesMap = {}, photoDays = {};
+  const itemMap = {}; // 날짜별 문서 ID 저장
   items.forEach(item => {
     const dt = new Date(item.created || item.date || Date.now());
     if(dt < minDate) minDate = dt; if(dt > maxDate) maxDate = dt;
@@ -1722,6 +1723,8 @@ function renderCalendarView(items, t) {
     const key=`${y}-${m}`, pKey=`${y}-${m}-${d}`;
     if(!entriesMap[key]) entriesMap[key] = new Set();
     entriesMap[key].add(d);
+    if(!itemMap[pKey]) itemMap[pKey] = [];
+    itemMap[pKey].push(item.id);
     let thumb = ''; if(textTypes.includes(t)||t==='memo') thumb=getThumb(item.content);
     if(thumb && !photoDays[pKey]) photoDays[pKey]=thumb;
   });
@@ -1752,8 +1755,15 @@ function renderCalendarView(items, t) {
         inner=`<div class="cal-photo-bg" style="background-image:url('${thumb}');"></div>`;
         numHtml=`<span class="cal-day-num">${d}</span>`;
       }
-      const targetDateStr=`${mo.y}-${String(mo.m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const clickFn=has?`onclick="switchListView('list'); setTagSearch('${targetDateStr}');"` :'';
+      let clickFn = '';
+      if (has && itemMap[pk] && itemMap[pk].length > 0) {
+        const docId = itemMap[pk][0];
+        let loadCall = `loadDoc('${t}','${docId}')`;
+        if (t === 'book') loadCall = `loadBook('${docId}')`;
+        else if (t === 'quote') loadCall = `loadQuote('${docId}')`;
+        else if (t === 'memo') loadCall = `loadMemo('${docId}')`;
+        clickFn = `onclick="${loadCall}; setMobileView('editor'); selectCalDay(this);"`;
+      }
       cells+=`<div class="${cls}" ${clickFn}>${inner}${numHtml}</div>`;
     }
     html+=`${mi>0?'<div class="cal-separator"></div>':''}
@@ -1762,6 +1772,12 @@ function renderCalendarView(items, t) {
       <div class="cal-grid">${cells}</div>`;
   });
   calWrap.innerHTML = html;
+}
+
+// 캘린더 날짜 클릭 시 포커스(테두리) 표시
+function selectCalDay(element) {
+  document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
+  if(element) element.classList.add('selected');
 }
 
 function renderListPanel(){
