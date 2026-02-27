@@ -39,33 +39,23 @@ body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);colo
 .lock-err{font-size:12px;color:var(--red);min-height:18px;font-weight:500}
 
 /* Bouncing Loading Animation */
-.loading-scene { position: relative; height: 180px; width: 120px; display: flex; align-items: flex-start; justify-content: center; }
-.bounce-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid white; box-shadow: 0 6px 20px rgba(0,0,0,.12); object-fit: cover; position: absolute; top: 0; animation: bounce 1.80s cubic-bezier(.36,.07,.19,.97) infinite; transform-origin: center bottom; }
-.bounce-shadow { width: 60px; height: 12px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(150,114,78,.35) 0%, transparent 75%); position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); animation: shadow-pulse 1.80s cubic-bezier(.36,.07,.19,.97) infinite; }
-.loading-text { font-size: 13px; color: var(--tx-m); letter-spacing: .5px; margin-top: 16px; animation: fade-text 1.4s ease-in-out infinite; }
+.loading-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.loading-scene { position: relative; height: 140px; width: 120px; }
+.bounce-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid white; box-shadow: 0 6px 20px rgba(0,0,0,.12); object-fit: cover; position: absolute; top: 0; left: 50%; margin-left: -45px; animation: bounce 0.45s ease-in infinite alternate; z-index: 2; }
+.bounce-shadow { width: 60px; height: 12px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(150,114,78,.35) 0%, transparent 75%); position: absolute; bottom: 0; left: 50%; margin-left: -30px; animation: shadow-pulse 0.45s ease-in infinite alternate; z-index: 1; }
+.loading-text { font-size: 14px; color: var(--tx-m); letter-spacing: .5px; margin-top: 12px; font-weight: 600; text-align: center; animation: fade-text 1.4s ease-in-out infinite; }
+
 @keyframes bounce {
-  0%   { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
-  8%   { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
-  30%  { top: 0px;  transform: scaleX(0.95) scaleY(1.05); }
-  50%  { top: 0px;  transform: scaleX(0.95) scaleY(1.05); }
-  72%  { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
-  80%  { top: 68px; transform: scaleX(1.04) scaleY(0.97); }
-  90%  { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
-  100% { top: 70px; transform: scaleX(1.08) scaleY(0.92); }
+  0%   { transform: translateY(0px); }
+  100% { transform: translateY(40px); } 
 }
 @keyframes shadow-pulse {
-  0%   { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
-  8%   { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
-  30%  { transform: translateX(-50%) scaleX(0.45); opacity: .28; }
-  50%  { transform: translateX(-50%) scaleX(0.45); opacity: .28; }
-  72%  { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
-  80%  { transform: translateX(-50%) scaleX(1.08); opacity: .65; }
-  90%  { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
-  100% { transform: translateX(-50%) scaleX(1.2);  opacity: .85; }
+  0%   { transform: scale(0.5); opacity: 0.2; }  
+  100% { transform: scale(1.1); opacity: 0.85; } 
 }
 @keyframes fade-text {
-  0%, 100% { opacity: .4; }
-  50%      { opacity: .9; }
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.9; }
 }
 
 /* ═══════════════════════════════════════
@@ -584,11 +574,13 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 <body>
 
 <div id="loadingScreen" class="hidden">
-  <div class="loading-scene">
-    <img src="gio_circle_white_closeup2_512.png" alt="지오" class="bounce-avatar">
-    <div class="bounce-shadow"></div>
+  <div class="loading-wrapper">
+    <div class="loading-scene">
+      <img src="gio_circle_white_closeup2_512.png" alt="지오" class="bounce-avatar">
+      <div class="bounce-shadow"></div>
+    </div>
+    <div class="loading-text">불러오는 중</div>
   </div>
-  <div class="loading-text">불러오는 중</div>
 </div>
 
 <div id="lockScreen" class="hidden">
