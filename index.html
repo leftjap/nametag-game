@@ -5,7 +5,8 @@
 <link rel="icon" href="gio_circle_white_closeup2_512.png">
 <link rel="apple-touch-icon" href="apple-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#fbbf24">
 <meta name="apple-mobile-web-app-title" content="이름표">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
@@ -321,48 +322,50 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   gap: 3px;
   padding: 0 8px 14px;
 }
-.cal-day{
+.cal-day {
   aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--tx-d);
-  font-weight: 400;
-  transition: .1s;
-  position: relative;
-  overflow: hidden;
-  /* 내부 여백으로 원이 꽉 차되 살짝 숨구멍 */
-  padding: 2px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  overflow: visible;
+  padding: 0;
+  border-radius: 9px;
+  border: 2.5px solid transparent;
+  transition: border-color .15s;
 }
-.cal-day:hover:not(.empty){ background: rgba(0,0,0,.04); border-radius: 8px; }
-.cal-day.empty{ cursor:default; }
-.cal-day-inner{
+.cal-day.empty { cursor: default; }
+.cal-day:hover:not(.empty):not(.selected) { background: rgba(0,0,0,.04); }
+
+.cal-day-inner {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 6px;
+  position: relative; overflow: hidden;
+  font-size: 12px; color: var(--tx-d);
 }
-.cal-day.has-entry .cal-day-inner{
-  background: #3db8f5;
-  color: white;
-  font-weight: 600;
+
+/* 글 있는 날 */
+.cal-day.has-entry .cal-day-inner { background: #a8d8c8; color: white; font-weight: 600; }
+.cal-day.has-entry:hover:not(.selected) .cal-day-inner { background: #82c4b0; }
+
+/* 오늘 */
+.cal-day.today { border-color: #82c4b0; }
+.cal-day.today .cal-day-inner { color: #82c4b0; font-weight: 700; }
+.cal-day.today.has-entry .cal-day-inner { background: #82c4b0; color: white; }
+
+/* 클릭 선택 — 민트 테두리 + 어두운 민트 배경 */
+.cal-day.selected { border-color: #82c4b0; }
+.cal-day.selected .cal-day-inner { background: #82c4b0 !important; color: white !important; }
+
+/* 이미지 있는 날 — 이미지 유지, 텍스트쉐도우만 */
+.cal-photo-bg { position: absolute; inset: 0; background-size: cover; background-position: center; border-radius: 5px; }
+.cal-day-num { position: relative; z-index: 2; font-size: 12px; font-weight: 600; }
+.cal-day.has-photo .cal-day-num {
+  color: white; font-weight: 800; font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.4);
 }
-.cal-day.has-entry:hover .cal-day-inner{ background:#2aa8e8; }
-.cal-day.today .cal-day-inner{
-  border: 2px solid #3db8f5;
-  color: var(--tx);
-  font-weight: 700;
-}
-.cal-day.today.has-entry .cal-day-inner{
-  background: #3db8f5;
-  color: white;
-  border: none;
-}
-.cal-photo-bg{position:absolute;inset:0;}
-.cal-day-num{position:relative;z-index:2;font-size:13px;}
-.cal-day.has-photo .cal-day-num{color:white;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+/* 이미지+선택: 이미지 그대로 + 민트 테두리만 */
+.cal-day.has-photo.selected { border-color: #82c4b0; }
+.cal-day.has-photo.selected .cal-day-inner { background: none !important; }
 .cal-separator{height:1px;background:var(--border-l);margin:0 14px;}
 
 /* ═══ Editor (PC) ═══ */
@@ -435,8 +438,39 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .ed-body img:hover{box-shadow:0 4px 16px rgba(0,0,0,.13);}
 .ed-body p, .ed-body div { margin: 0; padding: 0; }
 
-.ed-foot{padding:12px 24px;border-top:1px solid var(--border);display:flex;justify-content:center;gap:24px;font-size:12px;color:var(--tx-m);font-family:'JetBrains Mono',monospace;font-weight:400;background:var(--bg);z-index:10}
-.ed-foot span{color:var(--tx-d);font-weight:500}
+.ed-foot {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--tx-m);
+  background: var(--bg);
+  z-index: 10;
+}
+
+/* 위치 버튼 (pill 형태) */
+.ed-foot-loc {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px 4px 8px; border-radius: 20px;
+  border: 1px solid var(--border-l); background: var(--bg-white);
+  font-size: 11.5px; color: var(--tx-m); cursor: pointer;
+  font-family: 'Pretendard', sans-serif; transition: .15s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 280px;
+}
+.ed-foot-loc:hover { border-color: var(--ac-light); color: var(--ac); }
+.ed-foot-loc svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; fill: none; flex-shrink: 0; }
+
+/* 글자수 영역 */
+.ed-foot-stats {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--tx-m);
+}
+.ed-foot-stats span { color: var(--tx-d); font-weight: 500; }
+.ed-foot-stats .fs-sep { width: 1px; height: 11px; background: var(--border-l); margin: 0 10px; }
 
 .special-form{padding:20px 0;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--border);margin-bottom:20px}
 .sf-field{display:flex;flex-direction:column;gap:6px}.sf-row{display:flex;gap:16px}
@@ -448,6 +482,16 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 
 .mobile-nav-btn{display:none}
 .mobile-back-btn{display:none}
+
+:::-webkit-scrollbar { width: 3px; height: 3px; }
+:::-webkit-scrollbar-track { background: transparent; }
+:::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+  min-height: 20px;
+}
+:::-webkit-scrollbar-thumb:hover { background: var(--tx-hint); }
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 
 /* ── 이미지 메뉴 ── */
 .img-actions {
@@ -635,11 +679,16 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .fab-btn:active{transform:scale(.9)}
 
   .ed-topbar{padding-top:calc(env(safe-area-inset-top) + 10px);padding-bottom:10px;padding-left:16px;padding-right:16px;background:var(--yellow);border-bottom:none;height:auto;min-height:calc(env(safe-area-inset-top) + 56px);align-items:center}
-  .ed-header-date{font-size:15px;font-weight:700;color:white}
+  .ed-header-date{
+    font-size:14px;font-weight:400;color:white;
+    position:static;transform:none;
+    flex:1;text-align:center;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
   .ed-top-btn.pc-only{display:none}
   .ed-save-status{display:none}
-  .ed-btn-done{display:block;color:white;font-weight:700;background:none;border:none;font-size:16px;cursor:pointer;font-family:'Pretendard',sans-serif;padding:10px 0 10px 10px;margin-left:auto;flex-shrink:0;white-space:nowrap}
-  .mobile-back-btn{display:flex !important}
+  .ed-btn-done{display:block;color:white;font-weight:400;background:none;border:none;font-size:16px;cursor:pointer;font-family:'Pretendard',sans-serif;padding:10px 0 10px 10px;margin-left:auto;flex-shrink:0;white-space:nowrap}
+  .mobile-back-btn{display:none !important}
   .toolbar{display:none !important}
 
   .editor-content-wrap{padding:20px 20px 200px}
@@ -647,7 +696,16 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
   .ed-body{font-size:16px;line-height:2.0;letter-spacing:0}
   .sf-row{flex-direction:column;gap:12px}
 
-  .ed-foot{padding:12px 20px;font-size:13px;gap:20px;background:var(--bg-white);border-top:1px solid var(--border)}
+  .ed-foot{
+    padding:10px 20px 22px;
+    justify-content:center;
+    background:var(--bg-white);
+  }
+  .ed-foot-stats{display:none;}
+  .ed-foot-loc{
+    max-width:100%;
+    padding:6px 16px;
+  }
 }
 </style>
 </head>
@@ -870,9 +928,6 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 
     <div class="tb-sep"></div>
 
-    <button class="tb-btn media" title="사진/동영상 업로드" onclick="document.getElementById('mediaInput').click()">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    </button>
     <button class="tb-btn media" title="파일 첨부" onclick="document.getElementById('fileInput').click()">
       <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
     </button>
@@ -901,7 +956,19 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
         </div>
       </div>
     </div>
-    <div class="ed-foot"><span id="edChars">0자</span><span id="edWords">0단어</span><span id="edPages">0매</span></div>
+    <div class="ed-foot">
+      <button class="ed-foot-loc" id="edFootLoc" onclick="openLocationModal(currentLocProfile())">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <span id="edFootLocText">위치 정보 없음</span>
+      </button>
+      <div class="ed-foot-stats">
+        <span id="edChars">0자</span>
+        <div class="fs-sep"></div>
+        <span id="edWords">0단어</span>
+        <div class="fs-sep"></div>
+        <span id="edPages">0.0매</span>
+      </div>
+    </div>
   </div>
   
   <div id="editorBook" style="display:none;flex-direction:column;flex:1;overflow:hidden">
@@ -1079,6 +1146,18 @@ function getWeekDates(){
 
 const stripHtml=s=>(s||'').replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ');
 const formatTopDate = iso => formatFullDate(iso);
+
+function buildDocContent(doc) {
+  const body = stripHtml(doc.content || '');
+  const metaLines = ['---'];
+  if (doc.location) metaLines.push('위치: ' + doc.location);
+  if (doc.weather)  metaLines.push('날씨: ' + doc.weather);
+  if (doc.tags)     metaLines.push('태그: ' + doc.tags);
+  if (doc.lat && doc.lng) metaLines.push('좌표: ' + doc.lat + ', ' + doc.lng);
+  metaLines.push('작성일: ' + (doc.created || ''));
+  const meta = metaLines.join('\n');
+  return body + '\n\n' + meta;
+}
 function fixDriveImageUrls(html) {
   if(!html) return '';
   return html.replace(/https:\/\/drive\.google\.com\/uc\?export=view(&amp;|&)id=([a-zA-Z0-9_-]+)/g, 'https://drive.google.com/thumbnail?id=$2&sz=w1000');
@@ -1088,6 +1167,9 @@ function fixDriveImageUrls(html) {
 let activeTab='navi';
 const textTypes=['navi','fiction','blog'];
 const TAB_META={navi:'오늘의 네비',fiction:'단편 습작',blog:'블로그',book:'서재',quote:'어구',memo:'메모'};
+function currentLocProfile() {
+  return activeTab === 'fiction' ? 'soyeon' : 'gio';
+}
 const curIds={};
 let curQuoteId = null;
 let curBookId=null;
@@ -1249,7 +1331,21 @@ function getDocs(type){return allDocs().filter(d=>d.type===type)}
 function saveDocs(docs){S(K.docs,docs)}
 
 function newDoc(type){
-  const doc={id:Date.now().toString(), driveId: null, type,title:'', tags:'', content:'',created:new Date().toISOString(),updated:new Date().toISOString(),pinned:false};
+  const doc={
+    id:Date.now().toString(),
+    driveId:null,
+    type,
+    title:'',
+    tags:'',
+    content:'',
+    location:'',
+    weather:'',
+    lat:null,
+    lng:null,
+    created:new Date().toISOString(),
+    updated:new Date().toISOString(),
+    pinned:false
+  };
   const docs=allDocs();docs.unshift(doc);saveDocs(docs);
   return doc;
 }
@@ -1283,6 +1379,16 @@ function updateMetaBar(type, title) {
     if(metaInfo) metaInfo.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> 10°C 지우기 · 와우산로37길 Mapo-gu`;
     if(moreBtn) moreBtn.setAttribute('onclick', "openLocationModal('gio')");
   }
+
+  // 하단 위치 pill 텍스트 업데이트
+  const footLocText = document.getElementById('edFootLocText');
+  if (footLocText) {
+    if (type === 'fiction') {
+      footLocText.textContent = 'Shinjuku, Tokyo';
+    } else {
+      footLocText.textContent = '와우산로37길 Mapo-gu';
+    }
+  }
 }
 
 function loadDoc(type, id, force=false){
@@ -1309,6 +1415,13 @@ function saveCurDoc(type){
     docs[idx].tags=tags;
     docs[idx].content=content;
     docs[idx].updated=new Date().toISOString();
+
+    // 현재 메타바에서 위치/날씨 정보 가져와서 저장
+    const locEl = document.getElementById('edFootLocText');
+    if (locEl && locEl.textContent && locEl.textContent !== '위치 정보 없음') {
+      docs[idx].location = locEl.textContent;
+    }
+
     saveDocs(docs);
   }
 }
@@ -2011,7 +2124,7 @@ const SYNC={
     const doc=items.find(d=>d.id===id);
     if(!doc||!stripHtml(doc.content).trim()){this.savingDocs[id]=false;return;}
     try{
-      const res=await this._post({action:'save_doc',id:doc.id,driveId:doc.driveId||null,type:type,title:doc.title||today(),content:stripHtml(doc.content)});
+      const res=await this._post({action:'save_doc',id:doc.id,driveId:doc.driveId||null,type:type,title:doc.title||today(),content:buildDocContent(doc)});
       if(res&&res.driveId){
         const freshItems=(type==='memo')?getMemos():allDocs();
         const freshDoc=freshItems.find(d=>d.id===doc.id);
