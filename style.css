@@ -384,7 +384,7 @@ mark.highlight { background-color: rgba(251, 191, 36, 0.45); color: inherit; pad
 .ed-top-btn:hover{opacity:.85}
 .ed-btn-done{display:none}
 
-.toolbar{display:flex;align-items:center;padding:6px 16px;border-bottom:1px solid var(--border);background:var(--bg-white);gap:2px;flex-wrap:nowrap;overflow:visible;position:relative;z-index:10}
+.toolbar{display:flex;align-items:center;padding:0 16px;height:34px;min-height:34px;border-bottom:1px solid var(--border);background:var(--bg-white);gap:2px;flex-wrap:nowrap;overflow:visible;position:relative;z-index:10}
 .tb-sep{width:1px;height:16px;background:var(--border-l);margin:0 4px;flex-shrink:0}
 .tb-heading-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:5px;border:1px solid transparent;cursor:pointer;color:var(--tx-d);font-size:13px;font-weight:600;font-family:'Pretendard',sans-serif;background:none;transition:.12s;white-space:nowrap;flex-shrink:0;position:relative}
 .tb-heading-btn:hover{background:rgba(0,0,0,.03);border-color:var(--border-l)}
