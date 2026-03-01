@@ -6,7 +6,7 @@
 <link rel="apple-touch-icon" href="apple-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#fbbf24">
+<meta name="theme-color" content="#007aff">
 <meta name="apple-mobile-web-app-title" content="이름표">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
@@ -113,9 +113,7 @@
     </div>
     
     <div class="sec" style="padding-bottom:40px;">
-      <div class="sec-t" style="display:flex; justify-content:space-between; align-items:center;">
-        기록
-      </div>
+      <div class="sec-t" style="display:flex; justify-content:space-between; align-items:center;">기록</div>
       <div class="stats-wrap">
         <div class="stat-col">
           <div class="stat-label">오늘 쓴 글</div>
@@ -169,15 +167,9 @@
   </div>
 
   <div class="pane-calendar" id="pane-calendar">
-    <!-- 상단 고정 요일 헤더 -->
     <div class="cal-global-dow">
-      <div class="cal-dow">일</div>
-      <div class="cal-dow">월</div>
-      <div class="cal-dow">화</div>
-      <div class="cal-dow">수</div>
-      <div class="cal-dow">목</div>
-      <div class="cal-dow">금</div>
-      <div class="cal-dow">토</div>
+      <div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div>
+      <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
     </div>
     <div class="cal-wrap" id="calWrap"></div>
   </div>
@@ -193,11 +185,18 @@
       <button class="mobile-nav-btn mobile-back-btn" onclick="setMobileView('list')" title="목록으로 가기">
         <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
       </button>
-      <span class="ed-header-date" id="edDate"></span>
+      <!-- 저장됨 → X 닫기 버튼으로 변경 -->
+      <button class="ed-close-btn pc-only" onclick="closeEditor()" title="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
       <span class="ed-save-status" id="edSaveStatus">저장됨</span>
     </div>
+    <span class="ed-header-date" id="edDate"></span>
     <div class="ed-topbar-right">
-      <button class="ed-top-btn pc-only" onclick="handleNew()">+ 새 글</button>
+      <!-- + 새 글 → + 아이콘 버튼 -->
+      <button class="ed-new-btn pc-only" onclick="handleNew()" title="새 글">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
       <button class="ed-btn-done" onclick="handleDone()">완료</button>
     </div>
   </div>
@@ -209,44 +208,20 @@
         <svg class="caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div class="heading-dropdown" id="headingDropdown">
-        <div class="heading-opt" onclick="applyHeading('h1')">
-          <span class="h-label h1">제목</span><span class="h-size">H1</span>
-        </div>
-        <div class="heading-opt" onclick="applyHeading('h2')">
-          <span class="h-label h2">부제목</span><span class="h-size">H2</span>
-        </div>
-        <div class="heading-opt" onclick="applyHeading('h3')">
-          <span class="h-label h3">소제목</span><span class="h-size">H3</span>
-        </div>
+        <div class="heading-opt" onclick="applyHeading('h1')"><span class="h-label h1">제목</span><span class="h-size">H1</span></div>
+        <div class="heading-opt" onclick="applyHeading('h2')"><span class="h-label h2">부제목</span><span class="h-size">H2</span></div>
+        <div class="heading-opt" onclick="applyHeading('h3')"><span class="h-label h3">소제목</span><span class="h-size">H3</span></div>
       </div>
     </div>
-
     <div class="tb-sep"></div>
-
-    <button class="tb-btn" title="순서 없는 목록" onclick="execCmd('insertUnorderedList')">
-      <svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
-    </button>
-    <button class="tb-btn" title="순서 있는 목록" onclick="execCmd('insertOrderedList')">
-      <svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="9" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">1.</text><text x="2" y="15" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">2.</text><text x="2" y="21" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">3.</text></svg>
-    </button>
-    <button class="tb-btn" title="체크리스트" onclick="insertChecklist()">
-      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    </button>
-
+    <button class="tb-btn" title="순서 없는 목록" onclick="execCmd('insertUnorderedList')"><svg viewBox="0 0 24 24"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></button>
+    <button class="tb-btn" title="순서 있는 목록" onclick="execCmd('insertOrderedList')"><svg viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="9" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">1.</text><text x="2" y="15" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">2.</text><text x="2" y="21" font-size="8" font-family="sans-serif" stroke="none" fill="currentColor" font-weight="700">3.</text></svg></button>
+    <button class="tb-btn" title="체크리스트" onclick="insertChecklist()"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></button>
     <div class="tb-sep"></div>
-
-    <button class="tb-btn" title="인용" onclick="execCmd('formatBlock','blockquote')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-    </button>
-    <button class="tb-btn" title="구분선" onclick="execCmd('insertHorizontalRule')">
-      <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/></svg>
-    </button>
-
+    <button class="tb-btn" title="인용" onclick="execCmd('formatBlock','blockquote')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg></button>
+    <button class="tb-btn" title="구분선" onclick="execCmd('insertHorizontalRule')"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/></svg></button>
     <div class="tb-sep"></div>
-
-    <button class="tb-btn media" title="파일 첨부" onclick="document.getElementById('fileInput').click()">
-      <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-    </button>
+    <button class="tb-btn media" title="파일 첨부" onclick="document.getElementById('fileInput').click()"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
     <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleMediaUpload(event)">
     <input type="file" id="fileInput" style="display:none" onchange="handleMediaUpload(event)">
   </div>
@@ -265,10 +240,8 @@
       </button>
       <div class="ed-foot-stats-wrap">
         <div class="ed-foot-stats">
-          <span id="edChars">0자</span>
-          <div class="fs-sep"></div>
-          <span id="edWords">0단어</span>
-          <div class="fs-sep"></div>
+          <span id="edChars">0자</span><div class="fs-sep"></div>
+          <span id="edWords">0단어</span><div class="fs-sep"></div>
           <span id="edPages">0.0매</span>
         </div>
       </div>
@@ -321,23 +294,16 @@
       </button>
     </div>
     <div class="modal-addr">
-      <div class="addr-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-      </div>
+      <div class="addr-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
       <div class="addr-texts">
         <div class="addr-main" id="addrMain"></div>
         <div class="addr-sub"  id="addrSub"></div>
       </div>
     </div>
-    <div class="modal-map-wrap">
-      <div class="modal-map">
-        <canvas id="mapCanvas"></canvas>
-      </div>
-    </div>
+    <div class="modal-map-wrap"><div class="modal-map"><canvas id="mapCanvas"></canvas></div></div>
   </div>
 </div>
 
-<!-- JS 로딩 순서: 의존성 순서대로 -->
 <script src="storage.js"></script>
 <script src="data.js"></script>
 <script src="ui.js"></script>

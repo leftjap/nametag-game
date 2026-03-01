@@ -1,6 +1,16 @@
 // ═══════════════════════════════════════
-// ui.js — UI 전환, 탭, 리스트 렌더링
+// ui.js — UI 전환, 탭, 리스트 렌더링 (Day One 스타일)
 // ═══════════════════════════════════════
+
+// ═══ 탭별 색상 아이콘 ═══
+const TAB_COLORS = {
+  navi:    '#FF3B30',
+  fiction: '#FF9500',
+  blog:    '#34C759',
+  book:    '#007AFF',
+  quote:   '#AF52DE',
+  memo:    '#8E8E93'
+};
 
 // ═══ 레이아웃 전환 ═══
 function switchListView(view) {
@@ -60,15 +70,45 @@ function setTagSearch(tag) {
   renderListPanel();
 }
 
+// ═══ 에디터 닫기 (X 버튼) ═══
+function closeEditor() {
+  // PC에서는 에디터 내용을 비우고 리스트로 포커스
+  const t = activeTab;
+  if(textTypes.includes(t)) {
+    saveCurDoc(t);
+  }
+  setMobileView('list');
+}
+
 // ═══ 탭 전환 ═══
 function renderWritingGrid() {
   const nav = document.getElementById('sideNav'); if(!nav) return;
-  const tabs = [{id:'navi',label:'오늘의 네비'},{id:'fiction',label:'단편 습작'},{id:'blog',label:'블로그'},{id:'book',label:'서재'},{id:'quote',label:'어구'},{id:'memo',label:'메모'}];
+  const tabs = [
+    {id:'navi',   label:'오늘의 네비'},
+    {id:'fiction', label:'단편 습작'},
+    {id:'blog',   label:'블로그'},
+    {id:'book',   label:'서재'},
+    {id:'quote',  label:'어구'},
+    {id:'memo',   label:'메모'}
+  ];
   let html = '';
   if(window.innerWidth <= 768) {
-    tabs.forEach(t => { html += `<div class="side-menu ${activeTab===t.id?'on':''}" data-tab="${t.id}" onclick="switchTab('${t.id}'); setMobileView('list');"><div class="side-menu-l">${t.label}</div><div class="badge-pill">${getTabCount(t.id)}</div><div class="wi-arrow">›</div></div>`; });
+    tabs.forEach(t => {
+      const color = TAB_COLORS[t.id] || '#8E8E93';
+      html += `<div class="side-menu ${activeTab===t.id?'on':''}" data-tab="${t.id}" onclick="switchTab('${t.id}'); setMobileView('list');">
+        <div class="side-menu-l"><span class="tab-color-dot" style="background:${color}"></span>${t.label}</div>
+        <div class="badge-pill">${getTabCount(t.id)}</div>
+        <div class="wi-arrow">›</div>
+      </div>`;
+    });
   } else {
-    tabs.forEach(t => { html += `<button class="side-menu ${activeTab===t.id?'on':''}" onclick="switchTab('${t.id}'); setMobileView('list');"><span class="side-menu-l">${t.label}</span><span class="badge-pill">${getTabCount(t.id)}</span></button>`; });
+    tabs.forEach(t => {
+      const color = TAB_COLORS[t.id] || '#8E8E93';
+      html += `<button class="side-menu ${activeTab===t.id?'on':''}" onclick="switchTab('${t.id}'); setMobileView('list');">
+        <span class="side-menu-l"><span class="tab-color-dot" style="background:${activeTab===t.id ? '#ffffff' : color}"></span>${t.label}</span>
+        <span class="badge-pill">${getTabCount(t.id)}</span>
+      </button>`;
+    });
   }
   nav.innerHTML = html;
 }
@@ -98,7 +138,7 @@ function getThumb(content) {
   return m ? m[1] : '';
 }
 
-// XSS 방어: HTML 이스케이프 함수
+// XSS 방어
 const escapeHtml = (str) => {
   if (!str) return '';
   return String(str)
@@ -109,7 +149,6 @@ const escapeHtml = (str) => {
     .replace(/'/g, '&#039;');
 };
 
-// XSS 방어 적용된 하이라이트 함수
 const hl = (txt) => {
   if (!txt) return '';
   const safe = escapeHtml(txt);
@@ -136,7 +175,7 @@ function generateItemHtml(item, t) {
   if(textTypes.includes(t)) {
     isCur=curIds[t]===item.id; clickFn=`loadDoc('${t}','${item.id}'); setMobileView('editor');`;
     const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
-    const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>`:'';
+    const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
     return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button><button class="lp-action-btn del" onclick="delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
   } else if(t==='book') {
@@ -149,13 +188,13 @@ function generateItemHtml(item, t) {
   } else if(t==='memo') {
     isCur=curMemoId===item.id; clickFn=`loadMemo('${item.id}'); setMobileView('editor');`;
     const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
-    const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>`:'';
+    const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
     return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button><button class="lp-action-btn del" onclick="delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
   }
 }
 
-// ═══ 사진 뷰 ═══
+// ═══ 사진 뷰 (Day One 스타일 — 패딩, 라운딩, 간격 통일) ═══
 let selectedPhotoId = null;
 function renderPhotoView(items, t) {
   const grid = document.getElementById('photoGrid');
@@ -186,15 +225,20 @@ function selectPhoto(id, e) {
   }
 }
 
-// ═══ 캘린더 뷰 ═══
+// ═══ 캘린더 뷰 (Day One 스타일 — 라운딩 사각형, 미래 2개월, 과거는 기록까지) ═══
 function renderCalendarView(items, t) {
   const calWrap=document.getElementById('calWrap');
-  if(!items.length){calWrap.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--tx-hint);font-size:13px;">기록이 없습니다</div>';return;}
-  let minDate=new Date(), maxDate=new Date(0);
+  const todayD=new Date();
+  const todayY=todayD.getFullYear(), todayM=todayD.getMonth()+1, todayDay=todayD.getDate();
+
+  // 항목이 없어도 현재월+미래 2개월은 표시
+  let minDate=new Date(todayY, todayM-1, 1); // 기본: 이번달
+  let maxDate=new Date(todayY, todayM+1, 0); // 기본: 2개월 뒤 마지막날
+
   const entriesMap={}, photoDays={}, itemMap={};
   items.forEach(item=>{
     const dt=new Date(item.created||item.date||Date.now());
-    if(dt<minDate)minDate=dt; if(dt>maxDate)maxDate=dt;
+    if(dt<minDate) minDate=dt;
     const y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
     const key=`${y}-${m}`,pKey=`${y}-${m}-${d}`;
     if(!entriesMap[key])entriesMap[key]=new Set();
@@ -204,25 +248,30 @@ function renderCalendarView(items, t) {
     let thumb=''; if(textTypes.includes(t)||t==='memo')thumb=getThumb(item.content);
     if(thumb&&!photoDays[pKey])photoDays[pKey]=thumb;
   });
-  const todayD=new Date();
-  if(minDate>todayD)minDate=todayD; if(maxDate<todayD)maxDate=todayD;
-  let startY=minDate.getFullYear(),startM=minDate.getMonth()+1,endY=maxDate.getFullYear(),endM=maxDate.getMonth()+1;
+
+  // 미래 2개월까지 항상 표시
+  const futureEnd = new Date(todayY, todayM+1, 0); // 2개월 뒤 마지막날
+  if(futureEnd > maxDate) maxDate = futureEnd;
+
+  let startY=minDate.getFullYear(), startM=minDate.getMonth()+1;
+  let endY=maxDate.getFullYear(), endM=maxDate.getMonth()+1;
+
   const months=[]; let cy=startY,cm=startM;
   while(cy<endY||(cy===endY&&cm<=endM)){months.push({y:cy,m:cm,label:`${cy}년 ${cm}월`});cm++;if(cm>12){cm=1;cy++;}}
-  months.reverse();
-  const DOW=['일','월','화','수','목','금','토'];
+  months.reverse(); // 최신이 위로
+
   let html='';
   months.forEach((mo,mi)=>{
-    const first=new Date(mo.y,mo.m-1,1).getDay(),days=new Date(mo.y,mo.m,0).getDate();
-    const key=`${mo.y}-${mo.m}`,entries=entriesMap[key]?Array.from(entriesMap[key]):[];
+    const first=new Date(mo.y,mo.m-1,1).getDay(), days=new Date(mo.y,mo.m,0).getDate();
+    const key=`${mo.y}-${mo.m}`, entries=entriesMap[key]?Array.from(entriesMap[key]):[];
     let cells='';
     for(let i=0;i<first;i++) cells+=`<div class="cal-day empty"></div>`;
     for(let d=1;d<=days;d++){
       const has=entries.includes(d);
-      const isToday=(mo.y===todayD.getFullYear()&&mo.m===todayD.getMonth()+1&&d===todayD.getDate());
-      const pk=`${mo.y}-${mo.m}-${d}`,thumb=photoDays[pk];
+      const isToday=(mo.y===todayY && mo.m===todayM && d===todayDay);
+      const pk=`${mo.y}-${mo.m}-${d}`, thumb=photoDays[pk];
       let cls='cal-day'; if(has)cls+=' has-entry'; if(isToday)cls+=' today';
-      let inner='',numHtml=d;
+      let inner='', numHtml=d;
       if(thumb){cls+=' has-photo';inner=`<div class="cal-photo-bg" style="background-image:url('${thumb}');"></div>`;numHtml=`<span class="cal-day-num">${d}</span>`;}
       let clickFn='';
       if(has&&itemMap[pk]&&itemMap[pk].length>0){
@@ -237,7 +286,6 @@ function renderCalendarView(items, t) {
     }
     html+=`${mi>0?'<div class="cal-separator"></div>':''}
       <div class="cal-month-title">${mo.label}</div>
-      <div class="cal-dow-row">${DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('')}</div>
       <div class="cal-grid">${cells}</div>`;
   });
   calWrap.innerHTML=html;
