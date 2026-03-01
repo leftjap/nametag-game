@@ -6,7 +6,20 @@
 const APP_TOKEN = 'nametag2026';
 const K = { docs:'gb_docs', checks:'gb_chk', books:'gb_books', quotes:'gb_quotes', memos:'gb_memos' };
 const L = k => { try { return JSON.parse(localStorage.getItem(k)) || null } catch { return null } };
-const S = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+const S = (k, v) => {
+  try {
+    localStorage.setItem(k, JSON.stringify(v));
+  } catch (e) {
+    console.error('localStorage 저장 실패:', k, e.message);
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      if (!window._storageWarningShown) {
+        window._storageWarningShown = true;
+        alert('저장 공간이 부족합니다. 오래된 기록을 정리하거나, 동기화 후 브라우저 캐시를 정리해주세요.');
+      }
+    }
+  }
+};
 
 // ═══ 날짜/시간 유틸 ═══
 const getLocalYMD = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
