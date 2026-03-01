@@ -102,7 +102,7 @@
       </div>
     </div>
 
-    <div class="sec sec-border side-nav" style="padding:8px 16px 12px">
+    <div class="sec sec-border side-nav" style="padding:8px 12px 12px">
       <div class="sec-t" style="margin-bottom:4px">글쓰기</div>
       <div id="sideNav" class="writing-grid"></div>
     </div>
@@ -185,17 +185,12 @@
       <button class="mobile-nav-btn mobile-back-btn" onclick="setMobileView('list')" title="목록으로 가기">
         <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
       </button>
-      <!-- 저장됨 → X 닫기 버튼으로 변경 -->
-      <button class="ed-close-btn pc-only" onclick="closeEditor()" title="닫기">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-      <span class="ed-save-status" id="edSaveStatus">저장됨</span>
     </div>
     <span class="ed-header-date" id="edDate"></span>
+    <span class="ed-save-status" id="edSaveStatus" style="display:none">저장됨</span>
     <div class="ed-topbar-right">
-      <!-- + 새 글 → + 아이콘 버튼 -->
       <button class="ed-new-btn pc-only" onclick="handleNew()" title="새 글">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
       </button>
       <button class="ed-btn-done" onclick="handleDone()">완료</button>
     </div>

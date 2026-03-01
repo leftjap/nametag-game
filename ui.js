@@ -2,14 +2,14 @@
 // ui.js — UI 전환, 탭, 리스트 렌더링 (Day One 스타일)
 // ═══════════════════════════════════════
 
-// ═══ 탭별 색상 아이콘 ═══
+// ═══ 탭별 파스텔 색상 (Day One 스타일) ═══
 const TAB_COLORS = {
-  navi:    '#FF3B30',
-  fiction: '#FF9500',
-  blog:    '#34C759',
-  book:    '#007AFF',
-  quote:   '#AF52DE',
-  memo:    '#8E8E93'
+  navi:    '#7EB5F4',
+  fiction: '#F4B77E',
+  blog:    '#82C99A',
+  book:    '#7E9CF4',
+  quote:   '#C49ADE',
+  memo:    '#B0B0B8'
 };
 
 // ═══ 레이아웃 전환 ═══
@@ -70,16 +70,6 @@ function setTagSearch(tag) {
   renderListPanel();
 }
 
-// ═══ 에디터 닫기 (X 버튼) ═══
-function closeEditor() {
-  // PC에서는 에디터 내용을 비우고 리스트로 포커스
-  const t = activeTab;
-  if(textTypes.includes(t)) {
-    saveCurDoc(t);
-  }
-  setMobileView('list');
-}
-
 // ═══ 탭 전환 ═══
 function renderWritingGrid() {
   const nav = document.getElementById('sideNav'); if(!nav) return;
@@ -94,18 +84,20 @@ function renderWritingGrid() {
   let html = '';
   if(window.innerWidth <= 768) {
     tabs.forEach(t => {
-      const color = TAB_COLORS[t.id] || '#8E8E93';
-      html += `<div class="side-menu ${activeTab===t.id?'on':''}" data-tab="${t.id}" onclick="switchTab('${t.id}'); setMobileView('list');">
-        <div class="side-menu-l"><span class="tab-color-dot" style="background:${color}"></span>${t.label}</div>
+      const color = TAB_COLORS[t.id] || '#B0B0B8';
+      const isOn = activeTab===t.id;
+      html += `<div class="side-menu ${isOn?'on':''}" data-tab="${t.id}" onclick="switchTab('${t.id}'); setMobileView('list');">
+        <div class="side-menu-l"><span class="tab-color-dot" style="background:${isOn ? '#ffffff' : color}"></span>${t.label}</div>
         <div class="badge-pill">${getTabCount(t.id)}</div>
         <div class="wi-arrow">›</div>
       </div>`;
     });
   } else {
     tabs.forEach(t => {
-      const color = TAB_COLORS[t.id] || '#8E8E93';
-      html += `<button class="side-menu ${activeTab===t.id?'on':''}" onclick="switchTab('${t.id}'); setMobileView('list');">
-        <span class="side-menu-l"><span class="tab-color-dot" style="background:${activeTab===t.id ? '#ffffff' : color}"></span>${t.label}</span>
+      const color = TAB_COLORS[t.id] || '#B0B0B8';
+      const isOn = activeTab===t.id;
+      html += `<button class="side-menu ${isOn?'on':''}" onclick="switchTab('${t.id}'); setMobileView('list');">
+        <span class="side-menu-l"><span class="tab-color-dot" style="background:${isOn ? '#ffffff' : color}"></span>${t.label}</span>
         <span class="badge-pill">${getTabCount(t.id)}</span>
       </button>`;
     });
@@ -194,7 +186,7 @@ function generateItemHtml(item, t) {
   }
 }
 
-// ═══ 사진 뷰 (Day One 스타일 — 패딩, 라운딩, 간격 통일) ═══
+// ═══ 사진 뷰 (Day One 스타일 — 날짜 우측 하단) ═══
 let selectedPhotoId = null;
 function renderPhotoView(items, t) {
   const grid = document.getElementById('photoGrid');
@@ -205,11 +197,18 @@ function renderPhotoView(items, t) {
   let html='';
   photoItems.forEach(item => {
     const thumb=getThumb(item.content), dt=new Date(item.created||item.date||Date.now());
-    const day=String(dt.getDate()).padStart(2,'0'), ym=`${dt.getFullYear()}년 ${dt.getMonth()+1}월`;
+    const day=String(dt.getDate()).padStart(2,'0');
+    const ym=`${dt.getFullYear()}년 ${dt.getMonth()+1}월`;
     const isSolo=photoItems.length===1, isSelected=selectedPhotoId===item.id;
     let clickFn=`loadDoc('${t}','${item.id}'); setMobileView('editor');`;
     if(t==='memo') clickFn=`loadMemo('${item.id}'); setMobileView('editor');`;
-    html+=`<div class="photo-cell${isSolo?' solo':''}${isSelected?' selected':''}" onclick="selectPhoto('${item.id}', event); ${clickFn}"><div class="photo-cell-bg" style="background-image:url('${thumb}');"></div><div class="photo-date-block"><span class="photo-day-num">${day}</span><span class="photo-ym">${ym}</span></div></div>`;
+    html+=`<div class="photo-cell${isSolo?' solo':''}${isSelected?' selected':''}" onclick="selectPhoto('${item.id}', event); ${clickFn}">
+      <div class="photo-cell-bg" style="background-image:url('${thumb}');"></div>
+      <div class="photo-date-block">
+        <span class="photo-day-num">${day}</span>
+        <span class="photo-ym">${ym}</span>
+      </div>
+    </div>`;
   });
   grid.innerHTML = html;
 }
@@ -225,20 +224,21 @@ function selectPhoto(id, e) {
   }
 }
 
-// ═══ 캘린더 뷰 (Day One 스타일 — 라운딩 사각형, 미래 2개월, 과거는 기록까지) ═══
+// ═══ 캘린더 뷰 (Day One 스타일 — 과거→현재→미래 순서, 현재월 자동 스크롤) ═══
 function renderCalendarView(items, t) {
   const calWrap=document.getElementById('calWrap');
   const todayD=new Date();
   const todayY=todayD.getFullYear(), todayM=todayD.getMonth()+1, todayDay=todayD.getDate();
 
-  // 항목이 없어도 현재월+미래 2개월은 표시
-  let minDate=new Date(todayY, todayM-1, 1); // 기본: 이번달
-  let maxDate=new Date(todayY, todayM+1, 0); // 기본: 2개월 뒤 마지막날
+  // 기본 범위: 이번달 기준 미래 2개월
+  let minDate=new Date(todayY, todayM-1, 1);
+  const futureEnd=new Date(todayY, todayM+1, 0); // 2개월 뒤 마지막날
+  let maxDate=futureEnd;
 
   const entriesMap={}, photoDays={}, itemMap={};
   items.forEach(item=>{
     const dt=new Date(item.created||item.date||Date.now());
-    if(dt<minDate) minDate=dt;
+    if(dt<minDate) minDate=new Date(dt.getFullYear(), dt.getMonth(), 1);
     const y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
     const key=`${y}-${m}`,pKey=`${y}-${m}-${d}`;
     if(!entriesMap[key])entriesMap[key]=new Set();
@@ -249,19 +249,22 @@ function renderCalendarView(items, t) {
     if(thumb&&!photoDays[pKey])photoDays[pKey]=thumb;
   });
 
-  // 미래 2개월까지 항상 표시
-  const futureEnd = new Date(todayY, todayM+1, 0); // 2개월 뒤 마지막날
-  if(futureEnd > maxDate) maxDate = futureEnd;
-
   let startY=minDate.getFullYear(), startM=minDate.getMonth()+1;
   let endY=maxDate.getFullYear(), endM=maxDate.getMonth()+1;
 
+  // 과거→미래 순서 (오래된 것이 위)
   const months=[]; let cy=startY,cm=startM;
-  while(cy<endY||(cy===endY&&cm<=endM)){months.push({y:cy,m:cm,label:`${cy}년 ${cm}월`});cm++;if(cm>12){cm=1;cy++;}}
-  months.reverse(); // 최신이 위로
+  while(cy<endY||(cy===endY&&cm<=endM)){
+    months.push({y:cy,m:cm,label:`${cy}년 ${cm}월`});
+    cm++; if(cm>12){cm=1;cy++;}
+  }
 
   let html='';
+  let currentMonthIdx = -1;
   months.forEach((mo,mi)=>{
+    // 현재월 인덱스 기억
+    if(mo.y===todayY && mo.m===todayM) currentMonthIdx=mi;
+
     const first=new Date(mo.y,mo.m-1,1).getDay(), days=new Date(mo.y,mo.m,0).getDate();
     const key=`${mo.y}-${mo.m}`, entries=entriesMap[key]?Array.from(entriesMap[key]):[];
     let cells='';
@@ -284,11 +287,25 @@ function renderCalendarView(items, t) {
       }
       cells+=`<div class="${cls}" ${clickFn}>${inner}${numHtml}</div>`;
     }
+    const monthId = `cal-month-${mo.y}-${mo.m}`;
     html+=`${mi>0?'<div class="cal-separator"></div>':''}
-      <div class="cal-month-title">${mo.label}</div>
+      <div class="cal-month-title" id="${monthId}">${mo.label}</div>
       <div class="cal-grid">${cells}</div>`;
   });
   calWrap.innerHTML=html;
+
+  // 현재월로 자동 스크롤
+  requestAnimationFrame(()=>{
+    const currentEl = document.getElementById(`cal-month-${todayY}-${todayM}`);
+    if(currentEl) {
+      const pane = document.getElementById('pane-calendar');
+      if(pane) {
+        currentEl.scrollIntoView({block:'start'});
+        // 요일 헤더 높이만큼 살짝 위로
+        pane.scrollTop = Math.max(0, pane.scrollTop - 40);
+      }
+    }
+  });
 }
 
 function selectCalDay(element) {
