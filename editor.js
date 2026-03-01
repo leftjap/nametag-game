@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-// editor.js — 에디터 툴바, 복사/붙여넣기, 미디어, 제스처
+// editor.js — 에디터 툴바, 복사/붙여넣기, 미디어, 제스처 (v5)
 // ═══════════════════════════════════════
 
 // ═══ 툴바 ═══
@@ -183,10 +183,27 @@ async function handlePaste(e) {
   }
 }
 
+// ═══ 이미지 클릭 선택 — v5: 파란 하이라이트 제거, 탭 고유색 테두리 ═══
 function setupEditorImageSelection() {
-  const onImageClick=function(e){if(e.target.tagName==='IMG'&&e.target.closest('.ed-body')){const range=document.createRange();range.selectNode(e.target);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);}};
+  const onImageClick = function(e) {
+    // 이전 선택 모두 해제
+    document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
+
+    if (e.target.tagName === 'IMG' && e.target.closest('.ed-body')) {
+      e.target.classList.add('img-selected');
+      // 파란 하이라이트 방지
+      window.getSelection().removeAllRanges();
+    }
+  };
   document.getElementById('edBody').addEventListener('click', onImageClick);
   document.getElementById('memo-body').addEventListener('click', onImageClick);
+
+  // 이미지 외 영역 클릭 시 선택 해제
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.ed-body') || (e.target.tagName !== 'IMG' && !e.target.closest('.img-actions') && !e.target.closest('#imgHoverBtn') && !e.target.closest('#imgDropdownMenu'))) {
+      document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
+    }
+  });
 }
 
 // ═══ 자동 저장 ═══

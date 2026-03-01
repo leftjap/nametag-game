@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-// ui.js — UI 전환, 탭, 리스트 렌더링 (Day One 스타일 v4)
+// ui.js — UI 전환, 탭, 리스트 렌더링 (Day One 스타일 v5)
 // ═══════════════════════════════════════
 
 // ═══ 탭별 파스텔 색상 ═══
@@ -158,11 +158,18 @@ const getPreviewText = (htmlContent) => {
   return raw.slice(0,80);
 };
 
-function generateItemHtml(item, t) {
+// ═══ 아이템 HTML 생성 — showDate 파라미터 추가 (8번: 같은 날짜 중복 방지) ═══
+function generateItemHtml(item, t, showDate) {
+  if(showDate === undefined) showDate = true;
   const dt=new Date(item.created||item.date||Date.now()), day=dt.getDate(), dow=weekdays[dt.getDay()], time=formatTimeOnly(item.created||item.date);
   const swipePin = fn => `<div class="swipe-action pin-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>`;
   const swipeDel = fn => `<div class="swipe-action del-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>`;
-  const dateBlock = `<div class="lp-date-wrap"><div class="lp-dow">${dow}</div><div class="lp-day">${day}</div></div>`;
+
+  // 8번: 날짜 표시 여부에 따라 보이기/숨기기
+  const dateBlock = showDate
+    ? `<div class="lp-date-wrap"><div class="lp-dow">${dow}</div><div class="lp-day">${day}</div></div>`
+    : `<div class="lp-date-wrap" style="visibility:hidden"><div class="lp-dow">&nbsp;</div><div class="lp-day">&nbsp;</div></div>`;
+
   let isCur=false, clickFn='';
 
   if(textTypes.includes(t)) {
@@ -170,24 +177,25 @@ function generateItemHtml(item, t) {
     const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
     const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
   } else if(t==='book') {
     isCur=curBookId===item.id; clickFn=`loadBook('${item.id}'); setMobileView('editor');`;
     const authorPub=[item.author,item.publisher].filter(Boolean).join(' · ');
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title)}</div><div class="lp-item-preview">${hl(authorPub)}</div><div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div><div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delBook('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title)}</div><div class="lp-item-preview">${hl(authorPub)}</div><div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div></div>`;
   } else if(t==='quote') {
     isCur=curQuoteId===item.id; clickFn=`loadQuote('${item.id}'); setMobileView('editor');`;
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="quote-txt">${hl(item.text)}</div>${item.by?`<div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'📌 ':''}${hl(item.by)}</div>`:''}</div><div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delQuote('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="quote-txt">${hl(item.text)}</div>${item.by?`<div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'📌 ':''}${hl(item.by)}</div>`:''}</div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div></div>`;
   } else if(t==='memo') {
     isCur=curMemoId===item.id; clickFn=`loadMemo('${item.id}'); setMobileView('editor');`;
     const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
     const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
   }
+  return '';
 }
 
-// ═══ 사진 뷰 — 탭 색상 테두리 ═══
+// ═══ 사진 뷰 ═══
 let selectedPhotoId = null;
 function renderPhotoView(items, t) {
   const grid = document.getElementById('photoGrid');
@@ -225,7 +233,7 @@ function selectPhoto(id, e) {
   }
 }
 
-// ═══ 캘린더 뷰 — 과거→현재→미래, 탭 색상 반영 ═══
+// ═══ 캘린더 뷰 ═══
 function renderCalendarView(items, t) {
   const calWrap=document.getElementById('calWrap');
   const todayD=new Date();
@@ -306,6 +314,7 @@ function selectCalDay(element) {
   if(element) element.classList.add('selected');
 }
 
+// ═══ 리스트 패널 메인 렌더링 — 8번: 같은 날짜 중복 방지 ═══
 function renderListPanel() {
   renderWritingGrid();
   const t=activeTab, el=document.getElementById('pane-list');
@@ -336,20 +345,39 @@ function renderListPanel() {
   pinnedItems.sort(sortFn); unpinnedItems.sort(sortFn);
 
   let html='';
+
+  // 고정 항목
   if(pinnedItems.length>0){
     html+=`<div class="lp-pin-hdr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tab-color)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> 고정됨</div>`;
-    pinnedItems.forEach(item=>{html+=generateItemHtml(item,t);});
+    let pinLastDate='';
+    pinnedItems.forEach(item=>{
+      const dt=new Date(item.created||item.date||Date.now());
+      const dateKey=getLocalYMD(dt);
+      const showDate=(dateKey!==pinLastDate);
+      pinLastDate=dateKey;
+      html+=generateItemHtml(item,t,showDate);
+    });
   }
-  let currentMonthStr='';
+
+  // 일반 항목
+  let currentMonthStr='', lastDateStr='';
   unpinnedItems.forEach(item=>{
-    const dt=new Date(item.created||item.date||Date.now()),mStr=getMonthYearStr(dt.toISOString());
-    if(mStr!==currentMonthStr){html+=`<div class="lp-month-hdr">${mStr}</div>`;currentMonthStr=mStr;}
-    html+=generateItemHtml(item,t);
+    const dt=new Date(item.created||item.date||Date.now());
+    const mStr=getMonthYearStr(dt.toISOString());
+    if(mStr!==currentMonthStr){
+      html+=`<div class="lp-month-hdr">${mStr}</div>`;
+      currentMonthStr=mStr;
+      lastDateStr=''; // 월이 바뀌면 날짜도 리셋
+    }
+    const dateKey=getLocalYMD(dt);
+    const showDate=(dateKey!==lastDateStr);
+    lastDateStr=dateKey;
+    html+=generateItemHtml(item,t,showDate);
   });
   el.innerHTML=html;
 }
 
-// ═══ 에디터 더보기 메뉴 ═══
+// ═══ 에디터 더보기 메뉴 — v5: 글자수/원고지 분리, 구분선 메뉴 삭제 ═══
 function toggleEditorMenu(e) {
   e.stopPropagation();
   const menu = document.getElementById('editorDropdownMenu');
@@ -362,8 +390,11 @@ function toggleEditorMenu(e) {
   const txt = target ? target.textContent.trim() : '';
   const chars = txt.replace(/\s/g,'').length;
   const pages = Math.floor(chars/200);
-  const valEl = document.getElementById('menuWordCount');
-  if(valEl) valEl.textContent = chars.toLocaleString()+'자 / '+pages+'매';
+
+  const charEl = document.getElementById('menuCharCount');
+  const pageEl = document.getElementById('menuPageCount');
+  if(charEl) charEl.textContent = chars.toLocaleString()+'자';
+  if(pageEl) pageEl.textContent = pages+'매';
 
   // 고정 라벨 업데이트
   const pinLabel = document.getElementById('menuPinLabel');
@@ -392,18 +423,7 @@ function editorMenuAction(action) {
   const menu = document.getElementById('editorDropdownMenu');
   menu.classList.remove('open');
 
-  if(action==='wordcount') {
-    // 이미 표시됨, 아무것도 안 함
-    return;
-  }
-
-  if(action==='hr') {
-    const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
-    target.focus();
-    document.execCommand('insertHorizontalRule', false, null);
-    if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
-    return;
-  }
+  if(action==='wordcount') return;
 
   if(action==='pin') {
     let id=null, type=activeTab;
@@ -421,7 +441,6 @@ function editorMenuAction(action) {
   if(action==='copymd') {
     const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
     if(!target) return;
-    // HTML → 간단 마크다운 변환
     let md = '';
     function traverse(el) {
       if(el.nodeType===Node.TEXT_NODE) { md+=el.nodeValue; return; }

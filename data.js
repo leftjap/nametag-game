@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-// data.js — 문서/책/어구/메모 CRUD (v4)
+// data.js — 문서/책/어구/메모 CRUD (v5)
 // ═══════════════════════════════════════
 
 // ═══ 상태 변수 ═══
@@ -91,7 +91,6 @@ function updateWC() {
   const c = t.replace(/\s/g,'').length;
   const w = t.split(/\s+/).filter(x=>x).length;
   const pages = Math.floor(c / 200);
-  // 3단 하단: 글자수 제거, 단어+매수만
   if(document.getElementById('edWords')) document.getElementById('edWords').textContent = w.toLocaleString()+'단어';
   if(document.getElementById('edPages')) document.getElementById('edPages').textContent = pages+'매';
   updateWritingStats();
@@ -248,7 +247,7 @@ function delMemo(id, e) {
   renderListPanel(); SYNC.scheduleDatabaseSave();
 }
 
-// ═══ Stats — 소수점 제거, 월간/누적 형식 ═══
+// ═══ Stats ═══
 function getTabCount(t) {
   if(textTypes.includes(t)) return getDocs(t).length;
   if(t==='book')  return (L(K.books)||[]).length;
