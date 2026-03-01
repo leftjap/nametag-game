@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-// data.js — 문서/책/어구/메모 CRUD
+// data.js — 문서/책/어구/메모 CRUD (v4)
 // ═══════════════════════════════════════
 
 // ═══ 상태 변수 ═══
@@ -90,9 +90,10 @@ function updateWC() {
   const t = target ? target.textContent.trim() : '';
   const c = t.replace(/\s/g,'').length;
   const w = t.split(/\s+/).filter(x=>x).length;
-  if(document.getElementById('edChars')) document.getElementById('edChars').textContent = c.toLocaleString()+'자';
+  const pages = Math.floor(c / 200);
+  // 3단 하단: 글자수 제거, 단어+매수만
   if(document.getElementById('edWords')) document.getElementById('edWords').textContent = w.toLocaleString()+'단어';
-  if(document.getElementById('edPages')) document.getElementById('edPages').textContent = (c/200).toFixed(1)+'매';
+  if(document.getElementById('edPages')) document.getElementById('edPages').textContent = pages+'매';
   updateWritingStats();
 }
 
@@ -147,10 +148,16 @@ function delBook(id, e) {
 
 function updateBookStats() {
   const books=getBooks(), td=today(), tm=td.slice(0,7);
-  let pT=0, pM=0;
-  books.forEach(b => { const p=parseInt(b.pages)||0, d=b.date; if(!d) return; if(d===td) pT+=p; if(d.startsWith(tm)) pM+=p; });
+  let pT=0, pM=0, pAll=0;
+  books.forEach(b => {
+    const p=parseInt(b.pages)||0, d=b.date;
+    pAll+=p;
+    if(!d) return;
+    if(d===td) pT+=p;
+    if(d.startsWith(tm)) pM+=p;
+  });
   if(document.getElementById('bToday')) document.getElementById('bToday').innerHTML = pT+`<span class='unit'>p</span>`;
-  if(document.getElementById('bMonth')) document.getElementById('bMonth').textContent = pM+'p';
+  if(document.getElementById('bMonthSub')) document.getElementById('bMonthSub').textContent = '월간 '+pM+'p / 누적 '+pAll+'p';
 }
 
 // ═══ Quotes ═══
@@ -241,7 +248,7 @@ function delMemo(id, e) {
   renderListPanel(); SYNC.scheduleDatabaseSave();
 }
 
-// ═══ Stats ═══
+// ═══ Stats — 소수점 제거, 월간/누적 형식 ═══
 function getTabCount(t) {
   if(textTypes.includes(t)) return getDocs(t).length;
   if(t==='book')  return (L(K.books)||[]).length;
@@ -253,15 +260,20 @@ function getTabCount(t) {
 function updateWritingStats() {
   const docs = allDocs().filter(d=>d.type==='fiction');
   const td=today(), tm=td.slice(0,7);
-  let tT=0, tM=0;
+  let tT=0, tM=0, tAll=0;
   docs.forEach(d => {
     const c=stripHtml(d.content).replace(/\s/g,'').length;
+    tAll+=c;
     const dt=d.updated?.slice(0,10)||d.created?.slice(0,10);
     if(!dt) return;
-    if(dt===td) tT+=c; if(dt.startsWith(tm)) tM+=c;
+    if(dt===td) tT+=c;
+    if(dt.startsWith(tm)) tM+=c;
   });
-  if(document.getElementById('wToday')) document.getElementById('wToday').innerHTML = (tT/200).toFixed(1)+`<span class='unit'>매</span>`;
-  if(document.getElementById('wMonth')) document.getElementById('wMonth').textContent = (tM/200).toFixed(1)+'매';
+  const todayPages = Math.floor(tT/200);
+  const monthPages = Math.floor(tM/200);
+  const allPages = Math.floor(tAll/200);
+  if(document.getElementById('wToday')) document.getElementById('wToday').innerHTML = todayPages+`<span class='unit'>매</span>`;
+  if(document.getElementById('wMonthSub')) document.getElementById('wMonthSub').textContent = '월간 '+monthPages+'매 / 누적 '+allPages+'매';
 }
 
 function togglePin(type, id, e) {

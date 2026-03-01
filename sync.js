@@ -528,6 +528,7 @@ function init() {
     if (localStorage.getItem('gb_sidebar_closed') === '1') {
       document.getElementById('mainApp').classList.add('sidebar-closed');
     }
+    applyTabColor('navi');
     renderChk();
     updateBookStats();
     updateWritingStats();

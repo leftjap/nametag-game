@@ -118,12 +118,12 @@
         <div class="stat-col">
           <div class="stat-label">오늘 쓴 글</div>
           <div class="stat-big" id="wToday">0</div>
-          <div class="stat-sub">월간 <span id="wMonth">0</span></div>
+          <div class="stat-sub" id="wMonthSub">월간 0매 / 누적 0매</div>
         </div>
         <div class="stat-col">
           <div class="stat-label">읽은 책</div>
           <div class="stat-big" id="bToday">0</div>
-          <div class="stat-sub">월간 <span id="bMonth">0</span></div>
+          <div class="stat-sub" id="bMonthSub">월간 0p / 누적 0p</div>
         </div>
       </div>
     </div>
@@ -189,10 +189,50 @@
     <span class="ed-header-date" id="edDate"></span>
     <span class="ed-save-status" id="edSaveStatus" style="display:none">저장됨</span>
     <div class="ed-topbar-right">
+      <!-- 더보기 메뉴 버튼 -->
+      <button class="ed-more-btn pc-only" onclick="toggleEditorMenu(event)" title="더보기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+      <!-- + 새 글 버튼 -->
       <button class="ed-new-btn pc-only" onclick="handleNew()" title="새 글">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
       </button>
       <button class="ed-btn-done" onclick="handleDone()">완료</button>
+    </div>
+  </div>
+
+  <!-- 에디터 더보기 드롭다운 메뉴 -->
+  <div id="editorDropdownMenu" class="editor-menu">
+    <div class="editor-menu-item" onclick="editorMenuAction('wordcount')">
+      <svg viewBox="0 0 24 24"><text x="3" y="17" font-size="14" font-weight="600" fill="currentColor" stroke="none" font-family="sans-serif">가</text></svg>
+      <span>글자수</span>
+      <span class="editor-menu-val" id="menuWordCount">0자 / 0매</span>
+    </div>
+    <div class="editor-menu-sep"></div>
+    <div class="editor-menu-item" onclick="editorMenuAction('hr')">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+      <span>구분선</span>
+    </div>
+    <div class="editor-menu-item" onclick="editorMenuAction('pin')">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+      <span id="menuPinLabel">고정</span>
+    </div>
+    <div class="editor-menu-item" onclick="editorMenuAction('copymd')">
+      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <span>본문 복사</span>
+    </div>
+    <div class="editor-menu-item" onclick="editorMenuAction('export')">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>내보내기</span>
+    </div>
+    <div class="editor-menu-sep"></div>
+    <div class="editor-menu-item danger" onclick="editorMenuAction('delete')">
+      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      <span>삭제</span>
     </div>
   </div>
   
@@ -235,9 +275,8 @@
       </button>
       <div class="ed-foot-stats-wrap">
         <div class="ed-foot-stats">
-          <span id="edChars">0자</span><div class="fs-sep"></div>
           <span id="edWords">0단어</span><div class="fs-sep"></div>
-          <span id="edPages">0.0매</span>
+          <span id="edPages">0매</span>
         </div>
       </div>
     </div>

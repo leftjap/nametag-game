@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════
-// ui.js — UI 전환, 탭, 리스트 렌더링 (Day One 스타일)
+// ui.js — UI 전환, 탭, 리스트 렌더링 (Day One 스타일 v4)
 // ═══════════════════════════════════════
 
-// ═══ 탭별 파스텔 색상 (Day One 스타일) ═══
+// ═══ 탭별 파스텔 색상 ═══
 const TAB_COLORS = {
   navi:    '#7EB5F4',
   fiction: '#F4B77E',
@@ -11,6 +11,12 @@ const TAB_COLORS = {
   quote:   '#C49ADE',
   memo:    '#B0B0B8'
 };
+
+// ═══ 탭 색상을 CSS 변수로 전파 ═══
+function applyTabColor(tabId) {
+  const color = TAB_COLORS[tabId] || '#7EB5F4';
+  document.documentElement.style.setProperty('--tab-color', color);
+}
 
 // ═══ 레이아웃 전환 ═══
 function switchListView(view) {
@@ -96,8 +102,8 @@ function renderWritingGrid() {
     tabs.forEach(t => {
       const color = TAB_COLORS[t.id] || '#B0B0B8';
       const isOn = activeTab===t.id;
-      html += `<button class="side-menu ${isOn?'on':''}" onclick="switchTab('${t.id}'); setMobileView('list');">
-        <span class="side-menu-l"><span class="tab-color-dot" style="background:${isOn ? '#ffffff' : color}"></span>${t.label}</span>
+      html += `<button class="side-menu ${isOn?'on':''}" data-tab="${t.id}" onclick="switchTab('${t.id}');">
+        <span class="side-menu-l"><span class="tab-color-dot" style="background:${color}"></span>${t.label}</span>
         <span class="badge-pill">${getTabCount(t.id)}</span>
       </button>`;
     });
@@ -110,6 +116,7 @@ window.addEventListener('resize', () => { renderWritingGrid(); renderChk(); });
 function switchTab(t) {
   if(textTypes.includes(activeTab)) saveCurDoc(activeTab);
   activeTab = t;
+  applyTabColor(t);
   document.getElementById('editorText').style.display  = textTypes.includes(t) ? 'flex':'none';
   document.getElementById('editorBook').style.display  = t==='book'  ? 'flex':'none';
   document.getElementById('editorQuote').style.display = t==='quote' ? 'flex':'none';
@@ -130,23 +137,17 @@ function getThumb(content) {
   return m ? m[1] : '';
 }
 
-// XSS 방어
 const escapeHtml = (str) => {
   if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 };
 
 const hl = (txt) => {
   if (!txt) return '';
   const safe = escapeHtml(txt);
   if (!currentSearchQuery) return safe;
-  const safeQuery = escapeHtml(currentSearchQuery).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return safe.replace(new RegExp(`(${safeQuery})`, 'gi'), '<mark class="highlight">$1</mark>');
+  const safeQuery = escapeHtml(currentSearchQuery).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return safe.replace(new RegExp(`(${safeQuery})`,'gi'),'<mark class="highlight">$1</mark>');
 };
 
 const getPreviewText = (htmlContent) => {
@@ -169,24 +170,24 @@ function generateItemHtml(item, t) {
     const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
     const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button><button class="lp-action-btn del" onclick="delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delDoc('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
   } else if(t==='book') {
     isCur=curBookId===item.id; clickFn=`loadBook('${item.id}'); setMobileView('editor');`;
     const authorPub=[item.author,item.publisher].filter(Boolean).join(' · ');
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title)}</div><div class="lp-item-preview">${hl(authorPub)}</div><div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div><div class="lp-item-actions"><button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button><button class="lp-action-btn del" onclick="delBook('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title)}</div><div class="lp-item-preview">${hl(authorPub)}</div><div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div><div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delBook('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div></div>`;
   } else if(t==='quote') {
     isCur=curQuoteId===item.id; clickFn=`loadQuote('${item.id}'); setMobileView('editor');`;
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="quote-txt">${hl(item.text)}</div>${item.by?`<div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'📌 ':''}${hl(item.by)}</div>`:''}</div><div class="lp-item-actions"><button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button><button class="lp-action-btn del" onclick="delQuote('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="quote-txt">${hl(item.text)}</div>${item.by?`<div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'📌 ':''}${hl(item.by)}</div>`:''}</div><div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delQuote('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div></div>`;
   } else if(t==='memo') {
     isCur=curMemoId===item.id; clickFn=`loadMemo('${item.id}'); setMobileView('editor');`;
     const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
     const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
-    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn pin ${item.pinned?'on':''}" onclick="togglePin('${t}','${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg></button><button class="lp-action-btn del" onclick="delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="lp-item-actions"><button class="lp-action-btn del" onclick="event.stopPropagation();delMemo('${item.id}',event)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
   }
 }
 
-// ═══ 사진 뷰 (Day One 스타일 — 날짜 우측 하단) ═══
+// ═══ 사진 뷰 — 탭 색상 테두리 ═══
 let selectedPhotoId = null;
 function renderPhotoView(items, t) {
   const grid = document.getElementById('photoGrid');
@@ -224,15 +225,14 @@ function selectPhoto(id, e) {
   }
 }
 
-// ═══ 캘린더 뷰 (Day One 스타일 — 과거→현재→미래 순서, 현재월 자동 스크롤) ═══
+// ═══ 캘린더 뷰 — 과거→현재→미래, 탭 색상 반영 ═══
 function renderCalendarView(items, t) {
   const calWrap=document.getElementById('calWrap');
   const todayD=new Date();
   const todayY=todayD.getFullYear(), todayM=todayD.getMonth()+1, todayDay=todayD.getDate();
 
-  // 기본 범위: 이번달 기준 미래 2개월
   let minDate=new Date(todayY, todayM-1, 1);
-  const futureEnd=new Date(todayY, todayM+1, 0); // 2개월 뒤 마지막날
+  const futureEnd=new Date(todayY, todayM+1, 0);
   let maxDate=futureEnd;
 
   const entriesMap={}, photoDays={}, itemMap={};
@@ -252,7 +252,6 @@ function renderCalendarView(items, t) {
   let startY=minDate.getFullYear(), startM=minDate.getMonth()+1;
   let endY=maxDate.getFullYear(), endM=maxDate.getMonth()+1;
 
-  // 과거→미래 순서 (오래된 것이 위)
   const months=[]; let cy=startY,cm=startM;
   while(cy<endY||(cy===endY&&cm<=endM)){
     months.push({y:cy,m:cm,label:`${cy}년 ${cm}월`});
@@ -260,11 +259,7 @@ function renderCalendarView(items, t) {
   }
 
   let html='';
-  let currentMonthIdx = -1;
   months.forEach((mo,mi)=>{
-    // 현재월 인덱스 기억
-    if(mo.y===todayY && mo.m===todayM) currentMonthIdx=mi;
-
     const first=new Date(mo.y,mo.m-1,1).getDay(), days=new Date(mo.y,mo.m,0).getDate();
     const key=`${mo.y}-${mo.m}`, entries=entriesMap[key]?Array.from(entriesMap[key]):[];
     let cells='';
@@ -294,14 +289,12 @@ function renderCalendarView(items, t) {
   });
   calWrap.innerHTML=html;
 
-  // 현재월로 자동 스크롤
   requestAnimationFrame(()=>{
     const currentEl = document.getElementById(`cal-month-${todayY}-${todayM}`);
     if(currentEl) {
       const pane = document.getElementById('pane-calendar');
       if(pane) {
         currentEl.scrollIntoView({block:'start'});
-        // 요일 헤더 높이만큼 살짝 위로
         pane.scrollTop = Math.max(0, pane.scrollTop - 40);
       }
     }
@@ -344,7 +337,7 @@ function renderListPanel() {
 
   let html='';
   if(pinnedItems.length>0){
-    html+=`<div class="lp-pin-hdr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ac-light)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> 고정됨</div>`;
+    html+=`<div class="lp-pin-hdr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tab-color)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> 고정됨</div>`;
     pinnedItems.forEach(item=>{html+=generateItemHtml(item,t);});
   }
   let currentMonthStr='';
@@ -355,6 +348,152 @@ function renderListPanel() {
   });
   el.innerHTML=html;
 }
+
+// ═══ 에디터 더보기 메뉴 ═══
+function toggleEditorMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('editorDropdownMenu');
+  if(menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    return;
+  }
+  // 글자수/매수 업데이트
+  const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
+  const txt = target ? target.textContent.trim() : '';
+  const chars = txt.replace(/\s/g,'').length;
+  const pages = Math.floor(chars/200);
+  const valEl = document.getElementById('menuWordCount');
+  if(valEl) valEl.textContent = chars.toLocaleString()+'자 / '+pages+'매';
+
+  // 고정 라벨 업데이트
+  const pinLabel = document.getElementById('menuPinLabel');
+  if(pinLabel) {
+    let isPinned = false;
+    if(textTypes.includes(activeTab) && curIds[activeTab]) {
+      const doc = allDocs().find(d=>d.id===curIds[activeTab]);
+      if(doc) isPinned = doc.pinned;
+    } else if(activeTab==='book' && curBookId) {
+      const b = getBooks().find(x=>x.id===curBookId);
+      if(b) isPinned = b.pinned;
+    } else if(activeTab==='quote' && curQuoteId) {
+      const q = getQuotes().find(x=>x.id===curQuoteId);
+      if(q) isPinned = q.pinned;
+    } else if(activeTab==='memo' && curMemoId) {
+      const m = getMemos().find(x=>x.id===curMemoId);
+      if(m) isPinned = m.pinned;
+    }
+    pinLabel.textContent = isPinned ? '고정 해제' : '고정';
+  }
+
+  menu.classList.add('open');
+}
+
+function editorMenuAction(action) {
+  const menu = document.getElementById('editorDropdownMenu');
+  menu.classList.remove('open');
+
+  if(action==='wordcount') {
+    // 이미 표시됨, 아무것도 안 함
+    return;
+  }
+
+  if(action==='hr') {
+    const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
+    target.focus();
+    document.execCommand('insertHorizontalRule', false, null);
+    if(textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo();
+    return;
+  }
+
+  if(action==='pin') {
+    let id=null, type=activeTab;
+    if(textTypes.includes(activeTab)) id=curIds[activeTab];
+    else if(activeTab==='book') id=curBookId;
+    else if(activeTab==='quote') id=curQuoteId;
+    else if(activeTab==='memo') id=curMemoId;
+    if(id) {
+      const fakeEvent = {stopPropagation:()=>{}};
+      togglePin(type, id, fakeEvent);
+    }
+    return;
+  }
+
+  if(action==='copymd') {
+    const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
+    if(!target) return;
+    // HTML → 간단 마크다운 변환
+    let md = '';
+    function traverse(el) {
+      if(el.nodeType===Node.TEXT_NODE) { md+=el.nodeValue; return; }
+      if(el.nodeType!==Node.ELEMENT_NODE) return;
+      const tag=el.tagName.toLowerCase();
+      if(tag==='br') { md+='\n'; return; }
+      if(tag==='h1') md+='\n# ';
+      if(tag==='h2') md+='\n## ';
+      if(tag==='h3') md+='\n### ';
+      if(tag==='blockquote') md+='\n> ';
+      if(tag==='li') md+='\n- ';
+      if(tag==='hr') { md+='\n---\n'; return; }
+      if(tag==='img') { md+=`\n![이미지](${el.src})\n`; return; }
+      for(let child of el.childNodes) traverse(child);
+      if(['div','p','h1','h2','h3','blockquote','li'].includes(tag)) md+='\n';
+    }
+    traverse(target);
+    md = md.replace(/\n{3,}/g,'\n\n').trim();
+    navigator.clipboard.writeText(md).then(()=>{
+      const status = document.getElementById('edSaveStatus');
+      if(status) { status.style.display='inline'; status.textContent='복사됨'; setTimeout(()=>{status.style.display='none';},1500); }
+    }).catch(()=>{});
+    return;
+  }
+
+  if(action==='export') {
+    let data = {};
+    if(textTypes.includes(activeTab) && curIds[activeTab]) {
+      data = allDocs().find(d=>d.id===curIds[activeTab]) || {};
+    } else if(activeTab==='book' && curBookId) {
+      data = getBooks().find(b=>b.id===curBookId) || {};
+    } else if(activeTab==='quote' && curQuoteId) {
+      data = getQuotes().find(q=>q.id===curQuoteId) || {};
+    } else if(activeTab==='memo' && curMemoId) {
+      data = getMemos().find(m=>m.id===curMemoId) || {};
+    }
+    if(!data.id) return;
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (data.title||data.text||'export').slice(0,30).replace(/[^가-힣a-zA-Z0-9]/g,'_') + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    return;
+  }
+
+  if(action==='delete') {
+    const fakeEvent = {stopPropagation:()=>{}};
+    if(textTypes.includes(activeTab) && curIds[activeTab]) {
+      delDoc(activeTab, curIds[activeTab], fakeEvent);
+    } else if(activeTab==='book' && curBookId) {
+      delBook(curBookId, fakeEvent);
+    } else if(activeTab==='quote' && curQuoteId) {
+      delQuote(curQuoteId, fakeEvent);
+    } else if(activeTab==='memo' && curMemoId) {
+      delMemo(curMemoId, fakeEvent);
+    }
+    return;
+  }
+}
+
+// 외부 클릭으로 메뉴 닫기
+document.addEventListener('click', e => {
+  const menu = document.getElementById('editorDropdownMenu');
+  if(menu && menu.classList.contains('open')) {
+    if(!e.target.closest('.ed-more-btn') && !e.target.closest('.editor-menu')) {
+      menu.classList.remove('open');
+    }
+  }
+});
 
 // ═══ 간단 액션 ═══
 function handleNew() {
