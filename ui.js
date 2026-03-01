@@ -98,10 +98,24 @@ function getThumb(content) {
   return m ? m[1] : '';
 }
 
+// XSS 방어: HTML 이스케이프 함수
+const escapeHtml = (str) => {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+// XSS 방어 적용된 하이라이트 함수
 const hl = (txt) => {
-  if(!txt || !currentSearchQuery) return txt||'';
-  const safeQuery = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return String(txt).replace(new RegExp(`(${safeQuery})`,'gi'),'<mark class="highlight">$1</mark>');
+  if (!txt) return '';
+  const safe = escapeHtml(txt);
+  if (!currentSearchQuery) return safe;
+  const safeQuery = escapeHtml(currentSearchQuery).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(new RegExp(`(${safeQuery})`, 'gi'), '<mark class="highlight">$1</mark>');
 };
 
 const getPreviewText = (htmlContent) => {
