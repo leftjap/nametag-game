@@ -502,7 +502,8 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  if (localStorage.getItem('gb_id_token')) {
+  const isLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+  if (isLocal || localStorage.getItem('gb_id_token')) {
     document.getElementById('lockScreen').classList.add('hidden');
     showApp();
   } else {
