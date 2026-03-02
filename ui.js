@@ -356,7 +356,7 @@ function renderListPanel() {
       const dateKey=getLocalYMD(dt);
       const showDate=(dateKey!==pinLastDate);
       pinLastDate=dateKey;
-      html+=generateItemHtml(item,t,showDate);
+      html+=generateItemHtml(item,t,showDate).replace('class="lp-item','class="lp-item pinned-item');
     });
   }
 

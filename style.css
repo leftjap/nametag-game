@@ -206,15 +206,17 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   font-size:10.5px;font-weight:600;color:var(--tx-hint);
   padding:0 16px;height:34px;min-height:34px;
   display:flex;align-items:center;gap:5px;
-  position:sticky;top:0;background:var(--bg-white);z-index:5;
-  border-bottom:1px solid var(--border-l);letter-spacing:.3px;
+  position:sticky;top:0;background:#f2f2f7;z-index:5;
+  border-bottom:1px solid var(--border);border-top:1px solid var(--border);
+  letter-spacing:.3px;
 }
 
 .lp-month-hdr{
-  font-size:15px;font-weight:700;color:var(--tx);
-  padding:20px 16px 8px;display:flex;align-items:center;
-  position:sticky;top:0;background:var(--bg-white);z-index:5;
-  border-bottom:1px solid var(--border-l);letter-spacing:-.2px;
+  font-size:13px;font-weight:700;color:var(--tx-d);
+  padding:10px 16px 10px;display:flex;align-items:center;
+  position:sticky;top:0;background:#f2f2f7;z-index:5;
+  border-bottom:1px solid var(--border);border-top:none;
+  letter-spacing:-.2px;
 }
 
 /* ═══ 리스트 항목 — v5.2: flex-start 정렬 ═══ */
@@ -470,8 +472,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .modal-map{width:100%;height:200px;background:var(--bg);border-radius:0 0 16px 16px;overflow:hidden}
 .modal-map canvas,.modal-map iframe{width:100%;height:100%;display:block;border:none}
 
-/* ═══ 반응형 ═══ */
-@media(max-width:768px){
+/* ═══ 고정 영역 배경 ═══ */
+
+
+
+/* ═══ 반응형 ═══ */@media(max-width:768px){
   .side{position:fixed;top:0;left:0;bottom:0;width:100%!important;max-width:100%!important;min-width:0!important;z-index:30;transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
   .app.view-side .side{transform:translateX(0)}
   .list-panel{width:100%!important;max-width:100%!important;min-width:0!important;border-right:none}
