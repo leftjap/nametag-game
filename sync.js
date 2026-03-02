@@ -502,8 +502,20 @@ function handleCredentialResponse(response) {
 }
 
 window.onload = function () {
-  document.getElementById('lockScreen').classList.add('hidden');
-  showApp();
+  if (localStorage.getItem('gb_id_token')) {
+    document.getElementById('lockScreen').classList.add('hidden');
+    showApp();
+  } else {
+    document.getElementById('lockScreen').classList.remove('hidden');
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('googleSignInBtn'),
+      { theme: 'outline', size: 'large', width: 280 }
+    );
+  }
 };
 
 async function showApp() {
