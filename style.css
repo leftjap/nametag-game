@@ -72,8 +72,20 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
 
 /* 어구록 */
 .quote-section{padding:12px 14px}
-.q-card{cursor:pointer;transition:.2s;padding:8px 0;border-left:none;background:none;box-shadow:none;border-radius:0;display:block}
-.q-card:hover{opacity:.8}
+.q-card{
+  cursor:pointer;transition:.2s;
+  padding:14px 16px;
+  border-left:none;
+  background:color-mix(in srgb, var(--tab-color) 6%, var(--bg-white));
+  box-shadow:none;
+  border-radius:12px;
+  display:block;
+  border:1px solid color-mix(in srgb, var(--tab-color) 12%, transparent);
+}
+.q-card:hover{
+  background:color-mix(in srgb, var(--tab-color) 10%, var(--bg-white));
+  border-color:color-mix(in srgb, var(--tab-color) 20%, transparent);
+}
 .q-text{font-family:'Noto Serif KR',serif;font-size:14px;font-weight:400;line-height:1.65;color:var(--tx);word-break:keep-all}
 .q-by{font-size:10px;color:var(--tx-m);margin-top:3px;font-weight:400}
 .quote-mark{display:none}
