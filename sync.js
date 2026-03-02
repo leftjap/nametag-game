@@ -469,12 +469,24 @@ async function execImgAction(action) {
         const blob = await res.blob();
         await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
       } else {
-        await navigator.clipboard.write([new ClipboardItem({
-          'text/html': new Blob([currentHoverImg.outerHTML], { type: 'text/html' })
-        })]);
+        // 외부 URL 이미지: fetch → blob으로 변환 후 복사
+        try {
+          const res = await fetch(src);
+          const blob = await res.blob();
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        } catch {
+          // CORS 차단 시 HTML로 폴백
+          await navigator.clipboard.writeText(src);
+          console.log('이미지 URL이 클립보드에 복사됨 (CORS 제한)');
+        }
       }
     } catch (err) {
-      console.warn('Clipboard write failed:', err);
+      // 최종 폴백: 이미지 URL을 텍스트로 복사
+      try {
+        await navigator.clipboard.writeText(currentHoverImg.src);
+      } catch (e2) {
+        console.warn('Clipboard write failed:', e2);
+      }
     }
   }
   currentHoverImg = null;
@@ -555,18 +567,20 @@ function init() {
     document.getElementById('edBody').addEventListener('paste', handlePaste);
     document.getElementById('memo-body').addEventListener('paste', handlePaste);
 
-    const checkSelWrapper = () => {
+        const checkSelWrapper = () => {
       clearTimeout(selectionTimeout);
       selectionTimeout = setTimeout(checkSelection, 50);
     };
+    document.addEventListener('selectionchange', checkSelWrapper);
     document.getElementById('edBody').addEventListener('mouseup', checkSelWrapper);
     document.getElementById('edBody').addEventListener('keyup', e => { if (e.shiftKey) checkSelWrapper(); });
     document.getElementById('memo-body').addEventListener('mouseup', checkSelWrapper);
     document.getElementById('memo-body').addEventListener('keyup', e => { if (e.shiftKey) checkSelWrapper(); });
 
+    setupFloatingToolbar();
     setupEditorImageSelection();
     setupGesturesAndUI();
-
+    setupListContextMenu();
     const naviDocs = getDocs('navi');
     if (naviDocs.length) loadDoc('navi', naviDocs[0].id, true);
     else { const nd = newDoc('navi'); loadDoc('navi', nd.id, true); }

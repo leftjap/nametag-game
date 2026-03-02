@@ -90,7 +90,7 @@ function updateWC() {
   const t = target ? target.textContent.trim() : '';
   const c = t.replace(/\s/g,'').length;
   const w = t.split(/\s+/).filter(x=>x).length;
-  const pages = Math.floor(c / 200);
+  const pages = (c / 200).toFixed(1);
   if(document.getElementById('edWords')) document.getElementById('edWords').textContent = w.toLocaleString()+'단어';
   if(document.getElementById('edPages')) document.getElementById('edPages').textContent = pages+'매';
   updateWritingStats();
