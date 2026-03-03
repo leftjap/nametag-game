@@ -547,6 +547,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .pc-only{display:flex!important}
   .fab-btn{display:none!important}
 
+  .ed-body{font-size:17px;line-height:1.9}
+
   /* 사이드바 다크 (모바일과 동일) */
   .side .side-hdr{background:transparent;border-bottom:1px solid rgba(255,255,255,.08)}
   .side .sync-status{display:none}
@@ -695,7 +697,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
   .editor-content-wrap{padding:20px 18px 80px}
   .ed-title{font-size:20px;margin-bottom:16px}
-  .ed-body{font-size:15px;line-height:1.9}
+  .ed-body{font-size:17px;line-height:1.9}
 
   .lp-item{padding:12px 16px 10px;gap:6px;background:var(--bg-white);border-radius:0;margin:0;border-bottom:none;position:relative;box-shadow:none;overflow:visible;flex-direction:column;height:auto;min-height:auto}
   .lp-item::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:var(--border-l);pointer-events:none}
