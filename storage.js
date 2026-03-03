@@ -299,7 +299,185 @@ function renderRoutineRing() {
 }
 
 function openRoutineDetail() {
+  showRoutineCard();
   setMobileView('list');
+}
+
+function showRoutineCard() {
+  const pane = document.getElementById('pane-routine');
+  if(!pane) return;
+  pane.style.display = 'block';
+  const vs = document.getElementById('viewSwitcher');
+  if(vs) vs.style.display = 'none';
+  const fab = document.querySelector('.fab-btn');
+  if(fab) fab.style.display = 'none';
+  renderStreakCard();
+  renderMonthlyCard();
+  
+  const weekDates = getWeekDates();
+  const weekLabel = (new Date(weekDates[0])).getMonth()+1 + '/' + (new Date(weekDates[0])).getDate() + ' ~ ' + (new Date(weekDates[6])).getMonth()+1 + '/' + (new Date(weekDates[6])).getDate();
+  const weekEl = document.getElementById('routineCardWeek');
+  if(weekEl) weekEl.textContent = weekLabel;
+  
+  renderRoutineCardBody();
+}
+
+function hideRoutineCard() {
+  const pane = document.getElementById('pane-routine');
+  if(pane) pane.style.display = 'none';
+  const vs = document.getElementById('viewSwitcher');
+  if(vs) vs.style.display = 'flex';
+  const fab = document.querySelector('.fab-btn');
+  if(fab) fab.style.display = '';
+}
+
+function renderRoutineCardBody() {
+  const container = document.getElementById('routineCardBody');
+  if(!container) return;
+  
+  const all = getAllChk(), week = getWeekDates(), td = today();
+  const dayN = ['일','월','화','수','목','금','토'];
+  
+  let h = '';
+  h += '<div class="chk-table">';
+  h += '<div class="chk-week-hdr"><div class="chk-week-hdr-spacer"></div><div class="day-labels">'
+    + dayN.map(d => '<span class="day-lbl">'+d+'</span>').join('')
+    + '</div></div>';
+  
+  ROUTINE_META.forEach(r => {
+    const weekDone = week.map(dt => all[dt] && all[dt][r.id] ? 1 : 0);
+    const doneCount = weekDone.filter(d => d).length;
+    const pct = Math.round((doneCount/7)*100);
+    
+    const dotHtml = weekDone.map((done,i) => {
+      const dt = week[i], isTd = dt === td;
+      return '<div class="chk-dot '+(done?'done':'')+' '+(isTd?'today':'')+'" onclick="event.stopPropagation();toggleDayCard(\''+r.id+'\',\''+dt+'\')"></div>';
+    }).join('');
+    
+    h += '<div class="chk-row" onclick="toggleDayCard(\''+r.id+'\',\''+td+'\')">'
+      + (doneCount>0 ? '<span class="chk-pct">'+pct+'%</span>' : '')
+      + '<div class="chk-left"><span class="chk-lb">'+r.name+'</span></div>'
+      + '<div class="chk-dots">'+dotHtml+'</div>'
+      + '</div>';
+  });
+  
+  h += '</div>';
+  container.innerHTML = h;
+}
+
+function renderStreakCard() {
+
+  const container = document.getElementById('routineStreak');
+  if(!container) return;
+  
+  const all = getAllChk(), td = today();
+  let html = '<div class="streak-title"><span>🔥</span> 연속 기록</div><div class="streak-list">';
+  
+  ROUTINE_META.forEach(r => {
+    let current = 0, best = 0, streak = 0;
+    const d = new Date();
+    // 오늘부터 거꾸로 세기
+    for(let i = 0; i < 365; i++) {
+      const dt = new Date(d);
+      dt.setDate(d.getDate() - i);
+      const key = getLocalYMD(dt);
+      if(all[key] && all[key][r.id]) {
+        if(i === 0 || current > 0) current++;
+        streak++;
+      } else {
+        if(i === 0) current = 0;
+        else if(current > 0) break;
+        else { current = 0; break; }
+      }
+    }
+    // 최장 기록 계산
+    let tempStreak = 0;
+    for(let i = 0; i < 365; i++) {
+      const dt = new Date(d);
+      dt.setDate(d.getDate() - i);
+      const key = getLocalYMD(dt);
+      if(all[key] && all[key][r.id]) { tempStreak++; if(tempStreak > best) best = tempStreak; }
+      else { tempStreak = 0; }
+    }
+    
+    const maxDisplay = Math.max(best, 14);
+    const barPct = best > 0 ? Math.round((current / maxDisplay) * 100) : 0;
+    const isBroken = current === 0;
+    const barColor = isBroken ? 'var(--border)' : r.color;
+    
+    html += `<div class="streak-row${isBroken ? ' broken' : ''}">
+      <span class="streak-name">${r.name}</span>
+      <div class="streak-bar-wrap"><div class="streak-bar" style="width:${barPct}%;background:${barColor};opacity:.5"></div></div>
+      <span class="streak-info">${current > 0 ? '<span class="streak-days">' + current + '일째</span> · 최장 ' + best + '일' : '끊김' + (best > 0 ? ' · 최장 ' + best + '일' : '')}</span>
+    </div>`;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function renderMonthlyCard() {
+  const container = document.getElementById('routineMonthly');
+  if(!container) return;
+  
+  const all = getAllChk();
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayDate = now.getDate();
+  const monthName = (m + 1) + '월';
+  
+  let totalChecks = 0, totalPossible = 0;
+  let perfectDays = 0;
+  const itemCounts = {};
+  ROUTINE_META.forEach(r => { itemCounts[r.id] = 0; });
+  
+  for(let d = 1; d <= todayDate; d++) {
+    const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    let dayDone = 0;
+    ROUTINE_META.forEach(r => {
+      if(all[key] && all[key][r.id]) { totalChecks++; dayDone++; itemCounts[r.id]++; }
+      totalPossible++;
+    });
+    if(dayDone === ROUTINE_META.length) perfectDays++;
+  }
+  
+  const overallPct = totalPossible > 0 ? Math.round((totalChecks / totalPossible) * 100) : 0;
+  
+  let bestId = '', bestCount = 0, worstId = '', worstCount = 999;
+  ROUTINE_META.forEach(r => {
+    if(itemCounts[r.id] > bestCount) { bestCount = itemCounts[r.id]; bestId = r.id; }
+    if(itemCounts[r.id] < worstCount) { worstCount = itemCounts[r.id]; worstId = r.id; }
+  });
+  const bestName = ROUTINE_META.find(r => r.id === bestId)?.name || '';
+  const worstName = ROUTINE_META.find(r => r.id === worstId)?.name || '';
+  
+  let html = `<div class="monthly-title"><span>📊</span> ${monthName} 통계</div>`;
+  html += `<div class="monthly-overall">
+    <span class="monthly-pct">${overallPct}<span class="monthly-pct-unit">%</span></span>
+    <div class="monthly-bar-wrap"><div class="monthly-bar" style="width:${overallPct}%"></div></div>
+  </div>`;
+  html += '<div class="monthly-stats">';
+  html += `<div class="monthly-stat-row"><span class="ms-label">최다 달성</span><span class="ms-value">${bestName} <span class="ms-highlight">${bestCount}/${todayDate}일</span></span></div>`;
+  html += `<div class="monthly-stat-row"><span class="ms-label">최저 달성</span><span class="ms-value">${worstName} ${worstCount}/${todayDate}일</span></div>`;
+  html += `<div class="monthly-stat-row"><span class="ms-label">완벽한 날</span><span class="ms-value"><span class="ms-highlight">${perfectDays}일</span> / ${todayDate}일</span></div>`;
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function toggleDayCard(id, dateStr) {
+  const d = L(K.checks) || {};
+  if(!d[dateStr]) d[dateStr] = {};
+  d[dateStr][id] = !d[dateStr][id];
+  S(K.checks, d);
+  renderRoutineCardBody();
+  renderStreakCard();
+  renderMonthlyCard();
+  renderChk();
+  renderRoutineRing();
+  clearTimeout(_chkT);
+  _chkT = setTimeout(() => { SYNC.saveChecksToSheet(dateStr, d[dateStr]); SYNC.scheduleDatabaseSave(); }, 1200);
 }
 
 let _chkT = null;function toggleChk(id) { toggleDay(id, today()); renderRoutineRing(); }

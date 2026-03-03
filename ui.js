@@ -120,7 +120,7 @@ function switchTab(t) {
   document.getElementById('editorQuote').style.display = t==='quote' ? 'flex':'none';
   document.getElementById('editorMemo').style.display  = t==='memo'  ? 'flex':'none';
   document.getElementById('edToolbar').style.display   = ['book','quote'].includes(t) ? 'none':'flex';
-  clearSearch(); switchListView('list');
+  clearSearch(); hideRoutineCard(); switchListView('list');
   if(textTypes.includes(t)) { const docs=getDocs(t); if(curIds[t])loadDoc(t,curIds[t],true); else if(docs.length)loadDoc(t,docs[0].id,true); else{const nd=newDoc(t);loadDoc(t,nd.id,true);} }
   if(t==='book')  { if(curBookId)loadBook(curBookId,true); else{const b=getBooks();if(b.length)loadBook(b[0].id,true);else newBook();} }
   if(t==='memo')  { if(curMemoId)loadMemo(curMemoId,true); else{const m=getMemos();if(m.length)loadMemo(m[0].id,true);else newMemoForm();} }
@@ -135,8 +135,32 @@ function getThumb(content) {
   return m ? m[1] : '';
 }
 
-const escapeHtml = (str) => {
-  if (!str) return '';
+function getThumbs(content, max) {
+  if(!content) return [];
+  const regex = /<img[^>]+src=["'](data:image[^"']+|https?:[^"']+)["'][^>]*>/gi;
+  const results = [];
+  let m;
+  while((m = regex.exec(content)) !== null && results.length < (max||2)) {
+    results.push(m[1]);
+  }
+  return results;
+}
+
+function getRelativeTime(dateStr) {
+  if(!dateStr) return '';
+  const now = new Date(), d = new Date(dateStr);
+  const diff = Math.floor((now - d) / 1000);
+  if(diff < 60) return '방금 전';
+  if(diff < 3600) return Math.floor(diff/60) + '분 전';
+  if(diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  if(diff < 604800) return Math.floor(diff/86400) + '일 전';
+  const y = d.getFullYear(), m = d.getMonth()+1, day = d.getDate();
+  const nowY = now.getFullYear();
+  if(y === nowY) return m + '월 ' + day + '일';
+  return y + '년 ' + m + '월 ' + day + '일';
+}
+
+const escapeHtml = (str) => {  if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 };
 
@@ -160,6 +184,7 @@ const getPreviewText = (htmlContent) => {
 function generateItemHtml(item, t, showDate) {
   if(showDate === undefined) showDate = true;
   const dt=new Date(item.created||item.date||Date.now()), day=dt.getDate(), dow=weekdays[dt.getDay()], time=formatTimeOnly(item.created||item.date);
+  const relTime = getRelativeTime(item.created||item.date);
   const swipePin = fn => `<div class="swipe-action pin-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>고정</span></div>`;
   const swipeDel = fn => `<div class="swipe-action del-action" onclick="event.stopPropagation();${fn}"><span><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>삭제</span></div>`;
 
@@ -175,23 +200,25 @@ function generateItemHtml(item, t, showDate) {
 
   if(textTypes.includes(t)) {
     isCur=curIds[t]===item.id; clickFn=`loadDoc('${t}','${item.id}'); setMobileView('editor');`;
-    const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
-    const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
+    const rawPreview=getPreviewText(item.content), preview=hl(rawPreview);
+    const thumbs=getThumbs(item.content, 5);
+    const thumbsHtml=thumbs.length?`<div class="lp-thumbs">${thumbs.map(src=>`<img src="${src}" alt="">`).join('')}</div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
-    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}${thumbsHtml}<div class="lp-item-meta">${item.pinned?'<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>  ':''}${relTime}</div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delDoc('${t}','${item.id}',event)`)}</div></div>`;
   } else if(t==='book') {
     isCur=curBookId===item.id; clickFn=`loadBook('${item.id}'); setMobileView('editor');`;
     const authorPub=[item.author,item.publisher].filter(Boolean).join(' · ');
-    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title)}</div><div class="lp-item-preview">${hl(authorPub)}</div><div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}"><div class="lp-item-title">${hl(item.title)}</div><div class="lp-item-preview">${hl(authorPub)}</div><div class="lp-item-meta">${item.pinned?'<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>  ':''}${relTime}</div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delBook('${item.id}',event)`)}</div></div>`;
   } else if(t==='quote') {
     isCur=curQuoteId===item.id; clickFn=`loadQuote('${item.id}'); setMobileView('editor');`;
-    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="quote-txt">${hl(item.text)}</div>${item.by?`<div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'📌 ':''}${hl(item.by)}</div>`:''}</div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}"><div class="quote-txt">${hl(item.text)}</div><div class="lp-item-meta" style="margin-top:4px;">${item.pinned?'<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>  ':''}${item.by?hl(item.by)+' · ':''}${relTime}</div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delQuote('${item.id}',event)`)}</div></div>`;
   } else if(t==='memo') {
     isCur=curMemoId===item.id; clickFn=`loadMemo('${item.id}'); setMobileView('editor');`;
-    const rawPreview=getPreviewText(item.content), preview=hl(rawPreview), thumb=getThumb(item.content);
-    const thumbHtml=thumb?`<div class="lp-thumb"><img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></div>`:'';
+    const rawPreview=getPreviewText(item.content), preview=hl(rawPreview);
+    const thumbs=getThumbs(item.content, 5);
+    const thumbsHtml=thumbs.length?`<div class="lp-thumbs">${thumbs.map(src=>`<img src="${src}" alt="">`).join('')}</div>`:'';
     const tagHtml=item.tags?`<div class="lp-item-tags">${hl(item.tags)}</div>`:'';
-    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}">${dateBlock}<div class="lp-text-wrap"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}<div class="lp-item-meta">${item.pinned?'📌 ':''}${time}</div></div>${thumbHtml}<div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
+    return `<div class="lp-item${sameDateClass} ${isCur?'on':''}" onclick="${clickFn}"><div class="lp-item-title">${hl(item.title||'제목 없음')}</div>${tagHtml}${preview?`<div class="lp-item-preview">${preview}</div>`:''}${thumbsHtml}<div class="lp-item-meta">${item.pinned?'<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>  ':''}${relTime}</div><div class="swipe-actions">${swipePin(`togglePin('${t}','${item.id}',event)`)}${swipeDel(`delMemo('${item.id}',event)`)}</div></div>`;
   }
   return '';
 }
@@ -321,7 +348,18 @@ function renderListPanel() {
   const t=activeTab, el=document.getElementById('pane-list');
   const emptyState='<div style="text-align:center;padding:80px 20px;color:var(--tx-hint);font-size:15px">기록이 없습니다</div>';
   let items=[];
-  if(textTypes.includes(t))items=getDocs(t);
+  let isRoutineMode = document.getElementById('pane-routine') && document.getElementById('pane-routine').style.display !== 'none';
+  if(isRoutineMode){
+    const td=today();
+    const allItems=[];
+    allDocs().forEach(d=>{const dt=(d.created||d.updated||'').slice(0,10);if(dt===td)allItems.push({...d,_type:d.type});});
+    getBooks().forEach(b=>{const dt=(b.date||b.created||'').slice(0,10);if(dt===td)allItems.push({...b,_type:'book'});});
+    getQuotes().forEach(q=>{const dt=(q.created||'').slice(0,10);if(dt===td)allItems.push({...q,_type:'quote'});});
+    getMemos().forEach(m=>{const dt=(m.created||m.updated||'').slice(0,10);if(dt===td)allItems.push({...m,_type:'memo'});});
+    allItems.sort((a,b)=>new Date(b.created||b.date||0)-new Date(a.created||a.date||0));
+    items=allItems;
+  }
+  else if(textTypes.includes(t))items=getDocs(t);
   else if(t==='book')items=getBooks();
   else if(t==='quote')items=getQuotes();
   else if(t==='memo')items=getMemos();
@@ -339,8 +377,10 @@ function renderListPanel() {
 
   if(currentListView==='photo'){renderPhotoView(items,t);}
   if(currentListView==='calendar'){renderCalendarView(items,t);}
-  if(!items.length){el.innerHTML=emptyState;return;}
-
+  if(!items.length){
+    if(isRoutineMode){el.innerHTML='';return;}
+    el.innerHTML=emptyState;return;
+  }
   const pinnedItems=items.filter(i=>i.pinned), unpinnedItems=items.filter(i=>!i.pinned);
   const sortFn=(a,b)=>new Date(b.created||b.date||0)-new Date(a.created||a.date||0);
   pinnedItems.sort(sortFn); unpinnedItems.sort(sortFn);
@@ -348,14 +388,14 @@ function renderListPanel() {
   let html='';
 
   if(pinnedItems.length>0){
-    html+=`<div class="lp-pin-hdr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--tab-color)"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg> 고정됨</div>`;
     let pinLastDate='';
     pinnedItems.forEach(item=>{
       const dt=new Date(item.created||item.date||Date.now());
       const dateKey=getLocalYMD(dt);
       const showDate=(dateKey!==pinLastDate);
       pinLastDate=dateKey;
-      html+=generateItemHtml(item,t,showDate).replace('class="lp-item','class="lp-item pinned-item');
+      const itemType=item._type||t;
+      html+=generateItemHtml(item,itemType,showDate).replace('class="lp-item','class="lp-item pinned-item');
     });
   }
 
@@ -364,15 +404,16 @@ function renderListPanel() {
     const dt=new Date(item.created||item.date||Date.now());
     const mStr=getMonthYearStr(dt.toISOString());
     if(mStr!==currentMonthStr){
-      html+=`<div class="lp-month-hdr">${mStr}</div>`;
       currentMonthStr=mStr;
       lastDateStr='';
     }
     const dateKey=getLocalYMD(dt);
     const showDate=(dateKey!==lastDateStr);
     lastDateStr=dateKey;
-    html+=generateItemHtml(item,t,showDate);
+    const itemType=item._type||t;
+    html+=generateItemHtml(item,itemType,showDate);
   });
+
   el.innerHTML=html;
 }
 

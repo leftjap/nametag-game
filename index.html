@@ -13,7 +13,8 @@
 <title>인생은 이름표 붙이기 게임</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<link rel="stylesheet" href="style.css?v=52">
+<link rel="stylesheet" href="style.css?v=53
+">
 </head>
 <body>
 
@@ -88,9 +89,10 @@
       <button class="sync-btn" onclick="SYNC.syncAll()">↻</button>
     <button class="sync-cloud-btn" onclick="SYNC.syncAll()" id="syncCloudBtn" title="동기화">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        <path d="M6.5 19a4.5 4.5 0 0 1-.42-8.98A7 7 0 0 1 13 5a6.97 6.97 0 0 1 6.79 5.32A4.5 4.5 0 0 1 17.5 19H6.5z"/>
+        <line x1="12" y1="10" x2="12" y2="14"/>
+        <circle cx="12" cy="16.5" r="0.5" fill="currentColor" stroke="none"/>
       </svg>
-      <span class="sync-cloud-dot" id="syncCloudDot"></span>
     </button>    </div>
   </div>
   
@@ -177,8 +179,18 @@
     </div>
   </div>
 
-  <div class="pane-list" id="pane-list"></div>
-  
+  <div class="pane-routine" id="pane-routine" style="display:none">
+    <div class="routine-card">
+      <div class="routine-card-hdr">
+        <span class="routine-card-title">데일리 루틴</span>
+        <span class="routine-card-week" id="routineCardWeek"></span>
+      </div>
+      <div class="routine-card-body" id="routineCardBody"></div>
+    </div>
+    <div class="routine-streak" id="routineStreak"></div>
+    <div class="routine-monthly" id="routineMonthly"></div>
+  </div>
+  <div class="pane-list" id="pane-list"></div>  
   <div class="pane-photo" id="pane-photo">
     <div class="photo-grid" id="photoGrid"></div>
   </div>
@@ -200,7 +212,8 @@
   <div class="col-header ed-topbar">
     <div class="ed-topbar-left">
       <button class="mobile-nav-btn mobile-back-btn" onclick="setMobileView('list')" title="목록으로 가기">
-        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+
       </button>
     </div>
     <span class="ed-header-date" id="edDate"></span>
