@@ -337,7 +337,27 @@ function renderRoutineCardBody() {
   
   const all = getAllChk(), week = getWeekDates(), td = today();
   const dayN = ['일','월','화','수','목','금','토'];
-  
+
+  const W = Math.max(200, container.offsetWidth - 80);
+  const H = 40;
+
+  function circleRectAreaCard(cx, cy, r) {
+    const steps=200, dy=H/steps; let area=0;
+    for(let i=0; i<steps; i++) {
+      const y=(i+0.5)*dy, d2=r*r-(y-cy)*(y-cy);
+      if(d2<=0) continue;
+      const hw=Math.sqrt(d2), x0=Math.max(0,cx-hw), x1=Math.min(W,cx+hw);
+      if(x1>x0) area+=(x1-x0)*dy;
+    }
+    return area;
+  }
+  function findRadiusCard(cx, cy, targetArea) {
+    let lo=0, hi=W*3;
+    for(let i=0; i<60; i++) { const mid=(lo+hi)/2; if(circleRectAreaCard(cx,cy,mid)<targetArea) lo=mid; else hi=mid; }
+    return (lo+hi)/2;
+  }
+  const CENTER_MAP = {1:{cx:-15,cy:-8},2:{cx:0,cy:H},3:{cx:0,cy:H/2},4:{cx:W*0.15,cy:0},5:{cx:-10,cy:0},6:{cx:0,cy:H*0.3}};
+
   let h = '';
   h += '<div class="chk-table">';
   h += '<div class="chk-week-hdr"><div class="chk-week-hdr-spacer"></div><div class="day-labels">'
@@ -348,14 +368,24 @@ function renderRoutineCardBody() {
     const weekDone = week.map(dt => all[dt] && all[dt][r.id] ? 1 : 0);
     const doneCount = weekDone.filter(d => d).length;
     const pct = Math.round((doneCount/7)*100);
-    
+
+    const target = (doneCount===1) ? (1.7/7)*W*H : (doneCount/7)*W*H;
+    let blobHtml = '';
+    if(doneCount===7) {
+      blobHtml = '<div class="chk-blob" style="background:'+r.color+';width:9999px;height:9999px;left:-4999px;top:'+(H/2-4999)+'px;"></div>';
+    } else if(doneCount>0) {
+      const {cx,cy} = CENTER_MAP[doneCount];
+      const rr = findRadiusCard(cx,cy,target);
+      blobHtml = '<div class="chk-blob" style="background:'+r.color+';width:'+(rr*2)+'px;height:'+(rr*2)+'px;left:'+(cx-rr)+'px;top:'+(cy-rr)+'px;"></div>';
+    }
+
     const dotHtml = weekDone.map((done,i) => {
       const dt = week[i], isTd = dt === td;
       return '<div class="chk-dot '+(done?'done':'')+' '+(isTd?'today':'')+'" onclick="event.stopPropagation();toggleDayCard(\''+r.id+'\',\''+dt+'\')"></div>';
     }).join('');
     
     h += '<div class="chk-row" onclick="toggleDayCard(\''+r.id+'\',\''+td+'\')">'
-      + (doneCount>0 ? '<span class="chk-pct">'+pct+'%</span>' : '')
+      + blobHtml
       + '<div class="chk-left"><span class="chk-lb">'+r.name+'</span></div>'
       + '<div class="chk-dots">'+dotHtml+'</div>'
       + '</div>';
@@ -366,31 +396,27 @@ function renderRoutineCardBody() {
 }
 
 function renderStreakCard() {
-
   const container = document.getElementById('routineStreak');
   if(!container) return;
   
   const all = getAllChk(), td = today();
-  let html = '<div class="streak-title"><span>🔥</span> 연속 기록</div><div class="streak-list">';
   
+  // 각 루틴의 연속 기록 계산
+  const streakData = [];
   ROUTINE_META.forEach(r => {
-    let current = 0, best = 0, streak = 0;
+    let current = 0, best = 0;
     const d = new Date();
-    // 오늘부터 거꾸로 세기
     for(let i = 0; i < 365; i++) {
       const dt = new Date(d);
       dt.setDate(d.getDate() - i);
       const key = getLocalYMD(dt);
       if(all[key] && all[key][r.id]) {
         if(i === 0 || current > 0) current++;
-        streak++;
       } else {
         if(i === 0) current = 0;
-        else if(current > 0) break;
-        else { current = 0; break; }
+        else break;
       }
     }
-    // 최장 기록 계산
     let tempStreak = 0;
     for(let i = 0; i < 365; i++) {
       const dt = new Date(d);
@@ -399,20 +425,41 @@ function renderStreakCard() {
       if(all[key] && all[key][r.id]) { tempStreak++; if(tempStreak > best) best = tempStreak; }
       else { tempStreak = 0; }
     }
-    
-    const maxDisplay = Math.max(best, 14);
-    const barPct = best > 0 ? Math.round((current / maxDisplay) * 100) : 0;
-    const isBroken = current === 0;
-    const barColor = isBroken ? 'var(--border)' : r.color;
-    
-    html += `<div class="streak-row${isBroken ? ' broken' : ''}">
-      <span class="streak-name">${r.name}</span>
-      <div class="streak-bar-wrap"><div class="streak-bar" style="width:${barPct}%;background:${barColor};opacity:.5"></div></div>
-      <span class="streak-info">${current > 0 ? '<span class="streak-days">' + current + '일째</span> · 최장 ' + best + '일' : '끊김' + (best > 0 ? ' · 최장 ' + best + '일' : '')}</span>
-    </div>`;
+    streakData.push({ ...r, current, best, isBroken: current === 0 });
   });
   
+  // 최다 연속 항목 찾기
+  let heroIdx = -1, heroMax = 0;
+  streakData.forEach((s, i) => {
+    if(s.current > heroMax) { heroMax = s.current; heroIdx = i; }
+  });
+  
+  let html = '<div class="streak-title">연속 기록</div>';
+  
+  // 히어로 카드
+  if(heroIdx !== -1 && heroMax > 0) {
+    const hero = streakData[heroIdx];
+    html += `<div class="streak-hero" style="background:${hero.color}12;border:1px solid ${hero.color}30;">
+      <div class="streak-hero-days" style="color:${hero.color}">${hero.current}</div>
+      <div class="streak-hero-text">
+        <span class="streak-hero-name">${hero.name}</span>
+        <span class="streak-hero-sub">${hero.current}일 연속 진행 중 · 최장 ${hero.best}일</span>
+      </div>
+    </div>`;
+  }
+  
+  // 나머지 그리드
+  html += '<div class="streak-list">';
+  streakData.forEach((s, i) => {
+    if(i === heroIdx) return;
+    html += `<div class="streak-row${s.isBroken ? ' broken' : ''}">
+      <span class="streak-days">${s.current > 0 ? s.current : '—'}</span>
+      <span class="streak-name">${s.name}</span>
+      <span class="streak-info">${s.current > 0 ? '일째 · 최장 ' + s.best : (s.best > 0 ? '최장 ' + s.best + '일' : '')}</span>
+    </div>`;
+  });
   html += '</div>';
+  
   container.innerHTML = html;
 }
 
@@ -426,41 +473,56 @@ function renderMonthlyCard() {
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const todayDate = now.getDate();
   const monthName = (m + 1) + '월';
+  const total = ROUTINE_META.length;
   
-  let totalChecks = 0, totalPossible = 0;
-  let perfectDays = 0;
-  const itemCounts = {};
-  ROUTINE_META.forEach(r => { itemCounts[r.id] = 0; });
-  
-  for(let d = 1; d <= todayDate; d++) {
+  // 각 날의 달성 수 계산
+  const dayData = [];
+  let totalChecks = 0, perfectDays = 0;
+  for(let d = 1; d <= daysInMonth; d++) {
     const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    let dayDone = 0;
-    ROUTINE_META.forEach(r => {
-      if(all[key] && all[key][r.id]) { totalChecks++; dayDone++; itemCounts[r.id]++; }
-      totalPossible++;
-    });
-    if(dayDone === ROUTINE_META.length) perfectDays++;
+    let done = 0;
+    ROUTINE_META.forEach(r => { if(all[key] && all[key][r.id]) done++; });
+    dayData.push({ day: d, done, isFuture: d > todayDate });
+    if(d <= todayDate) {
+      totalChecks += done;
+      if(done === total) perfectDays++;
+    }
   }
   
+  const totalPossible = todayDate * total;
   const overallPct = totalPossible > 0 ? Math.round((totalChecks / totalPossible) * 100) : 0;
   
-  let bestId = '', bestCount = 0, worstId = '', worstCount = 999;
-  ROUTINE_META.forEach(r => {
-    if(itemCounts[r.id] > bestCount) { bestCount = itemCounts[r.id]; bestId = r.id; }
-    if(itemCounts[r.id] < worstCount) { worstCount = itemCounts[r.id]; worstId = r.id; }
-  });
-  const bestName = ROUTINE_META.find(r => r.id === bestId)?.name || '';
-  const worstName = ROUTINE_META.find(r => r.id === worstId)?.name || '';
+  const avgPerDay = todayDate > 0 ? (totalChecks / todayDate).toFixed(1) : '0';
   
-  let html = `<div class="monthly-title"><span>📊</span> ${monthName} 통계</div>`;
-  html += `<div class="monthly-overall">
-    <span class="monthly-pct">${overallPct}<span class="monthly-pct-unit">%</span></span>
-    <div class="monthly-bar-wrap"><div class="monthly-bar" style="width:${overallPct}%"></div></div>
+  let html = `<div class="monthly-title">${monthName}</div>`;
+  
+  // 상단 요약
+  html += `<div class="rhythm-summary">
+    <div class="rhythm-stat"><span class="rhythm-stat-num">${overallPct}<span class="rhythm-stat-unit">%</span></span><span class="rhythm-stat-label">달성률</span></div>
+    <div class="rhythm-stat"><span class="rhythm-stat-num">${perfectDays}<span class="rhythm-stat-unit">일</span></span><span class="rhythm-stat-label">완벽한 날</span></div>
+    <div class="rhythm-stat"><span class="rhythm-stat-num">${avgPerDay}<span class="rhythm-stat-unit">/${total}</span></span><span class="rhythm-stat-label">일 평균</span></div>
   </div>`;
-  html += '<div class="monthly-stats">';
-  html += `<div class="monthly-stat-row"><span class="ms-label">최다 달성</span><span class="ms-value">${bestName} <span class="ms-highlight">${bestCount}/${todayDate}일</span></span></div>`;
-  html += `<div class="monthly-stat-row"><span class="ms-label">최저 달성</span><span class="ms-value">${worstName} ${worstCount}/${todayDate}일</span></div>`;
-  html += `<div class="monthly-stat-row"><span class="ms-label">완벽한 날</span><span class="ms-value"><span class="ms-highlight">${perfectDays}일</span> / ${todayDate}일</span></div>`;
+  
+  // 이퀄라이저 바 차트
+  html += '<div class="rhythm-chart">';
+  dayData.forEach(dd => {
+    const heightPct = total > 0 ? (dd.done / total) * 100 : 0;
+    let cls = 'rhythm-bar';
+    if(dd.isFuture) cls += ' future';
+    else if(dd.done === 0) cls += ' zero';
+    else if(dd.done === total) cls += ' perfect';
+    if(dd.day === todayDate) cls += ' today';
+    
+    const barStyle = (!dd.isFuture && dd.done > 0) ? `height:${Math.max(heightPct, 8)}%` : '';
+    
+    // 5일 간격으로 날짜 라벨 표시
+    const showLabel = (dd.day === 1 || dd.day % 5 === 0 || dd.day === daysInMonth);
+    
+    html += `<div class="${cls}" title="${m+1}/${dd.day}: ${dd.done}/${total}">
+      <div class="rhythm-bar-fill" style="${barStyle}"></div>
+      ${showLabel ? '<span class="rhythm-bar-label">' + dd.day + '</span>' : ''}
+    </div>`;
+  });
   html += '</div>';
   
   container.innerHTML = html;

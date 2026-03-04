@@ -157,7 +157,7 @@ function updateBookStats() {
     if(d.startsWith(tm)) pM+=p;
   });
   if(document.getElementById('bToday')) document.getElementById('bToday').innerHTML = pT+`<span class='unit'>p</span>`;
-  if(document.getElementById('bMonthSub')) document.getElementById('bMonthSub').textContent = '월간 '+pM+'p / 누적 '+pAll+'p';
+  if(document.getElementById('bMonthSub')) document.getElementById('bMonthSub').innerHTML = '월간 '+pM+'p<br>누적 '+pAll+'p';
 }
 
 // ═══ Quotes ═══
@@ -274,7 +274,7 @@ function updateWritingStats() {
   const monthPages = Math.floor(tM/200);
   const allPages = Math.floor(tAll/200);
   if(document.getElementById('wToday')) document.getElementById('wToday').innerHTML = todayPages+`<span class='unit'>매</span>`;
-  if(document.getElementById('wMonthSub')) document.getElementById('wMonthSub').textContent = '월간 '+monthPages+'매 / 누적 '+allPages+'매';
+  if(document.getElementById('wMonthSub')) document.getElementById('wMonthSub').innerHTML = '월간 '+monthPages+'매<br>누적 '+allPages+'매';
 }
 
 function togglePin(type, id, e) {
