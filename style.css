@@ -608,8 +608,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
    ═══════════════════════════════════════ */
 @media(max-width:768px){
   .app{position:relative;overflow:hidden}
-  .pane-list,.pane-photo,.pane-calendar,.side-scroll,.editor-scroll-area{touch-action:pan-y}
-
+  .pane-photo,.pane-calendar,.side-scroll,.editor-scroll-area{touch-action:pan-y}.pane-list{touch-action:pan-y}.list-panel{touch-action:auto}
   .side{
     position:fixed;top:0;left:0;bottom:0;padding-top:env(safe-area-inset-top, 0px);
     width:calc(100% - 72px)!important;max-width:340px!important;min-width:0!important;
@@ -767,13 +766,17 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .tb-btn{width:28px;height:28px}
   .heading-dropdown{min-width:120px}
 
-  .pane-list,
   .pane-photo,
   .pane-calendar,
   .side-scroll,
   .editor-scroll-area,
-  .list-panel,
   .editor{
+    touch-action:pan-y;
+  }
+  .list-panel{
+    touch-action:auto;
+  }
+  .pane-list{
     touch-action:pan-y;
   }
 }

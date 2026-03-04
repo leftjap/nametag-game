@@ -436,9 +436,9 @@ function setupGesturesAndUI() {
     var dx=cx-startX,dy=cy-startY;
 
     if(!decided){
-      if(Math.abs(dx)<8&&Math.abs(dy)<8) return;
+      if(Math.abs(dx)<6&&Math.abs(dy)<6) return;
       decided=true;
-      if(Math.abs(dy)>Math.abs(dx)){startState=null;return;}
+      if(Math.abs(dy)>Math.abs(dx)*1.2){startState=null;return;}
       swipeDir=dx>0?'right':'left';
       // 유효 방향만
       if(startState==='list'&&swipeDir==='left'){startState=null;return;}
@@ -554,12 +554,17 @@ function setupSwipeActions() {
     const item=e.target.closest('.lp-item'); if(!item)return;
     if(currentItem&&currentItem!==item){currentItem.style.transform='';currentItem.classList.remove('swiped');hideOverlay();}
     currentItem=item; startX=e.touches[0].clientX; startY=e.touches[0].clientY; swiping=false; dx=0; item.style.transition='none';
-  },{passive:true});
+  },{passive:true,capture:false});
 
   listEl.addEventListener('touchmove',e=>{
     if(!currentItem)return;
     const mx=e.touches[0].clientX-startX, my=e.touches[0].clientY-startY;
-    if(!swiping&&Math.abs(mx)>Math.abs(my)&&Math.abs(mx)>10){swiping=true;window._itemSwiping=true;}
+    if(!swiping){
+      if(Math.abs(mx)>Math.abs(my)&&Math.abs(mx)>10){
+        if(mx>0){currentItem=null;return;}
+        swiping=true;window._itemSwiping=true;
+      } else {return;}
+    }
     if(!swiping)return; e.preventDefault();
     dx=Math.min(0,mx); if(currentItem.classList.contains('swiped')) dx=Math.min(0,mx-160);
     currentItem.style.transform=`translateX(${dx}px)`;

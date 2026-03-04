@@ -472,7 +472,19 @@ window._gestureReady=false;
   }
 
   function handleStart(x,y,target){
-    if(window.innerWidth<=768)return;
+    if(window.innerWidth<=768){
+      // 모바일: 리스트 패널에서 우측 스와이프 → 사이드바 열기
+      var state=getState();
+      if(state==='no-side'){
+        var pn=findPanel(target);
+        if(pn==='list'){
+          sx=x;sy=y;
+          panel='list';swiping=false;dir=null;tracking=true;decided=false;
+          startState=state;
+        }
+      }
+      return;
+    }
     if(!canStartGesture(target))return;
     var pn=findPanel(target);
     if(!pn)return;
@@ -482,7 +494,8 @@ window._gestureReady=false;
   }
 
   function handleMove(x,y,e){
-    if(!tracking||window.innerWidth<=768)return;
+    if(!tracking)return;
+    if(window.innerWidth<=768&&!(startState==='no-side'&&panel==='list'))return;
     if(window._itemSwiping){tracking=false;return;}
     var dx=x-sx,dy=y-sy;
     if(!decided){
@@ -525,7 +538,7 @@ window._gestureReady=false;
   }
 
   function handleEnd(x){
-    if(!tracking||!swiping||window.innerWidth<=768){resetState();return;}
+    if(!tracking||!swiping||(window.innerWidth<=768&&!(startState==='no-side'&&panel==='list'))){resetState();return;}
     var dx=x-sx;
     allPanels.forEach(function(el){if(el){el.style.transition='transform .25s cubic-bezier(.2,.8,.2,1),opacity .25s';}});
     if(Math.abs(dx)>TH){doSwipe(dx);}
