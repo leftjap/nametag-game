@@ -388,7 +388,12 @@ function setupAutoSave() {
 }
 
 // ═══ 모바일 제스처 ═══
+function setupTabletGestures() {
+  // 빈 함수 — 실제 등록은 showApp에서 인라인으로 수행
+}
+
 function setupGesturesAndUI() {
+  if(window.innerWidth > 768) return;
   const app=document.getElementById('mainApp');
   let startX=0,startY=0;
   let swiping=false, swipeDir=null;
@@ -399,7 +404,7 @@ function setupGesturesAndUI() {
   const THRESHOLD=80;
 
   app.addEventListener('touchstart',e=>{
-    if(window.innerWidth>768)return;
+    if(window.innerWidth>600)return;
     startX=e.touches[0].clientX; startY=e.touches[0].clientY;
     swiping=false; swipeDir=null;
     if(editorEl) editorEl.style.transition='none';
@@ -408,7 +413,7 @@ function setupGesturesAndUI() {
   },{passive:true});
 
   app.addEventListener('touchmove',e=>{
-    if(window.innerWidth>768)return;
+    if(window.innerWidth>600)return;
     if(window._itemSwiping)return;
     const cx=e.touches[0].clientX, cy=e.touches[0].clientY;
     const dx=cx-startX, dy=cy-startY;
@@ -452,7 +457,7 @@ function setupGesturesAndUI() {
   },{passive:false});
 
   app.addEventListener('touchend',e=>{
-    if(window.innerWidth>768 || !swiping)return;
+    if(window.innerWidth>600 || !swiping)return;
     const dx=e.changedTouches[0].clientX-startX;
     const reset=()=>{
       [editorEl,listEl,sideEl].forEach(el=>{if(el){el.style.transition='transform .3s cubic-bezier(.25,.1,.25,1), opacity .3s';el.style.transform='';el.style.opacity='';}});

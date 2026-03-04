@@ -526,17 +526,23 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     width:240px!important;max-width:240px!important;min-width:220px!important;
     background:#2c2c2e;border-right:none;
     transform:none;z-index:auto;
-    transition:width .3s,min-width .3s,opacity .2s;
+    transition:width .3s cubic-bezier(.25,.1,.25,1),min-width .3s cubic-bezier(.25,.1,.25,1),max-width .3s cubic-bezier(.25,.1,.25,1),opacity .2s;
   }
   .app.sidebar-closed .side{
     width:0!important;min-width:0!important;max-width:0!important;
     opacity:0;border-right-width:0;pointer-events:none;overflow:hidden;
   }
+  .pc-sidebar-toggle{display:none!important}
   .app.view-side .side{transform:none;box-shadow:none}
   .app.view-side .list-panel{transform:none;opacity:1;pointer-events:auto}
   .list-panel{
     width:280px!important;min-width:260px!important;max-width:300px!important;
-    border-right:1px solid var(--border);transition:none;
+    border-right:1px solid var(--border);
+    transition:width .3s cubic-bezier(.25,.1,.25,1),min-width .3s cubic-bezier(.25,.1,.25,1),max-width .3s cubic-bezier(.25,.1,.25,1),opacity .2s;
+  }
+  .app.list-closed .list-panel{
+    width:0!important;min-width:0!important;max-width:0!important;
+    opacity:0;border-right-width:0;pointer-events:none;overflow:hidden;
   }
   .editor{flex:1;min-width:0}
   .pc-sidebar-toggle{display:flex!important}

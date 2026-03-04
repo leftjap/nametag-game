@@ -370,5 +370,97 @@
 <script src="editor.js"></script>
 <script src="sync.js"></script>
 
+<script>
+// 태블릿 제스처 — v10 final
+window._gestureReady=false;
+(function waitAndBind(){
+  var app=document.getElementById('mainApp');
+  if(!app||app.style.display==='none'||app.style.display===''){
+    setTimeout(waitAndBind,300);return;
+  }
+  if(window._gestureReady)return;
+  window._gestureReady=true;
+
+  var sx=0,sy=0,panel=null,swiping=false,dir=null,tracking=false,decided=false;
+  var TH=60;
+  var DECIDE_DIST=12;
+
+  function findPanel(el){
+    while(el&&el!==document.body){
+      if(el.classList){
+        if(el.classList.contains('side'))return'side';
+        if(el.classList.contains('editor'))return'editor';
+        if(el.classList.contains('list-panel'))return'list';
+      }
+      el=el.parentElement;
+    }
+    return null;
+  }
+
+  function doSwipe(dx){
+    var so=!app.classList.contains('sidebar-closed');
+    var lo=!app.classList.contains('list-closed');
+    if(panel==='side'&&dir==='left'&&dx<-TH) app.classList.add('sidebar-closed');
+    else if(panel==='editor'&&dir==='left'&&dx<-TH){
+      if(so) app.classList.add('sidebar-closed');
+      else if(lo) app.classList.add('list-closed');
+    }
+    else if(panel==='editor'&&dir==='right'&&dx>TH){
+      if(!lo) app.classList.remove('list-closed');
+      else if(!so) app.classList.remove('sidebar-closed');
+    }
+    else if(panel==='list'&&dir==='right'&&dx>TH&&!so){
+      app.classList.remove('sidebar-closed');
+    }
+  }
+
+  document.addEventListener('touchstart',function(e){
+    if(window.innerWidth<=768)return;
+    if(e.touches.length!==1)return;
+    var t=e.target;
+    if(t.closest('input')||t.closest('textarea'))return;
+    if(t.closest('.swipe-actions')||t.closest('#swipeOverlay'))return;
+    if(t.closest('.chk-dot'))return;
+    var pn=findPanel(t);
+    if(!pn)return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;
+    panel=pn;swiping=false;dir=null;tracking=true;decided=false;
+  },true);
+
+  document.addEventListener('touchmove',function(e){
+    if(!tracking||window.innerWidth<=768)return;
+    if(e.touches.length!==1){tracking=false;return;}
+    if(window._itemSwiping){tracking=false;return;}
+    var cx=e.touches[0].clientX,cy=e.touches[0].clientY;
+    var dx=cx-sx,dy=cy-sy;
+    if(!decided){
+      if(Math.abs(dx)<DECIDE_DIST&&Math.abs(dy)<DECIDE_DIST)return;
+      decided=true;
+      if(Math.abs(dy)>=Math.abs(dx)){tracking=false;return;}
+      swiping=true;
+      dir=dx>0?'right':'left';
+      if(panel==='list'&&dir==='left'){tracking=false;return;}
+    }
+    if(swiping&&e.cancelable){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  },{capture:true,passive:false});
+
+  document.addEventListener('touchend',function(e){
+    if(!tracking||!swiping||window.innerWidth<=768){
+      tracking=false;swiping=false;decided=false;return;
+    }
+    var dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>TH) doSwipe(dx);
+    tracking=false;swiping=false;panel=null;dir=null;decided=false;
+  },true);
+
+  document.addEventListener('touchcancel',function(){
+    tracking=false;swiping=false;panel=null;dir=null;decided=false;
+  },true);
+})();
+</script>
+
 </body>
 </html>
