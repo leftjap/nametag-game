@@ -276,8 +276,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 .quote-txt{font-size:13px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 
-.swipe-actions{display:none}
-.fab-btn{display:none}
+.swipe-actions{display:none;position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}.fab-btn{display:none}
 
 /* ═══ 사진 그리드 ═══ */
 .photo-grid{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -552,8 +551,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .stat-label{font-size:13px !important;color:rgba(255,255,255,.9) !important}
 
   /* 사이드바 다크 (모바일과 동일) */
-  .side .side-hdr{background:transparent;border-bottom:1px solid rgba(255,255,255,.08)}
-  .side .sync-status{display:none}
+  .side .side-hdr{background:transparent;border-bottom:none;position:relative}.side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}  .side .sync-status{display:none}
   .side .sync-btn{display:none}
   .sync-cloud-btn{display:flex;width:36px;height:36px;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);border-radius:8px;position:relative;flex-shrink:0}
   .side .cat-avatar{border:2px solid rgba(255,255,255,.15)}
@@ -583,6 +581,16 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .badge-pill{display:none}
   .side .wi-arrow{display:block!important;font-size:17px;color:rgba(255,255,255,.3);font-weight:300;margin-left:auto}
   .side .side-menu.on .wi-arrow{color:rgba(255,255,255,.45)}
+
+  /* 태블릿 스와이프 액션 */
+  .swipe-actions{position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}
+  .swipe-action{width:80px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:600}
+  .swipe-action span{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .swipe-action svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+  .pin-action{background:#a8c8f0}
+  .del-action{background:#e8756d}
+  .lp-item{overflow:visible !important;position:relative !important}
+  /* 스와이프 오버레이는 body에 fixed로 표시 */
 }
 
 
@@ -622,7 +630,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .app.view-list.view-editor .editor{visibility:visible}
 
   /* 사이드바 다크 테마 */
-  .side .side-hdr{background:transparent;border-bottom:1px solid rgba(255,255,255,.08);padding:0 16px;height:56px}
+  .side .side-hdr{background:transparent;border-bottom:none;position:relative;padding:0 16px;height:56px}.side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}
   .side .cat-avatar{width:32px;height:32px;border:2px solid rgba(255,255,255,.15)}
   .side .brand{display:none}
   .side .sync-status{display:none}
@@ -701,7 +709,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .search-icon-btn svg{width:20px;height:20px}
 
 
-  .swipe-actions{display:flex;position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}
+  .swipe-actions{position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}
+
   .swipe-action{width:80px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:600}
   .swipe-action span{display:flex;flex-direction:column;align-items:center;gap:4px}
   .swipe-action svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
@@ -726,7 +735,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .lp-item::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:var(--border-l);pointer-events:none}
   .lp-item.swiped::after{display:none}
   .lp-item::before{display:none}
-  .lp-item.on{background:#f0f0f2}  .lp-date-wrap{min-width:36px;max-width:36px}
+  .lp-item.on{background:#f0f0f2;border-radius:0;margin:0;width:100%;border-left:none;padding-left:16px !important}
+  .lp-date-wrap{min-width:36px;max-width:36px}
   .lp-day{font-size:20px}
   .lp-item-title{font-size:17px;font-weight:500;white-space:normal;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
   .lp-item-preview{font-size:15px;-webkit-line-clamp:2;color:var(--tx-m);font-weight:400}
@@ -734,7 +744,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .lp-thumb{width:40px;min-width:40px;height:40px}
   .lp-pin-hdr{background:var(--bg-white);border:none;border-bottom:1px solid var(--border-l);padding:0 16px}
   .lp-month-hdr{background:var(--bg-white);border:none;border-bottom:1px solid var(--border-l);padding:10px 16px}
-    .pane-list{background:var(--bg-white);padding-top:0;overflow-x:hidden}
+    .pane-list{background:var(--bg-white);padding-top:0;overflow-x:clip}
   .toolbar{padding:0 10px;gap:1px}
   .tb-heading-btn{padding:5px 6px;font-size:12px}
   .tb-btn{width:28px;height:28px}
@@ -900,6 +910,22 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   max-height:none !important;
 }
 
+/* ═══ 선택 항목: 라운드 박스 + 좌측 컬러바 (웹/태블릿 전용) ═══ */
+@media(min-width:769px){
+  .lp-item.on{
+    background:color-mix(in srgb, var(--tab-color) 7%, var(--bg-white)) !important;
+    border-radius:12px !important;
+    margin:2px 8px !important;
+    width:calc(100% - 16px) !important;
+    border-left:3.5px solid var(--tab-color) !important;
+    padding-left:12.5px !important;
+    box-shadow:0 1px 3px rgba(0,0,0,.03) !important;
+  }
+  .lp-item.on::after{
+    display:none !important;
+  }
+}
+
 @media(max-width:768px){
   .lp-item{
     padding:12px 20px 14px !important;
@@ -993,7 +1019,18 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   /* ── 사이드바 다크 테마 (모바일과 동일) ── */
   .side .side-hdr{
     background:transparent !important;
-    border-bottom:1px solid rgba(255,255,255,.08) !important;
+    border-bottom:none !important;
+    position:relative !important;
+  }
+  .side .side-hdr::after{
+    content:'' !important;
+    position:absolute !important;
+    bottom:0 !important;
+    left:16px !important;
+    right:16px !important;
+    height:1px !important;
+    background:rgba(255,255,255,.08) !important;
+    pointer-events:none !important;
   }
   .side .cat-avatar{border:2px solid rgba(255,255,255,.15) !important}
   .side .sync-status{display:none !important}
@@ -1062,7 +1099,24 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .side .side-menu.on .wi-arrow{color:rgba(255,255,255,.45) !important}
 }
-
+/* ═══ 스와이프 오버레이 (body 고정) ═══ */
+#swipeOverlay{
+  position:fixed;display:none;flex-direction:row;z-index:9999;overflow:visible;
+}
+#swipeOverlay .swipe-action{
+  pointer-events:auto;
+}#swipeOverlay .swipe-action{
+  width:80px;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:11px;font-weight:600;cursor:pointer;
+}
+#swipeOverlay .swipe-action span{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+#swipeOverlay .swipe-action svg{
+  width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;
+}
+#swipeOverlay .pin-action{background:#a8c8f0}
+#swipeOverlay .del-action{background:#e8756d}
 
 
 

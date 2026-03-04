@@ -550,6 +550,8 @@ async function showApp() {
     if(window.innerWidth <= 768) {
       setMobileView('side');
     } else {
+      const app = document.getElementById('mainApp');
+      app.classList.remove('view-side','view-list','view-editor');
       renderListPanel();
     }
   }, 400);

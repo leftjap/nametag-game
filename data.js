@@ -136,6 +136,7 @@ function loadBook(id, force=false) {
   document.getElementById('book-body').innerHTML=b.memo||'';
   document.getElementById('edDate').textContent = formatTopDate(b.date ? new Date(b.date).toISOString() : new Date().toISOString());
   updateMetaBar('book', b.title);
+  renderListPanel();
 }
 
 function delBook(id, e) {
@@ -187,8 +188,8 @@ function loadQuote(id, force=false) {
   document.getElementById('quote-by').value=q.by||'';
   document.getElementById('edDate').textContent = formatTopDate(q.created);
   updateMetaBar('quote','');
+  renderListPanel();
 }
-
 function delQuote(id, e) {
   e.stopPropagation(); if(!confirm('삭제할까요?')) return;
   saveQuotes(getQuotes().filter(q=>q.id!==id));
@@ -230,6 +231,7 @@ function loadMemo(id, force=false) {
   document.getElementById('memo-body').innerHTML=fixDriveImageUrls(m.content);
   document.getElementById('edDate').textContent = formatTopDate(m.created);
   updateWC(); updateMetaBar('memo', m.title);
+  renderListPanel();
 }
 
 function newMemoForm() {
