@@ -321,7 +321,7 @@ function renderCalendarView(items, t) {
         if(t==='book')loadCall=`loadBook('${docId}')`;
         else if(t==='quote')loadCall=`loadQuote('${docId}')`;
         else if(t==='memo')loadCall=`loadMemo('${docId}')`;
-        clickFn=`onclick="${loadCall}; setMobileView('editor'); selectCalDay(this);"`;
+        clickFn=`onclick="selectCalDay(this); ${loadCall}; setMobileView('editor');"`;
       }
       cells+=`<div class="${cls}" ${clickFn}>${inner}${numHtml}</div>`;
     }
@@ -547,7 +547,12 @@ function handleNew() {
   renderListPanel(); setMobileView('editor');
 }
 
-function handleDone() { if(document.activeElement) document.activeElement.blur(); setMobileView('list'); }
+function handleDone() {
+  if(document.activeElement) document.activeElement.blur();
+  setMobileView('list');
+  const vs = document.getElementById('viewSwitcher');
+  if(vs && document.getElementById('pane-routine').style.display === 'none') vs.style.display = 'flex';
+}
 
 // ═══ 리스트 우클릭 컨텍스트 메뉴 ═══
 let contextItemId = null;
