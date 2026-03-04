@@ -554,18 +554,25 @@ function setupSwipeActions() {
     const item=e.target.closest('.lp-item'); if(!item)return;
     if(currentItem&&currentItem!==item){currentItem.style.transform='';currentItem.classList.remove('swiped');hideOverlay();}
     currentItem=item; startX=e.touches[0].clientX; startY=e.touches[0].clientY; swiping=false; dx=0; item.style.transition='none';
+    window._itemSwiping=false;
   },{passive:true,capture:false});
 
   listEl.addEventListener('touchmove',e=>{
-    if(!currentItem)return;
+    if(!currentItem){
+      window._itemSwiping=false;
+      return;
+    }
     const mx=e.touches[0].clientX-startX, my=e.touches[0].clientY-startY;
     if(!swiping){
+      if(Math.abs(my)>Math.abs(mx)&&Math.abs(my)>8){currentItem=null;window._itemSwiping=false;return;}
       if(Math.abs(mx)>Math.abs(my)&&Math.abs(mx)>10){
-        if(mx>0){currentItem=null;return;}
+        if(mx>0){currentItem.style.transition='';currentItem.style.transform='';currentItem=null;window._itemSwiping=false;return;}
         swiping=true;window._itemSwiping=true;
+        if(e.cancelable)e.preventDefault();
       } else {return;}
     }
-    if(!swiping)return; e.preventDefault();
+    if(!swiping)return;
+    if(e.cancelable)e.preventDefault();
     dx=Math.min(0,mx); if(currentItem.classList.contains('swiped')) dx=Math.min(0,mx-160);
     currentItem.style.transform=`translateX(${dx}px)`;
     if(dx<-20) showOverlay(currentItem);

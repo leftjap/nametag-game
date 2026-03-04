@@ -546,12 +546,16 @@ async function showApp() {
   setTimeout(() => {
     loading.classList.add('hidden');
     loading.style.opacity = '';
-    document.getElementById('mainApp').style.display = 'flex';
+   document.getElementById('mainApp').style.display = 'flex';
     if(window.innerWidth <= 768) {
       setMobileView('side');
     } else {
       const app = document.getElementById('mainApp');
       app.classList.remove('view-side','view-list','view-editor');
+      // 태블릿 초기: 리스트+에디터 (사이드바 닫힘)
+      if(window.innerWidth >= 769 && window.innerWidth <= 1024) {
+        app.classList.remove('tablet-side-open','tablet-list-closed');
+      }
       renderListPanel();
     }
   }, 400);

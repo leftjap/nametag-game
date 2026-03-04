@@ -32,8 +32,12 @@ function switchListView(view) {
 
 function toggleSidebar() {
   const app = document.getElementById('mainApp');
-  if(window.innerWidth > 768) {
-    // PC/태블릿: sidebar-closed 토글
+  const w = window.innerWidth;
+  if(w >= 769 && w <= 1024) {
+    // 태블릿: tablet-side-open 토글
+    app.classList.toggle('tablet-side-open');
+  } else if(w > 1024) {
+    // PC: sidebar-closed 토글
     app.classList.toggle('sidebar-closed');
   } else {
     // 모바일: 오버레이 방식
@@ -47,14 +51,39 @@ function toggleSidebar() {
 
 function setMobileView(view) {
   const app = document.getElementById('mainApp');
-  // PC/태블릿에서는 뷰 전환 불필요 (3단 항상 표시)
-  if(window.innerWidth > 768) {
-    if(view==='list') renderListPanel();
+  const w = window.innerWidth;
+
+  // 태블릿 (769~1024)
+  if(w >= 769 && w <= 1024) {
+    if(view==='list') {
+      // 사이드바가 열려있으면 닫기 (자연스러운 전환)
+      if(app.classList.contains('tablet-side-open')) {
+        app.classList.remove('tablet-side-open');
+      }
+      renderListPanel();
+    }
+    if(view==='side') toggleSidebar();
+    if(view==='editor') {
+      // 리스트가 닫혀있으면 아무것도 안함 (이미 에디터만 보이는 상태)
+    }
+    return;
+  }
+
+  // PC (1025 이상)
+  if(w > 1024) {
+    if(view==='list') {
+      // 사이드바가 닫혀있고 리스트도 닫혀있으면 리스트 열기
+      if(app.classList.contains('list-closed')) {
+        app.classList.remove('list-closed');
+      }
+      renderListPanel();
+    }
     if(view==='side') toggleSidebar();
     return;
   }
+
+  // 모바일 (768 이하)
   if(view==='side') {
-    // 사이드바는 오버레이 방식: view-list 유지하면서 view-side만 추가
     app.classList.add('view-side');
     return;
   }
@@ -130,6 +159,11 @@ function switchTab(t) {
   document.getElementById('editorMemo').style.display  = t==='memo'  ? 'flex':'none';
   document.getElementById('edToolbar').style.display   = ['book','quote'].includes(t) ? 'none':'flex';
   clearSearch(); hideRoutineCard(); switchListView('list');
+  // 태블릿/PC: 사이드바 열려있으면 닫으면서 리스트로 전환
+  const app = document.getElementById('mainApp');
+  if(window.innerWidth >= 769 && window.innerWidth <= 1024 && app.classList.contains('tablet-side-open')) {
+    app.classList.remove('tablet-side-open');
+  }
   setMobileView('list');  if(textTypes.includes(t)) { const docs=getDocs(t); if(curIds[t])loadDoc(t,curIds[t],true); else if(docs.length)loadDoc(t,docs[0].id,true); else{const nd=newDoc(t);loadDoc(t,nd.id,true);} }
   if(t==='book')  { if(curBookId)loadBook(curBookId,true); else{const b=getBooks();if(b.length)loadBook(b[0].id,true);else newBook();} }
   if(t==='memo')  { if(curMemoId)loadMemo(curMemoId,true); else{const m=getMemos();if(m.length)loadMemo(m[0].id,true);else newMemoForm();} }

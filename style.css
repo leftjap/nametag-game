@@ -51,7 +51,7 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
   background:var(--bg-side);border-right:1px solid var(--border);
   display:flex;flex-direction:column;overflow:hidden;z-index:30;
 }
-@media(min-width:769px){
+@media(min-width:1401px){
   .side{transition:width .3s cubic-bezier(.2,.8,.2,1),min-width .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
   .app.sidebar-closed .side{width:0!important;min-width:0!important;max-width:0!important;opacity:0;border-right-width:0;pointer-events:none}
   .list-panel{transition:width .3s cubic-bezier(.2,.8,.2,1),min-width .3s,max-width .3s,opacity .2s}
@@ -522,32 +522,71 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* ═══════════════════════════════════════
    태블릿 (769px ~ 1024px) — 3단, 사이드바 다크
    ═══════════════════════════════════════ */
-@media(min-width:769px) and (max-width:1024px){
+@media(min-width:769px) and (max-width:1400px){
   .side{
-    position:relative;
-    width:240px!important;max-width:240px!important;min-width:220px!important;
+    position:fixed;top:0;left:0;right:auto;bottom:0;
+    width:240px!important;max-width:240px!important;min-width:240px!important;
     background:#2c2c2e;border-right:none;
-    transform:none;z-index:auto;
-    transition:width .3s cubic-bezier(.25,.1,.25,1),min-width .3s cubic-bezier(.25,.1,.25,1),max-width .3s cubic-bezier(.25,.1,.25,1),opacity .2s;
+    transform:translateX(-240px);z-index:40;
+    transition:transform .32s cubic-bezier(.25,.1,.25,1);
+    will-change:transform;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
   }
-  .app.sidebar-closed .side{
-    width:0!important;min-width:0!important;max-width:0!important;
-    opacity:0;border-right-width:0;pointer-events:none;overflow:hidden;
+  .app.tablet-side-open .side{
+    transform:translateX(0);
+    box-shadow:4px 0 20px rgba(0,0,0,.3);
   }
-  .pc-sidebar-toggle{display:none!important}
-  .app.view-side .side{transform:none;box-shadow:none}
-  .app.view-side .list-panel{transform:none;opacity:1;pointer-events:auto}
   .list-panel{
-    width:280px!important;min-width:260px!important;max-width:300px!important;
+    position:fixed;top:0;left:0;right:auto;bottom:0;
+    width:300px!important;min-width:300px!important;max-width:300px!important;
     border-right:1px solid var(--border);
-    transition:width .3s cubic-bezier(.25,.1,.25,1),min-width .3s cubic-bezier(.25,.1,.25,1),max-width .3s cubic-bezier(.25,.1,.25,1),opacity .2s;
+    transform:translateX(0);z-index:20;
+    transition:transform .32s cubic-bezier(.25,.1,.25,1);
+    will-change:transform;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+  }
+  .app.tablet-list-closed .list-panel{
+    transform:translateX(-300px);
+  }
+  .app.tablet-side-open .list-panel{
+    transform:translateX(240px);
+  }
+  .app.tablet-side-open.tablet-list-closed .list-panel{
+    transform:translateX(-300px);
+  }
+  .editor{
+    position:fixed;top:0;bottom:0;
+    left:0;right:auto;
+    width:100vw;
+    min-width:0;z-index:10;
+    padding-left:0;
+    transition:transform .32s cubic-bezier(.25,.1,.25,1);
+    will-change:transform;
+    transform:translateX(300px);
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+  }
+  .app.tablet-list-closed .editor{
+    transform:translateX(0);
+  }
+  .app.tablet-side-open .editor{
+    transform:translateX(540px);
+  }
+  .app.tablet-side-open.tablet-list-closed .editor{
+    transform:translateX(0);
+  }
+
+  /* 기존 sidebar-closed/list-closed는 태블릿에서 무시 */
+  .app.sidebar-closed .side{
+    width:240px!important;min-width:240px!important;max-width:240px!important;
+    opacity:1;pointer-events:auto;overflow:visible;
   }
   .app.list-closed .list-panel{
-    width:0!important;min-width:0!important;max-width:0!important;
-    opacity:0;border-right-width:0;pointer-events:none;overflow:hidden;
-    transition:width .3s cubic-bezier(.25,.1,.25,1),min-width .3s,max-width .3s,opacity .2s;
+    width:300px!important;min-width:300px!important;max-width:300px!important;
+    opacity:1;pointer-events:auto;overflow:visible;
   }
-  .editor{flex:1;min-width:0}
   .pc-sidebar-toggle{display:flex!important}
   .mobile-nav-btn{display:none!important}
   .mobile-back-btn{display:none!important}
@@ -555,12 +594,19 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .pc-only{display:flex!important}
   .fab-btn{display:none!important}
 
+  .list-panel{touch-action:manipulation}
+  .pane-list{touch-action:manipulation}
+  .editor{touch-action:manipulation}
+  .editor-scroll-area{touch-action:manipulation}
+
   .ed-body{font-size:17px;line-height:1.9}
   .side .sec-t{font-size:14px !important}
   .side .stat-label{font-size:14px !important;color:rgba(255,255,255,.9) !important}
 
-  /* 사이드바 다크 (모바일과 동일) */
-  .side .side-hdr{background:transparent;border-bottom:none;position:relative}.side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}  .side .sync-status{display:none}
+  /* 사이드바 다크 */
+  .side .side-hdr{background:transparent;border-bottom:none;position:relative}
+  .side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}
+  .side .sync-status{display:none}
   .side .sync-btn{display:none}
   .sync-cloud-btn{display:flex;width:36px;height:36px;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);border-radius:8px;position:relative;flex-shrink:0}
   .side .cat-avatar{border:2px solid rgba(255,255,255,.15)}
@@ -599,9 +645,15 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .pin-action{background:#a8c8f0}
   .del-action{background:#e8756d}
   .lp-item{overflow:visible !important;position:relative !important}
-  /* 스와이프 오버레이는 body에 fixed로 표시 */
-}
 
+  /* 제스처 진행 중 transition 강제 제거 */
+  .app.gesture-active .side,
+  .app.gesture-active .list-panel,
+  .app.gesture-active .editor{
+    transition:none !important;
+    -webkit-transition:none !important;
+  }
+}
 
 /* ═══════════════════════════════════════
    모바일 (~768px) — Bear 스타일
@@ -1085,7 +1137,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     background:rgba(255,255,255,.08) !important;
   }
 }
-@media(min-width:769px) and (max-width:1024px){
+@media(min-width:769px) and (max-width:1400px){
   .sec-border::after{
     left:16px !important;
     right:16px !important;
@@ -1094,8 +1146,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 /* ═══ 웹/PC (1025px 이상) — 3단 레이아웃 ═══ */
 /* ═══ 웹/PC (1025px 이상) — 3단 레이아웃 ═══ */
-/* ═══ 웹/PC (1025px 이상) — 3단 레이아웃, 사이드바 다크 ═══ */
-@media(min-width:1025px){
+/* ═══ 웹/PC (
+1025px 이상) — 3단 레이아웃, 사이드바 다크 ═══ */
+@media(min-width:1401px){
   /* 레이아웃: 3단 나란히 */
   .side{
     position:relative !important;
@@ -1107,17 +1160,18 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     border-right:none !important;
     z-index:auto !important;
     box-shadow:none !important;
+    transition:width .32s cubic-bezier(.25,.1,.25,1),min-width .32s cubic-bezier(.25,.1,.25,1),max-width .32s cubic-bezier(.25,.1,.25,1),opacity .25s;
   }
   .app.sidebar-closed .side{
     width:0 !important;min-width:0 !important;max-width:0 !important;
     opacity:0;border-right-width:0;pointer-events:none;
     overflow:hidden;
-    transition:width .3s cubic-bezier(.2,.8,.2,1),min-width .3s,opacity .2s;
+    transition:width .32s cubic-bezier(.25,.1,.25,1),min-width .32s cubic-bezier(.25,.1,.25,1),max-width .32s cubic-bezier(.25,.1,.25,1),opacity .25s;
   }
   .app.list-closed .list-panel{
     width:0 !important;min-width:0 !important;max-width:0 !important;
     opacity:0;border-right-width:0;pointer-events:none;overflow:hidden;
-    transition:width .3s cubic-bezier(.2,.8,.2,1),min-width .3s,max-width .3s,opacity .2s;
+    transition:width .32s cubic-bezier(.25,.1,.25,1),min-width .32s cubic-bezier(.25,.1,.25,1),max-width .32s cubic-bezier(.25,.1,.25,1),opacity .25s;
   }
   .app.view-side .side{
     transform:none !important;
