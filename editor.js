@@ -404,8 +404,8 @@ function setupGesturesAndUI() {
   const editorEl=document.querySelector('.editor');
   const listEl=document.querySelector('.list-panel');
   const sideEl=document.querySelector('.side');
-  const THRESHOLD=60;
-  const DECIDE_DIST=12;
+  const THRESHOLD=35;
+  const DECIDE_DIST=6;
   const allEls=[editorEl,listEl,sideEl];
 
   allEls.forEach(el=>{if(el) el.style.willChange='transform,opacity';});
@@ -440,7 +440,7 @@ function setupGesturesAndUI() {
     decided=true;
 
     // 세로 → 포기, 브라우저 스크롤에 맡김
-    if(Math.abs(dy)>=Math.abs(dx)){phase='idle';return;}
+    if(Math.abs(dy)>Math.abs(dx)*0.8){phase='idle';return;}
 
     swipeDir=dx>0?'right':'left';
     // 불가능한 방향
@@ -453,7 +453,7 @@ function setupGesturesAndUI() {
     swiping=true;
     showOverlay();
     allEls.forEach(el=>{if(el){el.style.transition='none';el.style.webkitTransition='none';}});
-  },{capture:true,passive:true});
+  },{capture:true,passive:false});
 
   // 원래 터치가 끝나면 (오버레이 전환 실패 시 안전장치)
   document.addEventListener('touchend',function(e){
@@ -487,7 +487,7 @@ function setupGesturesAndUI() {
     } else if(startState==='list'){
       var move2=Math.max(0,Math.min(dx,sideW));
       if(sideEl) sideEl.style.transform='translate3d('+(-sideW+move2)+'px,0,0)';
-      if(listEl){listEl.style.transform='translate3d('+move2+'px,0,0)';listEl.style.opacity=String(Math.max(0.6,1-move2/vw*0.4));}
+      if(listEl){var targetShift=vw-72;var listShift=move2/sideW*targetShift;listEl.style.transform='translate3d('+listShift+'px,0,0)';listEl.style.opacity=String(Math.max(0.5,1-move2/vw*0.5));}
     } else if(startState==='editor'){
       var move3=Math.max(0,Math.min(dx,vw));
       if(editorEl) editorEl.style.transform='translate3d('+move3+'px,0,0)';

@@ -386,8 +386,8 @@ window._gestureReady=false;
   window._gestureReady=true;
 
   var sx=0,sy=0,panel=null,swiping=false,dir=null,tracking=false,decided=false;
-  var TH=60;
-  var DECIDE_DIST=12;
+  var TH=35;
+  var DECIDE_DIST=6;
   var startState=null;
   var isMouse=false;
 
@@ -477,7 +477,7 @@ window._gestureReady=false;
     if(!decided){
       if(Math.abs(dx)<DECIDE_DIST&&Math.abs(dy)<DECIDE_DIST)return;
       decided=true;
-      if(Math.abs(dy)>=Math.abs(dx)){tracking=false;return;}
+      if(Math.abs(dy)>Math.abs(dx)*0.8){tracking=false;return;}
       dir=dx>0?'right':'left';
       if(!isValidGesture(startState,panel,dir)){
         tracking=false;swiping=false;decided=false;return;
@@ -524,7 +524,8 @@ window._gestureReady=false;
     // contenteditable 내부: 텍스트 커서가 있으면 무시, 그 외는 스와이프 허용
     if(e.target.closest('[contenteditable]')&&e.target.tagName!=='IMG'){
       var ce=e.target.closest('[contenteditable]');
-      if(ce&&document.activeElement===ce)return;
+      var sel=window.getSelection();
+      if(ce&&document.activeElement===ce&&sel&&!sel.isCollapsed)return;
     }
     isMouse=true;
     handleStart(e.clientX,e.clientY,e.target);
