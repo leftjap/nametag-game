@@ -336,28 +336,140 @@ async function handlePaste(e) {
   }
 }
 
-// ═══ 이미지 클릭 선택 — v5: 파란 하이라이트 제거, 탭 고유색 테두리 ═══
+// ═══ 이미지 클릭 선택 + 우클릭/꾹누르기 컨텍스트 메뉴 + 리사이즈 ═══
+let imgCtxTarget = null;
+
+let imgLpTimer = null;
+let imgLpMoved = false;
+
 function setupEditorImageSelection() {
-  const onImageClick = function(e) {
-    // 이전 선택 모두 해제
-    document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
+  const edBodies = [document.getElementById('edBody'), document.getElementById('memo-body')];
 
-    if (e.target.tagName === 'IMG' && e.target.closest('.ed-body')) {
-      e.target.classList.add('img-selected');
-      // 파란 하이라이트 방지
-      window.getSelection().removeAllRanges();
-    }
-  };
-  document.getElementById('edBody').addEventListener('click', onImageClick);
-  document.getElementById('memo-body').addEventListener('click', onImageClick);
+  // 클릭 → 선택 + 리사이즈 핸들 표시
+  edBodies.forEach(body => {
+    if (!body) return;
+    body.addEventListener('click', function(e) {
+      if (e.target.tagName === 'IMG' && e.target.closest('.ed-body')) {
+        document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
+        e.target.classList.add('img-selected');
+        window.getSelection().removeAllRanges();
+      }
+    });
 
-  // 이미지 외 영역 클릭 시 선택 해제
+    // 우클릭 → 컨텍스트 메뉴
+    body.addEventListener('contextmenu', function(e) {
+      if (e.target.tagName === 'IMG' && e.target.closest('.ed-body')) {
+        e.preventDefault();
+        e.stopPropagation();
+        imgCtxTarget = e.target;
+        document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
+        e.target.classList.add('img-selected');
+        showImgContextMenu(e.clientX, e.clientY);
+      }
+    });
+
+    // 모바일 꾹누르기
+    body.addEventListener('touchstart', function(e) {
+      if (e.target.tagName !== 'IMG' || !e.target.closest('.ed-body')) return;
+      imgLpMoved = false;
+      const tx = e.touches[0].clientX, ty = e.touches[0].clientY;
+      clearTimeout(imgLpTimer);
+      imgLpTimer = setTimeout(function() {
+        if (!imgLpMoved) {
+          e.preventDefault();
+          imgCtxTarget = e.target;
+          document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
+          e.target.classList.add('img-selected');
+          if (navigator.vibrate) navigator.vibrate(15);
+          showImgContextMenu(tx, ty);
+        }
+      }, 500);
+    }, { passive: false });
+
+    body.addEventListener('touchmove', function(e) {
+      if (imgLpTimer) {
+        const t = e.touches[0];
+        if (Math.abs(t.clientX - (imgResizeStartX||0)) > 8 || Math.abs(t.clientY - (imgResizeStartY||0)) > 8) {
+          imgLpMoved = true;
+          clearTimeout(imgLpTimer);
+        }
+      }
+    }, { passive: true });
+
+    body.addEventListener('touchend', function() {
+      clearTimeout(imgLpTimer);
+    }, { passive: true });
+  });
+
+  // 이미지 외 클릭 → 선택 해제 + 핸들/메뉴 숨김
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('.ed-body') || (e.target.tagName !== 'IMG' && !e.target.closest('.img-actions') && !e.target.closest('#imgHoverBtn') && !e.target.closest('#imgDropdownMenu'))) {
+    if (e.target.closest('#imgContextMenu')) return;
+    if (!e.target.closest('.ed-body') || e.target.tagName !== 'IMG') {
       document.querySelectorAll('.ed-body img.img-selected').forEach(img => img.classList.remove('img-selected'));
     }
+    hideImgContextMenu();
+  });
+
+  // 스크롤 시 컨텍스트 메뉴 숨김
+  document.querySelectorAll('.editor-scroll-area').forEach(area => {
+    area.addEventListener('scroll', function() {
+      hideImgContextMenu();
+    });
   });
 }
+
+function showImgContextMenu(x, y) {
+  const menu = document.getElementById('imgContextMenu');
+  menu.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+  menu.style.top = Math.min(y, window.innerHeight - 160) + 'px';
+  menu.classList.add('open');
+}
+
+function hideImgContextMenu() {
+  const menu = document.getElementById('imgContextMenu');
+  if (menu) menu.classList.remove('open');
+}
+
+async function imgCtxAction(action) {
+  hideImgContextMenu();
+  if (!imgCtxTarget) return;
+
+
+
+  if (action === 'copy') {
+    try {
+      const src = imgCtxTarget.src;
+      if (src.startsWith('data:')) {
+        const res = await fetch(src);
+        const blob = await res.blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      } else {
+        try {
+          const res = await fetch(src);
+          const blob = await res.blob();
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        } catch {
+          await navigator.clipboard.writeText(src);
+        }
+      }
+    } catch (e2) {
+      try { await navigator.clipboard.writeText(imgCtxTarget.src); } catch {}
+    }
+    imgCtxTarget = null;
+    return;
+  }
+
+  if (action === 'delete') {
+    imgCtxTarget.remove();
+    hideResizeHandle();
+    updateWC();
+    if (textTypes.includes(activeTab)) saveCurDoc(activeTab);
+    else saveMemo();
+    imgCtxTarget = null;
+    return;
+  }
+}
+
 
 // ═══ 자동 저장 ═══
 let _at = null;
@@ -411,32 +523,24 @@ function setupGesturesAndUI() {
     allEls.forEach(function(el){if(el){el.style.transition='';el.style.transform='';el.style.opacity='';}});
     var rp=document.getElementById('sideRubber');
     if(rp){rp.style.transition='';rp.style.width='0';}
-    var erp=document.getElementById('editorRubber');
-    if(erp){erp.style.transition='';erp.style.width='0';}
     if(sideEl){
       var sh=sideEl.querySelector('.side-hdr');
       var ss=sideEl.querySelector('.side-scroll');
       if(sh){sh.style.transition='';sh.style.transform='';}
       if(ss){ss.style.transition='';ss.style.transform='';}
     }
-    var edInners=['.ed-topbar','#edToolbar','#editorText','#editorBook','#editorQuote','#editorMemo'];
-    edInners.forEach(function(sel){var el=document.querySelector(sel);if(el){el.style.transition='';el.style.transform='';}});
   }
   function animateBack(){
     var T='transform .25s ease, opacity .25s';
     allEls.forEach(function(el){if(el){el.style.transition=T;el.style.transform='';el.style.opacity='';}});
     var rp=document.getElementById('sideRubber');
     if(rp){rp.style.transition='width .25s ease';rp.style.width='0';}
-    var erp=document.getElementById('editorRubber');
-    if(erp){erp.style.transition='width .25s ease';erp.style.width='0';}
     if(sideEl){
       var sh=sideEl.querySelector('.side-hdr');
       var ss=sideEl.querySelector('.side-scroll');
       if(sh){sh.style.transition='transform .25s ease';sh.style.transform='';}
       if(ss){ss.style.transition='transform .25s ease';ss.style.transform='';}
     }
-    var edInners=['.ed-topbar','#edToolbar','#editorText','#editorBook','#editorQuote','#editorMemo'];
-    edInners.forEach(function(sel){var el=document.querySelector(sel);if(el){el.style.transition='transform .25s ease';el.style.transform='';}});
     setTimeout(cleanStyles,280);
   }
 
@@ -446,6 +550,7 @@ function setupGesturesAndUI() {
     if(window._itemSwiping) return;
     var t=e.target;
     if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT')) return;
+    if(t&&(t.closest('button')||t.closest('.fab-btn'))) return;
     startX=e.touches[0].clientX;
     startY=e.touches[0].clientY;
     swiping=false;swipeDir=null;decided=false;
@@ -612,7 +717,7 @@ function setupSwipeActions() {
     startY=e.touches[0].clientY;
     swiping=false; dx=0;
     wasSwiped=item.classList.contains('swiped');
-    window._itemSwiping=false;
+    window._itemSwiping=wasSwiped;
     item.style.transition='none';
     item.style.willChange='transform';
     if(currentActions) currentActions.style.transition='none';

@@ -282,7 +282,7 @@ function renderRoutineRing() {
   if (pct > 0) {
     ctx.beginPath();
     ctx.arc(cx, cy, radius, startAngle, startAngle + Math.PI * 2 * pct);
-    ctx.strokeStyle = '#7EB5F4';
+    ctx.strokeStyle = '#E55643';
     ctx.lineWidth = lineW;
     ctx.lineCap = 'round';
     ctx.stroke();

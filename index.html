@@ -49,31 +49,47 @@
   <button class="ft-btn" title="밑줄" data-cmd="underline"><u>U</u></button>
 </div>
 
-<!-- 이미지 플로팅 버튼 -->
-<div id="imgHoverBtn" class="img-actions" style="position:fixed;">
-  <button class="img-action-btn" onclick="toggleImgMenu(event)">
-    <svg viewBox="0 0 24 24">
-      <circle cx="5"  cy="12" r="1.3" fill="currentColor" stroke="none"/>
-      <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>
-      <circle cx="19" cy="12" r="1.3" fill="currentColor" stroke="none"/>
-    </svg>
-  </button>
-</div>
-<!-- 이미지 액션 드롭다운 -->
-<div id="imgDropdownMenu" class="img-menu" style="position:fixed;">
-  <div class="img-menu-date" id="imgMenuDate"></div>
-  <div class="img-menu-item" onclick="execImgAction('cut')">
-    <span>잘라내기</span>
-    <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-  </div>
-  <div class="img-menu-item" onclick="execImgAction('copy')">
-    <span>복사</span>
+<!-- 이미지 우클릭 컨텍스트 메뉴 -->
+<div id="imgContextMenu" class="img-ctx-menu" style="position:fixed;">
+
+  <div class="img-ctx-item" onclick="imgCtxAction('copy')">
     <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    <span>복사</span>
   </div>
-  <div class="img-menu-item danger" onclick="execImgAction('delete')">
-    <span>삭제</span>
+  <div class="img-ctx-sep"></div>
+  <div class="img-ctx-item danger" onclick="imgCtxAction('delete')">
     <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    <span>삭제</span>
   </div>
+</div>
+<!-- 이미지 리사이즈 핸들 — Bear 삼각형 + 13점 그립 -->
+<div id="imgResizeHandle" class="img-resize-handle">
+  <svg viewBox="0 0 44 44" width="44" height="44">
+    <defs>
+      <clipPath id="triClip">
+        <path d="M44,0 Q44,0 44,2 L44,42 Q44,44 42,44 L2,44 Q0,44 0,42 L42,0 Q44,0 44,0 Z"/>
+      </clipPath>
+    </defs>
+    <rect x="0" y="0" width="44" height="44" fill="rgba(255,255,255,.82)" clip-path="url(#triClip)"/>
+    <!-- row 1: 1 dot -->
+    <circle cx="37" cy="17" r="1.5" fill="#E55643" opacity=".5"/>
+    <!-- row 2: 2 dots -->
+    <circle cx="31" cy="23" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="37" cy="23" r="1.5" fill="#E55643" opacity=".5"/>
+    <!-- row 3: 3 dots -->
+    <circle cx="25" cy="29" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="31" cy="29" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="37" cy="29" r="1.5" fill="#E55643" opacity=".5"/>
+    <!-- row 4: 3 dots -->
+    <circle cx="19" cy="35" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="25" cy="35" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="31" cy="35" r="1.5" fill="#E55643" opacity=".5"/>
+    <!-- row 5: 4 dots -->
+    <circle cx="13" cy="41" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="19" cy="41" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="25" cy="41" r="1.5" fill="#E55643" opacity=".5"/>
+    <circle cx="31" cy="41" r="1.5" fill="#E55643" opacity=".5"/>
+  </svg>
 </div>
 
 <div class="app view-list" id="mainApp" style="display:none;">
@@ -210,7 +226,7 @@
   </div>
   
   <button class="fab-btn" onclick="handleNew()" title="새 글 작성">
-    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M15 5l4 4"/></svg>
   </button>
 </div>
 
@@ -219,9 +235,7 @@
   <div class="swipe-edge" id="editorSwipeEdge"></div>
   <div class="col-header ed-topbar">
     <div class="ed-topbar-left">
-      <button class="mobile-nav-btn mobile-back-btn" onclick="setMobileView('list')" title="목록으로 가기">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-
+      <button class="mobile-nav-btn mobile-back-btn" onclick="handleBackBtn()" title="목록으로 가기">        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
     </div>
     <span class="ed-header-date" id="edDate"></span>
@@ -347,6 +361,12 @@
         <input class="ed-title" id="memo-title" placeholder="메모 제목">
         <div class="ed-body" id="memo-body" contenteditable="true" spellcheck="false" translate="no" data-placeholder="메모를 작성하세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
+    </div>
+  </div>
+
+  <div id="editorDayList" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="editor-scroll-area">
+      <div class="day-list-wrap" id="dayListWrap"></div>
     </div>
   </div>
 
@@ -481,6 +501,7 @@ window._gestureReady=false;
   function resetState(){
     clearInlineStyles();
     tracking=false;swiping=false;panel=null;dir=null;decided=false;startState=null;isMouse=false;
+    window._gestureActive=false;
     var paneList=document.getElementById('pane-list');
     if(paneList)paneList.style.touchAction='';
   }
@@ -490,6 +511,7 @@ window._gestureReady=false;
     if(target.closest('.swipe-actions')||target.closest('#swipeOverlay'))return false;
     if(target.closest('.chk-dot'))return false;
     if(target.closest('.tb-btn')||target.closest('.tb-heading-btn'))return false;
+    if(target.closest('button'))return false;
     window._gestureStartTarget=target;
     var sel=window.getSelection();
     if(sel&&sel.rangeCount>0&&!sel.isCollapsed)return false;
@@ -692,6 +714,7 @@ window._gestureReady=false;
       console.log('[FINALIZE] classes after: '+app.className);
       // 인라인 스타일 제거 → CSS 클래스 기반 레이아웃으로 복귀
       clearInlineStyles();
+      if(typeof updateBackBtnIcon==='function') updateBackBtnIcon();
     };
 
     // transitionend 이벤트로 정확한 타이밍에 finalize
@@ -779,13 +802,16 @@ window._gestureReady=false;
   }
 
   function handleMove(x,y,e){
+    if(typeof cancelLongPress==='function') cancelLongPress();
     if(!tracking||window.innerWidth<=768)return;
-    if(window._itemSwiping){return;}
+    if(window._itemSwiping){tracking=false;return;}
     var dx=x-sx,dy=y-sy;
     if(!decided){
       if(Math.abs(dx)<DECIDE_DIST&&Math.abs(dy)<DECIDE_DIST)return;
       decided=true;
-      if(Math.abs(dy)>Math.abs(dx)*0.8){tracking=false;return;}
+      window._gestureActive=true;
+      if(typeof cancelLongPress==='function') cancelLongPress();
+      if(Math.abs(dy)>Math.abs(dx)*0.8){tracking=false;window._gestureActive=false;return;}
       dir=dx>0?'right':'left';
 
       // 리스트 아이템 위 좌 스와이프 → 아이템 스와이프 액션 우선
@@ -809,6 +835,7 @@ window._gestureReady=false;
   }
 
   function handleEnd(x){
+    window._gestureActive=false;
     if(!tracking||!swiping||window.innerWidth<=768){resetState();return;}
     var dx=x-sx;
     if(isTablet()) tabletEnd(dx);

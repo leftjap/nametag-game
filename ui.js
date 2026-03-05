@@ -13,8 +13,7 @@ const TAB_COLORS = {
 };
 
 function applyTabColor(tabId) {
-  const color = TAB_COLORS[tabId] || '#7EB5F4';
-  document.documentElement.style.setProperty('--tab-color', color);
+  document.documentElement.style.setProperty('--tab-color', '#E55643');
 }
 
 // ═══ 레이아웃 전환 ═══
@@ -33,10 +32,10 @@ function switchListView(view) {
 function toggleSidebar() {
   const app = document.getElementById('mainApp');
   const w = window.innerWidth;
-  if(w >= 769 && w <= 1024) {
+  if(w >= 769 && w <= 1400) {
     // 태블릿: tablet-side-open 토글
     app.classList.toggle('tablet-side-open');
-  } else if(w > 1024) {
+  } else if(w > 1400) {
     // PC: sidebar-closed 토글
     app.classList.toggle('sidebar-closed');
   } else {
@@ -53,24 +52,25 @@ function setMobileView(view) {
   const app = document.getElementById('mainApp');
   const w = window.innerWidth;
 
-  // 태블릿 (769~1024)
-  if(w >= 769 && w <= 1024) {
+  // 태블릿 (769~1400) — CSS 미디어쿼리 범위와 일치
+  if(w >= 769 && w <= 1400) {
     if(view==='list') {
-      // 사이드바가 열려있으면 닫기 (자연스러운 전환)
       if(app.classList.contains('tablet-side-open')) {
         app.classList.remove('tablet-side-open');
+      }
+      if(app.classList.contains('tablet-list-closed')) {
+        app.classList.remove('tablet-list-closed');
       }
       renderListPanel();
     }
     if(view==='side') toggleSidebar();
     if(view==='editor') {
-      // 리스트가 닫혀있으면 아무것도 안함 (이미 에디터만 보이는 상태)
     }
     return;
   }
 
-  // PC (1025 이상)
-  if(w > 1024) {
+  // PC (1401 이상)
+  if(w > 1400) {
     if(view==='list') {
       // 사이드바가 닫혀있고 리스트도 닫혀있으면 리스트 열기
       if(app.classList.contains('list-closed')) {
@@ -147,8 +147,7 @@ function renderWritingGrid() {
   nav.innerHTML = html;
 }
 
-window.addEventListener('resize', () => { renderWritingGrid(); renderChk(); });
-
+window.addEventListener('resize', () => { renderWritingGrid(); renderChk(); updateBackBtnIcon(); });
 function switchTab(t) {
   if(textTypes.includes(activeTab)) saveCurDoc(activeTab);
   activeTab = t;
@@ -159,12 +158,13 @@ function switchTab(t) {
   document.getElementById('editorMemo').style.display  = t==='memo'  ? 'flex':'none';
   document.getElementById('edToolbar').style.display   = ['book','quote'].includes(t) ? 'none':'flex';
   clearSearch(); hideRoutineCard(); switchListView('list');
-  // 태블릿/PC: 사이드바 열려있으면 닫으면서 리스트로 전환
+  // 태블릿: 사이드바 열려있으면 닫으면서 리스트로 전환
   const app = document.getElementById('mainApp');
-  if(window.innerWidth >= 769 && window.innerWidth <= 1024 && app.classList.contains('tablet-side-open')) {
+  if(window.innerWidth >= 769 && window.innerWidth <= 1400 && app.classList.contains('tablet-side-open')) {
     app.classList.remove('tablet-side-open');
   }
-  setMobileView('list');  if(textTypes.includes(t)) { const docs=getDocs(t); if(curIds[t])loadDoc(t,curIds[t],true); else if(docs.length)loadDoc(t,docs[0].id,true); else{const nd=newDoc(t);loadDoc(t,nd.id,true);} }
+  setMobileView('list'); updateBackBtnIcon(); if(textTypes.includes(t)) { const docs=getDocs(t);
+ if(curIds[t])loadDoc(t,curIds[t],true); else if(docs.length)loadDoc(t,docs[0].id,true); else{const nd=newDoc(t);loadDoc(t,nd.id,true);} }
   if(t==='book')  { if(curBookId)loadBook(curBookId,true); else{const b=getBooks();if(b.length)loadBook(b[0].id,true);else newBook();} }
   if(t==='memo')  { if(curMemoId)loadMemo(curMemoId,true); else{const m=getMemos();if(m.length)loadMemo(m[0].id,true);else newMemoForm();} }
   if(t==='quote') { newQuoteForm(); }
@@ -352,12 +352,16 @@ function renderCalendarView(items, t) {
       if(thumb){cls+=' has-photo';inner=`<div class="cal-photo-bg" style="background-image:url('${thumb}');"></div>`;numHtml=`<span class="cal-day-num">${d}</span>`;}
       let clickFn='';
       if(has&&itemMap[pk]&&itemMap[pk].length>0){
-        const docId=itemMap[pk][0];
-        let loadCall=`loadDoc('${t}','${docId}')`;
-        if(t==='book')loadCall=`loadBook('${docId}')`;
-        else if(t==='quote')loadCall=`loadQuote('${docId}')`;
-        else if(t==='memo')loadCall=`loadMemo('${docId}')`;
-        clickFn=`onclick="selectCalDay(this); ${loadCall}; setMobileView('editor');"`;
+        if(itemMap[pk].length===1){
+          const docId=itemMap[pk][0];
+          let loadCall=`loadDoc('${t}','${docId}')`;
+          if(t==='book')loadCall=`loadBook('${docId}')`;
+          else if(t==='quote')loadCall=`loadQuote('${docId}')`;
+          else if(t==='memo')loadCall=`loadMemo('${docId}')`;
+          clickFn=`onclick="selectCalDay(this); ${loadCall}; setMobileView('editor');"`;
+        } else {
+          clickFn=`onclick="selectCalDay(this); showDayList('${pk}','${t}'); setMobileView('editor');"`;
+        }
       }
       cells+=`<div class="${cls}" ${clickFn}>${inner}${numHtml}</div>`;
     }
@@ -383,6 +387,117 @@ function renderCalendarView(items, t) {
 function selectCalDay(element) {
   document.querySelectorAll('.cal-day').forEach(el=>el.classList.remove('selected'));
   if(element) element.classList.add('selected');
+}
+
+function showDayList(dateKey, type) {
+  // dateKey = "2026-3-5" 형식
+  const parts=dateKey.split('-');
+  const y=parseInt(parts[0]), m=parseInt(parts[1]), d=parseInt(parts[2]);
+  const dt=new Date(y, m-1, d);
+  const dayLabel=`${y}년 ${m}월 ${d}일 (${weekdays[dt.getDay()]})`;
+
+  // 해당 날짜 항목 수집
+  let items=[];
+  if(textTypes.includes(type)) items=getDocs(type);
+  else if(type==='book') items=getBooks();
+  else if(type==='quote') items=getQuotes();
+  else if(type==='memo') items=getMemos();
+
+  const dateItems=items.filter(item=>{
+    const itemDt=new Date(item.created||item.date||0);
+    return itemDt.getFullYear()===y && (itemDt.getMonth()+1)===m && itemDt.getDate()===d;
+  }).sort((a,b)=>new Date(b.created||b.date||0)-new Date(a.created||a.date||0));
+
+  if(dateItems.length===0) return;
+  if(dateItems.length===1){
+    hideDayList();
+    if(textTypes.includes(type)) loadDoc(type, dateItems[0].id);
+    else if(type==='book') loadBook(dateItems[0].id);
+    else if(type==='quote') loadQuote(dateItems[0].id);
+    else if(type==='memo') loadMemo(dateItems[0].id);
+    return;
+  }
+
+  // 에디터 패널들 숨기고 리스트 패널 표시
+  document.getElementById('editorText').style.display='none';
+  document.getElementById('editorBook').style.display='none';
+  document.getElementById('editorQuote').style.display='none';
+  document.getElementById('editorMemo').style.display='none';
+  document.getElementById('edToolbar').style.display='none';
+  const dayListPanel=document.getElementById('editorDayList');
+  dayListPanel.style.display='flex';
+
+  // 날짜 표시
+  document.getElementById('edDate').textContent=dayLabel;
+
+  // 카드 HTML 생성
+  let html=`<div class="day-list-header">${m}월 ${d}일</div>`;
+  html+=`<div class="day-list-sub">${dateItems.length}개의 기록</div>`;
+  html+=`<div class="day-list-items">`;
+
+  dateItems.forEach(item=>{
+    const time=formatTimeOnly(item.created||item.date);
+    let title='', preview='', thumbs=[];
+    let clickFn='';
+
+    if(textTypes.includes(type)){
+      title=item.title||'제목 없음';
+      preview=stripHtml(item.content||'').replace(/\s+/g,' ').trim().slice(0,120);
+      thumbs=getThumbs(item.content, 3);
+      clickFn=`hideDayList(); loadDoc('${type}','${item.id}'); setMobileView('editor');`;
+    } else if(type==='book'){
+      title=item.title||'제목 없음';
+      preview=[item.author, item.publisher].filter(Boolean).join(' · ');
+      clickFn=`hideDayList(); loadBook('${item.id}'); setMobileView('editor');`;
+    } else if(type==='quote'){
+      title=item.text ? (item.text.length>50 ? item.text.slice(0,50)+'…' : item.text) : '';
+      preview=item.by||'';
+      clickFn=`hideDayList(); loadQuote('${item.id}'); setMobileView('editor');`;
+    } else if(type==='memo'){
+      title=item.title||'제목 없음';
+      preview=stripHtml(item.content||'').replace(/\s+/g,' ').trim().slice(0,120);
+      thumbs=getThumbs(item.content, 3);
+      clickFn=`hideDayList(); loadMemo('${item.id}'); setMobileView('editor');`;
+    }
+
+    const safeTitle=escapeHtml(title);
+    const safePreview=escapeHtml(preview);
+
+    html+=`<div class="day-list-card" onclick="${clickFn}">`;
+
+    // 썸네일이 1개면 큰 이미지로 왼쪽에
+    if(thumbs.length===1){
+      html+=`<img class="day-list-card-thumb" src="${thumbs[0]}" alt="">`;
+    }
+
+    html+=`<div class="day-list-card-body">`;
+    html+=`<div class="day-list-card-title">${safeTitle}</div>`;
+    if(safePreview) html+=`<div class="day-list-card-preview">${safePreview}</div>`;
+
+    // 썸네일이 2개 이상이면 본문 아래 작은 이미지 나열
+    if(thumbs.length>=2){
+      html+=`<div class="day-list-card-thumbs">`;
+      thumbs.forEach(src=>{ html+=`<img src="${src}" alt="">`; });
+      html+=`</div>`;
+    }
+
+    html+=`<div class="day-list-card-meta">${time}</div>`;
+    html+=`</div></div>`;
+  });
+
+  html+=`</div>`;
+  document.getElementById('dayListWrap').innerHTML=html;
+}
+
+function hideDayList(){
+  const dayListPanel=document.getElementById('editorDayList');
+  if(dayListPanel) dayListPanel.style.display='none';
+  // 현재 탭에 맞는 에디터 패널 복원
+  document.getElementById('editorText').style.display=textTypes.includes(activeTab)?'flex':'none';
+  document.getElementById('editorBook').style.display=activeTab==='book'?'flex':'none';
+  document.getElementById('editorQuote').style.display=activeTab==='quote'?'flex':'none';
+  document.getElementById('editorMemo').style.display=activeTab==='memo'?'flex':'none';
+  document.getElementById('edToolbar').style.display=['book','quote'].includes(activeTab)?'none':'flex';
 }
 
 // ═══ 리스트 패널 메인 렌더링 ═══
@@ -468,6 +583,10 @@ function toggleEditorMenu(e) {
     menu.classList.remove('open');
     return;
   }
+  // 메뉴를 body로 이동시켜 transform 영향을 받지 않게 함
+  if(menu.parentElement !== document.body) {
+    document.body.appendChild(menu);
+  }
   const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
   const txt = target ? target.textContent.trim() : '';
   const chars = txt.replace(/\s/g,'').length;
@@ -497,6 +616,15 @@ function toggleEditorMenu(e) {
     pinLabel.textContent = isPinned ? '고정 해제' : '고정';
   }
 
+  // 에디터 더보기 버튼 위치 기준으로 메뉴 위치 설정
+  const moreBtn = document.querySelector('.ed-more-btn');
+  if(moreBtn) {
+    const btnRect = moreBtn.getBoundingClientRect();
+    menu.style.position = 'fixed';
+    menu.style.top = (btnRect.bottom + 4) + 'px';
+    menu.style.left = 'auto';
+    menu.style.right = (window.innerWidth - btnRect.right) + 'px';
+  }
   menu.classList.add('open');
 }
 
@@ -583,11 +711,57 @@ function handleNew() {
   renderListPanel(); setMobileView('editor');
 }
 
+function handleBackBtn() {
+  const w = window.innerWidth;
+  if(w >= 769 && w <= 1400) {
+    const app = document.getElementById('mainApp');
+    if(app.classList.contains('tablet-side-open')) {
+      // 1+2+3단 모두 펼침 → 에디터 전체화면으로
+      app.classList.remove('tablet-side-open');
+      app.classList.add('tablet-list-closed');
+    } else if(app.classList.contains('tablet-list-closed')) {
+      // 에디터 전체화면 → 1+2+3단 모두 펼침
+      app.classList.remove('tablet-list-closed');
+      app.classList.add('tablet-side-open');
+    } else {
+      // 리스트+에디터 (기본) → 에디터 전체화면으로
+      app.classList.add('tablet-list-closed');
+    }
+    updateBackBtnIcon();
+  } else {
+    setMobileView('list');
+  }
+}
+
 function handleDone() {
   if(document.activeElement) document.activeElement.blur();
   setMobileView('list');
   const vs = document.getElementById('viewSwitcher');
   if(vs && document.getElementById('pane-routine').style.display === 'none') vs.style.display = 'flex';
+}
+
+function toggleTabletList() {
+  const app = document.getElementById('mainApp');
+  app.classList.toggle('tablet-list-closed');
+  updateBackBtnIcon();
+}
+
+function updateBackBtnIcon() {
+  const app = document.getElementById('mainApp');
+  const btn = document.querySelector('.editor .mobile-back-btn');
+  if(!btn) return;
+  const w = window.innerWidth;
+  if(w >= 769 && w <= 1400) {
+    if(app.classList.contains('tablet-list-closed')) {
+      // 에디터 전체화면 → < 방향 (누르면 사이드바까지 펼침)
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+    } else {
+      // 사이드바 펼침 또는 리스트+에디터 → > 방향 (누르면 에디터 전체화면)
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+    }
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+  }
 }
 
 // ═══ 리스트 우클릭 컨텍스트 메뉴 ═══
@@ -645,6 +819,10 @@ function showContextMenuAt(item, x, y) {
     pinLabel.textContent = isPinned ? '고정 해제' : '고정';
   }
 
+  // 메뉴를 body로 이동시켜 transform 영향을 받지 않게 함
+  if(menu.parentElement !== document.body) {
+    document.body.appendChild(menu);
+  }
   menu.style.position = 'fixed';
   menu.style.top = Math.min(y, window.innerHeight - 280) + 'px';
   menu.style.left = Math.min(x, window.innerWidth - 230) + 'px';
@@ -652,15 +830,22 @@ function showContextMenuAt(item, x, y) {
   menu.classList.add('open');
 }
 
+var _lpTimer = null;
+var _lpItem = null;
+var _lpMoved = false;
+
+function cancelLongPress() {
+  _lpMoved = true;
+  clearTimeout(_lpTimer);
+  _lpItem = null;
+}
+
 function setupListContextMenu() {
   const listEl = document.getElementById('pane-list');
   if (!listEl) return;
 
-  let lpTimer = null;
-  let lpItem = null;
-  let lpMoved = false;
-  let lpX = 0;
-  let lpY = 0;
+  var lpX = 0;
+  var lpY = 0;
 
   // PC: 우클릭
   listEl.addEventListener('contextmenu', function(e) {
@@ -674,39 +859,40 @@ function setupListContextMenu() {
   listEl.addEventListener('touchstart', function(e) {
     const item = e.target.closest('.lp-item');
     if (!item) return;
-    lpItem = item;
-    lpMoved = false;
+    _lpItem = item;
+    _lpMoved = false;
     lpX = e.touches[0].clientX;
     lpY = e.touches[0].clientY;
-    clearTimeout(lpTimer);
-    lpTimer = setTimeout(function() {
-      if (!lpMoved && lpItem) {
+    clearTimeout(_lpTimer);
+    _lpTimer = setTimeout(function() {
+      if (!_lpMoved && _lpItem && !window._gestureActive) {
+        window._itemSwiping = true;
         if (navigator.vibrate) navigator.vibrate(20);
-        showContextMenuAt(lpItem, lpX, lpY);
-        lpItem = null;
+        showContextMenuAt(_lpItem, lpX, lpY);
+        _lpItem = null;
+        setTimeout(function(){ window._itemSwiping = false; }, 100);
+      } else {
+        _lpItem = null;
       }
     }, 600);
   }, { passive: true });
 
   listEl.addEventListener('touchmove', function(e) {
-    if (!lpItem) return;
+    if (!_lpItem) return;
     var dx = Math.abs(e.touches[0].clientX - lpX);
     var dy = Math.abs(e.touches[0].clientY - lpY);
-    if (dx > 8 || dy > 8) {
-      lpMoved = true;
-      clearTimeout(lpTimer);
-      lpItem = null;
+    if (dx > 20 || dy > 20) {
+      cancelLongPress();
     }
   }, { passive: true });
 
   listEl.addEventListener('touchend', function() {
-    clearTimeout(lpTimer);
-    lpItem = null;
+    clearTimeout(_lpTimer);
+    _lpItem = null;
   }, { passive: true });
 
   listEl.addEventListener('touchcancel', function() {
-    clearTimeout(lpTimer);
-    lpItem = null;
+    cancelLongPress();
   }, { passive: true });
 }
 
