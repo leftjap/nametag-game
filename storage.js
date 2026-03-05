@@ -306,7 +306,8 @@ function openRoutineDetail() {
 function showRoutineCard() {
   const pane = document.getElementById('pane-routine');
   if(!pane) return;
-  pane.style.display = 'block';
+  pane.style.display = 'flex';
+  pane.style.flexDirection = 'column';
   const vs = document.getElementById('viewSwitcher');
   if(vs) vs.style.display = 'none';
   const fab = document.querySelector('.fab-btn');

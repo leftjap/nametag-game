@@ -57,6 +57,8 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
   .list-panel{transition:width .3s cubic-bezier(.2,.8,.2,1),min-width .3s,max-width .3s,opacity .2s}
   .app.list-closed .list-panel{width:0!important;min-width:0!important;max-width:0!important;opacity:0;border-right-width:0;pointer-events:none;overflow:hidden}
 }
+.side-rubber{position:absolute;top:0;bottom:0;left:0;width:0;background:#2c2c2e;z-index:50;pointer-events:none}
+.editor-rubber{position:absolute;top:0;bottom:0;right:0;width:0;background:var(--bg-white);z-index:50;pointer-events:none}
 .side-hdr{display:flex;align-items:center;padding:0 14px;height:60px;min-height:60px;border-bottom:1px solid var(--border);gap:8px}
 .brand-wrap{display:flex;align-items:center;gap:10px}
 .brand{display:none}
@@ -163,7 +165,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .list-panel{
   width:var(--list-w);min-width:var(--list-min);max-width:var(--list-max);
   background:var(--bg-white);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:visible;position:relative;
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
 }
 
 .lp-hdr{
@@ -227,7 +229,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .lp-item{
   display:flex;flex-direction:column;padding:14px 16px 12px;gap:4px;cursor:pointer;
   border-bottom:1px solid var(--border-l);border-left:none;
-  transition:.1s;position:relative;min-height:0;background:var(--bg-white);overflow:hidden;
+  transition:.1s;position:relative;min-height:0;background:var(--bg-white);overflow:visible;
 }
 .lp-item:hover{background:var(--bg)}
 .lp-item.on{background:#f0f0f2}
@@ -278,7 +280,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 .quote-txt{font-size:13px;font-family:'Noto Serif KR',serif;line-height:1.6;color:var(--tx-d);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 
-.swipe-actions{display:none;position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}.fab-btn{display:none}
+.swipe-actions{display:flex;position:absolute;right:0;top:0;bottom:0;width:0px;flex-direction:row;z-index:1;pointer-events:auto;overflow:hidden;transform:translateX(100%)}
+.fab-btn{display:none}
 
 /* ═══ 사진 그리드 ═══ */
 .photo-grid{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -599,6 +602,20 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .editor{touch-action:manipulation}
   .editor-scroll-area{touch-action:manipulation}
 
+  .pane-routine{
+    position:absolute !important;
+    top:60px !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    flex:none !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch;
+    z-index:4;
+    background:var(--bg-white);
+    min-height:0;
+  }
   .ed-body{font-size:17px;line-height:1.9}
   .side .sec-t{font-size:14px !important}
   .side .stat-label{font-size:14px !important;color:rgba(255,255,255,.9) !important}
@@ -638,7 +655,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu.on .wi-arrow{color:rgba(255,255,255,.45)}
 
   /* 태블릿 스와이프 액션 */
-  .swipe-actions{position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}
+  .swipe-actions{display:flex;position:absolute;right:0;top:0;bottom:0;width:0px;flex-direction:row;z-index:1;pointer-events:auto;overflow:hidden;transform:translateX(100%)}
+
   .swipe-action{width:80px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:600}
   .swipe-action span{display:flex;flex-direction:column;align-items:center;gap:4px}
   .swipe-action svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
@@ -777,13 +795,22 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .search-icon-btn svg{width:20px;height:20px}
 
 
-  .swipe-actions{position:absolute;right:-160px;top:0;bottom:0;flex-direction:row;z-index:10}
+  .swipe-actions{display:flex;position:absolute;right:0;top:0;bottom:0;width:0px;flex-direction:row;z-index:1;pointer-events:auto;overflow:hidden;transform:translateX(100%)}
 
-  .swipe-action{width:80px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:600}
+
+  .swipe-action{width:80px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:600;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .12s ease;
+  }
+  .swipe-action:active{opacity:.8}
   .swipe-action span{display:flex;flex-direction:column;align-items:center;gap:4px}
   .swipe-action svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
   .pin-action{background:#a8c8f0}
   .del-action{background:#e8756d}
+
+  .lp-item.swiping{
+    transition:none !important;
+  }
 
   .ed-topbar{height:56px;min-height:56px;padding:0 16px}
   .mobile-back-btn{width:40px;height:40px}
@@ -812,7 +839,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .lp-thumb{width:40px;min-width:40px;height:40px}
   .lp-pin-hdr{background:var(--bg-white);border:none;border-bottom:1px solid var(--border-l);padding:0 16px}
   .lp-month-hdr{background:var(--bg-white);border:none;border-bottom:1px solid var(--border-l);padding:10px 16px}
-    .pane-list{background:var(--bg-white);padding-top:0;overflow-x:visible}
+    .pane-list{background:var(--bg-white);padding-top:0;overflow-x:hidden}
   .toolbar{padding:0 10px;gap:1px}
   .tb-heading-btn{padding:5px 6px;font-size:12px}
   .tb-btn{width:28px;height:28px}
@@ -845,8 +872,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   background:none;
   border:none;
   border-radius:0;
-  overflow:hidden;
+  overflow:visible;
   margin-bottom:0;
+  flex-shrink:0;
 }.routine-card-hdr{
   display:flex;align-items:center;justify-content:space-between;
   padding:0 14px;
@@ -908,6 +936,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   padding:14px 14px 10px;
   border-top:none;
   position:relative;
+  flex-shrink:0;
 }
 .routine-streak::before{
   content:'';position:absolute;top:0;left:14px;right:14px;
@@ -940,6 +969,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   padding:14px 14px 20px;
   border-top:none;
   position:relative;
+  flex-shrink:0;
 }
 .routine-monthly::before{
   content:'';position:absolute;top:0;left:14px;right:14px;
@@ -1052,10 +1082,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   height:auto !important;
   min-height:auto !important;
 }
-.pane-list{
-  overflow-y:auto !important;
-  overflow-x:visible !important;
-}
+    .pane-list{background:var(--bg-white);padding-top:0;overflow-x:hidden}
 .lp-item::after{
   content:'' !important;
   position:absolute !important;
@@ -1287,22 +1314,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 /* ═══ 스와이프 오버레이 (body 고정) ═══ */
 #swipeOverlay{
-  position:fixed;display:none;flex-direction:row;z-index:9999;overflow:visible;
+  display:none !important;
 }
-#swipeOverlay .swipe-action{
-  pointer-events:auto;
-}#swipeOverlay .swipe-action{
-  width:80px;display:flex;align-items:center;justify-content:center;
-  color:white;font-size:11px;font-weight:600;cursor:pointer;
-}
-#swipeOverlay .swipe-action span{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-}
-#swipeOverlay .swipe-action svg{
-  width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;
-}
-#swipeOverlay .pin-action{background:#a8c8f0}
-#swipeOverlay .del-action{background:#e8756d}
 
 /* ═══ 스와이프 엣지 (모바일 전용) ═══ */
 .swipe-edge{

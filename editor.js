@@ -409,9 +409,34 @@ function setupGesturesAndUI() {
   }
   function cleanStyles(){
     allEls.forEach(function(el){if(el){el.style.transition='';el.style.transform='';el.style.opacity='';}});
+    var rp=document.getElementById('sideRubber');
+    if(rp){rp.style.transition='';rp.style.width='0';}
+    var erp=document.getElementById('editorRubber');
+    if(erp){erp.style.transition='';erp.style.width='0';}
+    if(sideEl){
+      var sh=sideEl.querySelector('.side-hdr');
+      var ss=sideEl.querySelector('.side-scroll');
+      if(sh){sh.style.transition='';sh.style.transform='';}
+      if(ss){ss.style.transition='';ss.style.transform='';}
+    }
+    var edInners=['.ed-topbar','#edToolbar','#editorText','#editorBook','#editorQuote','#editorMemo'];
+    edInners.forEach(function(sel){var el=document.querySelector(sel);if(el){el.style.transition='';el.style.transform='';}});
   }
   function animateBack(){
-    allEls.forEach(function(el){if(el){el.style.transition='transform .25s ease, opacity .25s';el.style.transform='';el.style.opacity='';}});
+    var T='transform .25s ease, opacity .25s';
+    allEls.forEach(function(el){if(el){el.style.transition=T;el.style.transform='';el.style.opacity='';}});
+    var rp=document.getElementById('sideRubber');
+    if(rp){rp.style.transition='width .25s ease';rp.style.width='0';}
+    var erp=document.getElementById('editorRubber');
+    if(erp){erp.style.transition='width .25s ease';erp.style.width='0';}
+    if(sideEl){
+      var sh=sideEl.querySelector('.side-hdr');
+      var ss=sideEl.querySelector('.side-scroll');
+      if(sh){sh.style.transition='transform .25s ease';sh.style.transform='';}
+      if(ss){ss.style.transition='transform .25s ease';ss.style.transform='';}
+    }
+    var edInners=['.ed-topbar','#edToolbar','#editorText','#editorBook','#editorQuote','#editorMemo'];
+    edInners.forEach(function(sel){var el=document.querySelector(sel);if(el){el.style.transition='transform .25s ease';el.style.transform='';}});
     setTimeout(cleanStyles,280);
   }
 
@@ -440,10 +465,8 @@ function setupGesturesAndUI() {
       decided=true;
       if(Math.abs(dy)>Math.abs(dx)*1.2){startState=null;return;}
       swipeDir=dx>0?'right':'left';
-      // 유효 방향만
+      // 유효 방향만 (side+right, editor+left는 고무줄 효과 허용)
       if(startState==='list'&&swipeDir==='left'){startState=null;return;}
-      if(startState==='side'&&swipeDir==='right'){startState=null;return;}
-      if(startState==='editor'&&swipeDir==='left'){startState=null;return;}
       swiping=true;
       if(e.cancelable) e.preventDefault();
       allEls.forEach(function(el){if(el){el.style.transition='none';}});
@@ -454,14 +477,56 @@ function setupGesturesAndUI() {
     var vw=window.innerWidth;
     var sideW=sideEl?Math.min(sideEl.offsetWidth,vw*0.82):(vw*0.75);
 
-    if(startState==='side'&&swipeDir==='left'){
+    if(startState==='side'&&swipeDir==='right'){
+      // 고무줄 효과: rubber 표시 + 사이드바 내부 콘텐츠 밀기
+      var maxRubber=80;
+      var raw=Math.max(0,dx);
+      var rubberDx=maxRubber*(1-Math.exp(-raw/maxRubber));
+      var rubberPanel=document.getElementById('sideRubber');
+      var sideHdr=sideEl.querySelector('.side-hdr');
+      var sideScroll=sideEl.querySelector('.side-scroll');
+      if(rubberPanel) rubberPanel.style.width=rubberDx+'px';
+      if(sideHdr) sideHdr.style.transform='translate3d('+rubberDx+'px,0,0)';
+      if(sideScroll) sideScroll.style.transform='translate3d('+rubberDx+'px,0,0)';
+    } else if(startState==='side'&&swipeDir==='left'){
       var move=Math.max(-sideW,Math.min(0,dx));
+      var progress=Math.abs(move)/sideW;
       if(sideEl) sideEl.style.transform='translate3d('+move+'px,0,0)';
-      if(listEl){listEl.style.transform='translate3d('+Math.max(0,sideW+dx)+'px,0,0)';listEl.style.opacity=String(Math.min(1,0.5+Math.abs(dx)/sideW*0.5));}
+      // 리스트가 사이드바에 연결된 것처럼 함께 이동
+      if(listEl){
+        var listX=Math.max(0,sideW+dx);
+        listEl.style.transform='translate3d('+listX+'px,0,0)';
+        listEl.style.opacity=String(Math.min(1,0.4+progress*0.6));
+      }
     } else if(startState==='list'&&swipeDir==='right'){
       var move2=Math.max(0,Math.min(dx,sideW));
+      var progress2=move2/sideW;
       if(sideEl) sideEl.style.transform='translate3d('+(-sideW+move2)+'px,0,0)';
-      if(listEl){listEl.style.transform='translate3d('+move2+'px,0,0)';listEl.style.opacity=String(Math.max(0.5,1-move2/vw*0.5));}
+      // 리스트가 사이드바에 밀려나는 느낌
+      if(listEl){
+        listEl.style.transform='translate3d('+move2+'px,0,0)';
+        listEl.style.opacity=String(Math.max(0.5,1-progress2*0.5));
+      }
+    } else if(startState==='editor'&&swipeDir==='left'){
+      // 에디터 왼쪽 고무줄: 내부 콘텐츠가 왼쪽으로 밀림
+      var maxRubber=80;
+      var raw=Math.max(0,Math.abs(dx));
+      var rubberDx=maxRubber*(1-Math.exp(-raw/maxRubber));
+      var edRubber=document.getElementById('editorRubber');
+      var edTopbar=editorEl.querySelector('.ed-topbar');
+      var edToolbar=document.getElementById('edToolbar');
+      var edText=document.getElementById('editorText');
+      var edBook=document.getElementById('editorBook');
+      var edQuote=document.getElementById('editorQuote');
+      var edMemo=document.getElementById('editorMemo');
+      if(edRubber) edRubber.style.width=rubberDx+'px';
+      var shift='translate3d(-'+rubberDx+'px,0,0)';
+      if(edTopbar) edTopbar.style.transform=shift;
+      if(edToolbar) edToolbar.style.transform=shift;
+      if(edText) edText.style.transform=shift;
+      if(edBook) edBook.style.transform=shift;
+      if(edQuote) edQuote.style.transform=shift;
+      if(edMemo) edMemo.style.transform=shift;
     } else if(startState==='editor'&&swipeDir==='right'){
       var move3=Math.max(0,Math.min(dx,vw));
       if(editorEl) editorEl.style.transform='translate3d('+move3+'px,0,0)';
@@ -474,6 +539,7 @@ function setupGesturesAndUI() {
     if(!swiping||startState===null){startState=null;decided=false;return;}
     var dx=e.changedTouches[0].clientX-startX;
     var savedState=startState;
+    var savedDir=swipeDir;
     swiping=false;swipeDir=null;decided=false;startState=null;
 
     var vw=window.innerWidth;
@@ -484,7 +550,13 @@ function setupGesturesAndUI() {
     else if(savedState==='list'&&dx>minSwipe) didSwipe=true;
     else if(savedState==='editor'&&dx>minSwipe) didSwipe=true;
 
-    if(didSwipe){
+    if(savedState==='side'&&savedDir==='right'){
+      // 고무줄: 항상 원위치로 스프링백
+      animateBack();
+    } else if(savedState==='editor'&&savedDir==='left'){
+      // 에디터 고무줄: 항상 원위치로 스프링백
+      animateBack();
+    } else if(didSwipe){
       if(savedState==='list') app.classList.add('view-side');
       else if(savedState==='side') app.classList.remove('view-side');
       cleanStyles();
@@ -506,89 +578,114 @@ function setupGesturesAndUI() {
 
 function setupSwipeActions() {
   const listEl=document.getElementById('pane-list'); if(!listEl)return;
-  let startX=0,startY=0,currentItem=null,swiping=false,dx=0;
+  let startX=0,startY=0,currentItem=null,currentActions=null,swiping=false,dx=0;
+  let wasSwiped=false;
   const THRESHOLD=60;
+  const ACTIONS_W=160;
+  let rafId=null;
 
-  // body에 고정 오버레이 생성
-  let overlay=document.getElementById('swipeOverlay');
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='swipeOverlay';
-    overlay.style.cssText='position:fixed;display:none;flex-direction:row;z-index:9999;pointer-events:auto;';
-    document.body.appendChild(overlay);
+  function getActions(item){
+    return item?item.querySelector('.swipe-actions'):null;
   }
 
-  function showOverlay(item){
-    const actions=item.querySelector('.swipe-actions');
-    if(!actions)return;
-    const rect=item.getBoundingClientRect();
-    const listPanel=item.closest('.list-panel');
-    const listRect=listPanel?listPanel.getBoundingClientRect():{right:window.innerWidth};
-    // innerHTML 대신 직접 생성하여 onclick 확실히 복사
-    overlay.innerHTML='';
-    const origBtns=actions.querySelectorAll('.swipe-action');
-    origBtns.forEach(btn=>{
-      const clone=btn.cloneNode(true);
-      const handler=btn.getAttribute('onclick');
-      if(handler){
-        clone.setAttribute('onclick',handler);
-        clone.addEventListener('click',function(e){e.stopPropagation();});
-      }
-      overlay.appendChild(clone);
-    });
-    overlay.style.display='flex';
-    overlay.style.top=rect.top+'px';
-    overlay.style.height=Math.max(rect.height,50)+'px';
-    overlay.style.right=(window.innerWidth-listRect.right)+'px';
-    overlay.style.width='160px';
-    overlay.style.flexDirection='row';
+  function closeCurrent(){
+    if(!currentItem)return;
+    const acts=getActions(currentItem);
+    currentItem.style.transition='transform .28s cubic-bezier(.25,.1,.25,1)';
+    currentItem.style.transform='';
+    currentItem.classList.remove('swiped');
+    currentItem.style.willChange='';
+    if(acts){
+      acts.style.transition='width .28s cubic-bezier(.25,.1,.25,1)';
+      acts.style.width='0px';
+      setTimeout(()=>{acts.style.transition='';},300);
+    }
+    currentItem=null;currentActions=null;
   }
 
-  function hideOverlay(){
-    overlay.style.display='none';
-    overlay.innerHTML='';
-  }
-
-  // 터치+포인터 모두 지원 (태블릿 키보드+트랙패드 대응)
   listEl.addEventListener('touchstart',e=>{
     const item=e.target.closest('.lp-item'); if(!item)return;
-    if(currentItem&&currentItem!==item){currentItem.style.transform='';currentItem.classList.remove('swiped');hideOverlay();}
-    currentItem=item; startX=e.touches[0].clientX; startY=e.touches[0].clientY; swiping=false; dx=0; item.style.transition='none';
+    if(currentItem&&currentItem!==item) closeCurrent();
+    currentItem=item;
+    currentActions=getActions(item);
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    swiping=false; dx=0;
+    wasSwiped=item.classList.contains('swiped');
     window._itemSwiping=false;
+    item.style.transition='none';
+    item.style.willChange='transform';
+    if(currentActions) currentActions.style.transition='none';
   },{passive:true,capture:false});
 
   listEl.addEventListener('touchmove',e=>{
-    if(!currentItem){
-      window._itemSwiping=false;
-      return;
-    }
+    if(!currentItem){window._itemSwiping=false;return;}
     const mx=e.touches[0].clientX-startX, my=e.touches[0].clientY-startY;
     if(!swiping){
-      if(Math.abs(my)>Math.abs(mx)&&Math.abs(my)>8){currentItem=null;window._itemSwiping=false;return;}
+      if(Math.abs(my)>Math.abs(mx)&&Math.abs(my)>8){
+        currentItem.style.willChange='';
+        currentItem=null;currentActions=null;window._itemSwiping=false;return;
+      }
       if(Math.abs(mx)>Math.abs(my)&&Math.abs(mx)>10){
-        if(mx>0){currentItem.style.transition='';currentItem.style.transform='';currentItem=null;window._itemSwiping=false;return;}
+        if(mx>0&&!wasSwiped){
+          currentItem.style.transform='';currentItem.style.willChange='';
+          currentItem=null;currentActions=null;window._itemSwiping=false;return;
+        }
         swiping=true;window._itemSwiping=true;
         if(e.cancelable)e.preventDefault();
       } else {return;}
     }
     if(!swiping)return;
     if(e.cancelable)e.preventDefault();
-    dx=Math.min(0,mx); if(currentItem.classList.contains('swiped')) dx=Math.min(0,mx-160);
-    currentItem.style.transform=`translateX(${dx}px)`;
-    if(dx<-20) showOverlay(currentItem);
+    if(wasSwiped){
+      dx=Math.min(0,Math.max(-ACTIONS_W,mx-ACTIONS_W));
+    } else {
+      dx=Math.min(0,mx);
+    }
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId=requestAnimationFrame(()=>{
+      if(!currentItem)return;
+      var absDx=Math.min(Math.abs(dx),ACTIONS_W);
+      currentItem.style.transform='translate3d('+dx+'px,0,0)';
+      if(currentActions) currentActions.style.width=absDx+'px';
+    });
   },{passive:false});
 
   listEl.addEventListener('touchend',e=>{
-    if(!currentItem||!swiping)return;
-    currentItem.style.transition='transform .25s ease';
-    if(dx<-THRESHOLD){currentItem.style.transform='translateX(-160px)';currentItem.classList.add('swiped');showOverlay(currentItem);}
-    else{currentItem.style.transform='';currentItem.classList.remove('swiped');hideOverlay();}
+    if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+    if(!currentItem||!swiping){swiping=false;window._itemSwiping=false;return;}
+    currentItem.style.willChange='';
+    var T='transform .28s cubic-bezier(.25,.1,.25,1)';
+    currentItem.style.transition=T;
+    if(currentActions) currentActions.style.transition='width .28s cubic-bezier(.25,.1,.25,1)';
+    if(wasSwiped){
+      if(dx>-THRESHOLD){
+        currentItem.style.transform='';currentItem.classList.remove('swiped');
+        if(currentActions) currentActions.style.width='0px';
+      } else {
+        currentItem.style.transform='translate3d(-'+ACTIONS_W+'px,0,0)';
+        if(currentActions) currentActions.style.width=ACTIONS_W+'px';
+      }
+    } else {
+      if(dx<-THRESHOLD){
+        currentItem.style.transform='translate3d(-'+ACTIONS_W+'px,0,0)';
+        currentItem.classList.add('swiped');
+        if(currentActions) currentActions.style.width=ACTIONS_W+'px';
+      } else {
+        currentItem.style.transform='';currentItem.classList.remove('swiped');
+        if(currentActions) currentActions.style.width='0px';
+      }
+    }
+    setTimeout(()=>{
+      if(currentItem) currentItem.style.transition='';
+      if(currentActions) currentActions.style.transition='';
+    },300);
     swiping=false;window._itemSwiping=false;
   },{passive:true});
 
   document.addEventListener('touchstart',e=>{
-    if(currentItem&&!e.target.closest('.lp-item')&&!e.target.closest('#swipeOverlay')){
-      currentItem.style.transition='transform .25s ease'; currentItem.style.transform=''; currentItem.classList.remove('swiped'); hideOverlay(); currentItem=null;
+    if(currentItem&&!e.target.closest('.lp-item')&&!e.target.closest('.swipe-actions')){
+      closeCurrent();
     }
   },{passive:true});
 }
