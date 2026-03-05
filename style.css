@@ -155,8 +155,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .stats-wrap{display:flex;gap:0}
 .stat-col{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:0 10px}
 .stat-col+.stat-col{border-left:1px solid var(--border-l)}
-.cal-day.has-photo.selected{border:3px solid var(--tab-color) !important;border-radius:10px !important;box-shadow:none;padding:0;overflow:hidden}
-.cal-day.has-photo.selected .cal-photo-bg{border-radius:7px;inset:0}
+.cal-day.has-photo.selected{border:3px solid var(--tab-color) !important;border-radius:10px !important;box-shadow:none;padding:0;overflow:hidden;background:transparent !important}
+.cal-day.has-photo.selected .cal-photo-bg{border-radius:0;inset:0}
 .stat-big{font-size:20px;font-weight:300;font-family:'Pretendard',-apple-system,sans-serif;color:var(--tx);line-height:1.1;letter-spacing:-0.5px}
 .stat-sub{font-size:10px;color:var(--tx-hint);margin-top:3px;font-family:'Pretendard',sans-serif;white-space:normal;line-height:1.5;text-align:center}
 .stat-big .unit{font-size:13px;letter-spacing:0;color:var(--tx-m);font-family:'Pretendard',sans-serif}
@@ -315,13 +315,13 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .cal-day:hover:not(.empty):not(.selected):not(.has-entry){background:rgba(0,0,0,.04)}
 .cal-day.has-entry{background:var(--tab-color);color:white;font-weight:600;border-radius:10px}
 .cal-day.selected{border:2px solid var(--tab-color);color:var(--tab-color);font-weight:600;background:color-mix(in srgb, var(--tab-color) 8%, transparent);border-radius:10px}
-.cal-day.has-entry.selected{background:var(--tab-color);border:3px solid var(--tab-color);color:white;border-radius:10px}
-.cal-day.has-photo.selected{border:3px solid var(--tab-color) !important;border-radius:10px !important;box-shadow:none;padding:0;overflow:hidden}
-.cal-day.has-photo.selected .cal-photo-bg{border-radius:7px;inset:0}
+.cal-day.has-entry.selected{background:var(--tab-color);border:3px solid var(--tab-color);color:white;border-radius:10px;overflow:hidden}
+.cal-day.has-photo.selected{border:3px solid var(--tab-color) !important;border-radius:10px !important;box-shadow:none;padding:0;overflow:hidden;background:transparent !important}
+.cal-day.has-photo.selected .cal-photo-bg{border-radius:0;inset:0}
 .cal-day.today:not(.has-entry):not(.selected){color:var(--tab-color);font-weight:700;background:color-mix(in srgb, var(--tab-color) 10%, white);border-radius:10px}
-.cal-photo-bg{position:absolute;inset:0;background-size:cover;background-position:center;border-radius:10px;z-index:1}
+.cal-photo-bg{position:absolute;inset:-3px;background-size:cover;background-position:center;border-radius:10px;z-index:1}
 .cal-day.has-photo{color:white!important;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.8);background:transparent!important;border:3px solid transparent}
-.cal-day.has-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.5));border-radius:10px;z-index:2;pointer-events:none}
+.cal-day.has-photo::after{content:'';position:absolute;inset:-3px;background:linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.5));border-radius:10px;z-index:2;pointer-events:none}
 .cal-day-num{position:relative;z-index:3}
 .cal-separator{height:1px;background:var(--border-l);margin:0 14px}
 
