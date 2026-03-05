@@ -572,7 +572,7 @@ window._gestureReady=false;
     if(target.closest('.ed-title'))return false;
     if(target.closest('.special-form'))return false;
     if(target.closest('[contenteditable="true"]')){
-      if(isTablet()&&editorEl){
+      if(isTablet()&&!isMouse&&editorEl){
         window._gestureFromEditable=true;
       }else{return false;}
     }
@@ -589,35 +589,19 @@ window._gestureReady=false;
     LIST_W=listEl?Math.round(listEl.getBoundingClientRect().width)||300:300;
   }
 
-  // CSS가 실제로 적용하는 transform 값을 읽어오는 함수
-  function getComputedTranslateX(el){
-    if(!el) return 0;
-    var style=window.getComputedStyle(el);
-    var matrix=style.transform || style.webkitTransform;
-    if(!matrix || matrix==='none') return 0;
-    var m=matrix.match(/matrix.*\((.+)\)/);
-    if(!m) return 0;
-    var values=m[1].split(',').map(function(v){return parseFloat(v.trim());});
-    // matrix(a,b,c,d,tx,ty) or matrix3d(...,tx,...,ty,...)
-    if(values.length===6) return values[4];
-    if(values.length===16) return values[12];
-    return 0;
+  // 태블릿 상태별 기본 위치 계산 (DOM 읽기 없이)
+  function getTabletBasePositions(st){
+    if(st==='side-open') return {side:0, list:SIDE_W, editor:SIDE_W+LIST_W};
+    if(st==='editor-only') return {side:-SIDE_W, list:-LIST_W, editor:0};
+    return {side:-SIDE_W, list:0, editor:LIST_W};
   }
 
-  // 제스처 시작 시 각 패널의 현재 실제 위치를 스냅샷
-  var snapSide=0, snapList=0, snapEditor=0;
-  function snapshotTabletPositions(){
-    // 인라인 스타일이 없는 상태에서 CSS가 적용한 transform을 읽음
-    snapSide=getComputedTranslateX(sideEl);
-    snapList=getComputedTranslateX(listEl);
-    snapEditor=getComputedTranslateX(editorEl);
-  }
-
+   // ⚠️ gesture-active는 transition:none + overflow:hidden만 적용됨.
+   // CSS에서 .gesture-active .editor에 width를 변경하면 튕김 버그 재발. 절대 금지.
    function tabletMove(dx){
     var state=startState;
 
-    app.classList.add('gesture-active');
-    allPanels.forEach(function(el){if(el){el.style.transition='none';el.style.webkitTransition='none';}});
+    if(Math.abs(dx)>20&&!app.classList.contains('gesture-active')) app.classList.add('gesture-active');
 
     var setPos=function(el,x){if(el)el.style.transform='translate3d('+x+'px,0,0)';};
 
@@ -637,8 +621,8 @@ window._gestureReady=false;
       var raw=Math.max(0,dx);
       var rubberDx=maxRubber*(1-Math.exp(-raw/maxRubber));
       var rubberPanel=document.getElementById('sideRubber');
-      var sideHdr=sideEl.querySelector('.side-hdr');
-      var sideScroll=sideEl.querySelector('.side-scroll');
+      var sideHdr=sideEl?sideEl.querySelector('.side-hdr'):null;
+      var sideScroll=sideEl?sideEl.querySelector('.side-scroll'):null;
       if(rubberPanel){rubberPanel.style.transition='none';rubberPanel.style.width=rubberDx+'px';}
       if(sideHdr){sideHdr.style.transition='none';sideHdr.style.transform='translate3d('+rubberDx+'px,0,0)';}
       if(sideScroll){sideScroll.style.transition='none';sideScroll.style.transform='translate3d('+rubberDx+'px,0,0)';}
@@ -743,8 +727,9 @@ window._gestureReady=false;
       targetSide=-SIDE_W; targetList=-LIST_W; targetEditor=0;
     } else if(targetState==='side-open'){
       targetSide=0; targetList=SIDE_W; targetEditor=SIDE_W+LIST_W;
-    } else {
-      targetSide=snapSide; targetList=snapList; targetEditor=snapEditor;
+        } else {
+      var basePos=getTabletBasePositions(state);
+      targetSide=basePos.side; targetList=basePos.list; targetEditor=basePos.editor;
     }
 
     var T='transform .32s cubic-bezier(.25,.1,.25,1)';
@@ -755,28 +740,34 @@ window._gestureReady=false;
     setPos(listEl, targetList);
     setPos(editorEl, targetEditor);
 
+    // CSS 클래스 즉시 적용 (다음 제스처 상태 판정을 위해)
+    if(didSwipe){
+      if(state==='list-editor'&&swipeDir==='right') app.classList.add('tablet-side-open');
+      else if(state==='list-editor'&&swipeDir==='left') app.classList.add('tablet-list-closed');
+      else if(state==='side-open'&&swipeDir==='left') app.classList.remove('tablet-side-open');
+      else if(state==='editor-only'&&swipeDir==='right') app.classList.remove('tablet-list-closed');
+    }
 
-    // 애니메이션 완료 후 CSS 클래스로 전환
-    var transitionDone=false;
-    var finalize=function(){
-      if(transitionDone) return;
-      transitionDone=true;
-      console.log('[FINALIZE] didSwipe='+didSwipe+' state='+state+' dir='+swipeDir);
-      // CSS 클래스 먼저 적용
-      if(didSwipe){
-        if(state==='list-editor'&&swipeDir==='right') app.classList.add('tablet-side-open');
-        else if(state==='list-editor'&&swipeDir==='left') app.classList.add('tablet-list-closed');
-        else if(state==='side-open'&&swipeDir==='left') app.classList.remove('tablet-side-open');
-        else if(state==='editor-only'&&swipeDir==='right') app.classList.remove('tablet-list-closed');
-      }
-      console.log('[FINALIZE] classes after: '+app.className);
-      // 인라인 스타일 제거 → CSS 클래스 기반 레이아웃으로 복귀
+    // 애니메이션 완료 후 인라인 스타일 정리
+    var cleaned=false;
+    var cleanup=function(){
+      if(cleaned) return;
+      cleaned=true;
       clearInlineStyles();
       if(typeof updateBackBtnIcon==='function') updateBackBtnIcon();
     };
 
-    // transitionend 이벤트로 정확한 타이밍에 finalize
-    setTimeout(finalize, 350);
+    var fTarget=listEl||editorEl;
+    if(fTarget){
+      var onTEnd=function(ev){
+        if(ev.propertyName==='transform'){
+          fTarget.removeEventListener('transitionend',onTEnd);
+          cleanup();
+        }
+      };
+      fTarget.addEventListener('transitionend',onTEnd);
+    }
+    setTimeout(cleanup, 400);
   }
 
 
@@ -840,8 +831,6 @@ window._gestureReady=false;
     if(isTablet()){
       getTabletSizes();
       startState=getTabletState();
-      snapshotTabletPositions();
-      console.log('[GESTURE START] tablet state='+startState+' snap: side='+snapSide+' list='+snapList+' editor='+snapEditor+' SIDE_W='+SIDE_W+' LIST_W='+LIST_W);
     }
     else if(isPC()) startState=getPCState();
 
@@ -880,13 +869,18 @@ window._gestureReady=false;
       e.preventDefault();
       e.stopPropagation();
       var dx2=x-sx;
-      if(isTablet()) tabletMove(dx2);
-      else if(isPC()) pcMove(dx2);
+      if(window._gestureRaf) cancelAnimationFrame(window._gestureRaf);
+      window._gestureRaf=requestAnimationFrame(function(){
+        window._gestureRaf=null;
+        if(isTablet()) tabletMove(dx2);
+        else if(isPC()) pcMove(dx2);
+      });
     }
   }
 
   function handleEnd(x){
     window._gestureActive=false;
+    if(window._gestureRaf){cancelAnimationFrame(window._gestureRaf);window._gestureRaf=null;}
     var _pl=document.getElementById('pane-list');
     if(!tracking||!swiping||window.innerWidth<=768){resetState();if(_pl)_pl.style.touchAction='';return;}
     var dx=x-sx;
@@ -921,10 +915,9 @@ window._gestureReady=false;
     if(window.innerWidth<=768)return;
     if(window.innerWidth>1400)return;
     if(e.button!==0)return;
-    if(e.target.closest('[contenteditable]')&&e.target.tagName!=='IMG'){
-      var ce=e.target.closest('[contenteditable]');
-      var sel=window.getSelection();
-      if(ce&&document.activeElement===ce&&sel&&!sel.isCollapsed)return;
+    if(e.target.closest('[contenteditable]')){
+      isMouse=true;
+      return;
     }
     isMouse=true;
     handleStart(e.clientX,e.clientY,e.target);

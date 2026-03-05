@@ -640,6 +640,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
    태블릿 (769px ~ 1024px) — 3단, 사이드바 다크
    ═══════════════════════════════════════ */
 @media(min-width:769px) and (max-width:1400px){
+  .app{background:var(--bg-white)!important}
   .side-hdr{border-bottom:none!important}
   .side-hdr::after{display:none!important}
   .lp-hdr{border-bottom:none!important}
@@ -677,10 +678,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .app.tablet-side-open.tablet-list-closed .list-panel{
     transform:translateX(-300px);
   }
-  .editor{
+   .editor{
     position:fixed;top:0;bottom:0;
     left:0;right:auto;
-    width:100vw;
+    width:calc(100vw - 300px);
     min-width:0;z-index:10;
     padding-left:0;
     transition:transform .32s cubic-bezier(.25,.1,.25,1);
@@ -692,12 +693,22 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .app.tablet-list-closed .editor{
     transform:translateX(0);
+    width:100vw;
   }
   .app.tablet-side-open .editor{
     transform:translateX(540px);
+    width:calc(100vw - 540px);
   }
   .app.tablet-side-open.tablet-list-closed .editor{
     transform:translateX(0);
+    width:100vw;
+  }
+  /* ⚠️ 절대 수정 금지 — 이 규칙을 width:100vw 등으로 변경하면
+     태블릿에서 에디터 본문이 튕기는 고질적 버그가 재발함.
+     제스처 중 에디터 width는 CSS 상태값 그대로 유지해야 함.
+     overflow:hidden만 설정할 것. (2026-03-05 확정) */
+  .app.gesture-active .editor{
+    overflow:hidden !important;
   }
 
   /* 기존 sidebar-closed/list-closed는 태블릿에서 무시 */
