@@ -31,6 +31,48 @@ function setupEnterKey() {
   });
 }
 
+// ═══ Aa 서식 메뉴 ═══
+function toggleAaMenu(e) {
+  e.stopPropagation();
+  var menu = document.getElementById('aaDropdownMenu');
+  var edMenu = document.getElementById('editorDropdownMenu');
+  if(edMenu) edMenu.classList.remove('open');
+  var tabDD = document.getElementById('edTabDropdown');
+  if(tabDD) tabDD.classList.remove('open');
+  var overlay = document.getElementById('lpPopupOverlay');
+  if(overlay && overlay.classList.contains('open')) closeLpPopup();
+  menu.classList.toggle('open');
+}
+
+function aaAction(type) {
+  var menu = document.getElementById('aaDropdownMenu');
+  menu.classList.remove('open');
+  var target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
+  target.focus();
+  switch(type) {
+    case 'h1': document.execCommand('formatBlock', false, '<h1>'); break;
+    case 'h2': document.execCommand('formatBlock', false, '<h2>'); break;
+    case 'h3': document.execCommand('formatBlock', false, '<h3>'); break;
+    case 'ul': document.execCommand('insertUnorderedList'); break;
+    case 'ol': document.execCommand('insertOrderedList'); break;
+    case 'check': insertChecklist(); break;
+    case 'quote': document.execCommand('formatBlock', false, '<blockquote>'); break;
+    case 'hr': document.execCommand('insertHorizontalRule'); break;
+  }
+  updateWC();
+  if(textTypes.includes(activeTab)) saveCurDoc(activeTab);
+  else if(activeTab==='memo') saveMemo();
+}
+
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('aaDropdownMenu');
+  if(menu && menu.classList.contains('open')) {
+    if(!e.target.closest('.ed-aa-btn') && !e.target.closest('.aa-menu')) {
+      menu.classList.remove('open');
+    }
+  }
+});
+
 function toggleHeadingMenu() { document.getElementById('headingDropdown').classList.toggle('open'); }
 function applyHeading(tag)   { document.getElementById('headingDropdown').classList.remove('open'); execCmd('formatBlock', tag); }
 
@@ -529,6 +571,15 @@ function setupGesturesAndUI() {
       if(sh){sh.style.transition='';sh.style.transform='';}
       if(ss){ss.style.transition='';ss.style.transform='';}
     }
+    var erp=document.getElementById('editorRubber');
+    if(erp){erp.style.transition='';erp.style.width='0';}
+    var cEdTopbar=editorEl?editorEl.querySelector('.ed-topbar'):null;
+    var cEdToolbar=document.getElementById('edToolbar');
+    var cEdText=document.getElementById('editorText');
+    var cEdBook=document.getElementById('editorBook');
+    var cEdQuote=document.getElementById('editorQuote');
+    var cEdMemo=document.getElementById('editorMemo');
+    [cEdTopbar,cEdToolbar,cEdText,cEdBook,cEdQuote,cEdMemo].forEach(function(el){if(el){el.style.transition='';el.style.transform='';}});
   }
   function animateBack(){
     var T='transform .25s ease, opacity .25s';
@@ -541,6 +592,15 @@ function setupGesturesAndUI() {
       if(sh){sh.style.transition='transform .25s ease';sh.style.transform='';}
       if(ss){ss.style.transition='transform .25s ease';ss.style.transform='';}
     }
+    var edRubber=document.getElementById('editorRubber');
+    if(edRubber){edRubber.style.transition='width .25s ease';edRubber.style.width='0';}
+    var edTopbar2=editorEl?editorEl.querySelector('.ed-topbar'):null;
+    var edToolbar2=document.getElementById('edToolbar');
+    var edText2=document.getElementById('editorText');
+    var edBook2=document.getElementById('editorBook');
+    var edQuote2=document.getElementById('editorQuote');
+    var edMemo2=document.getElementById('editorMemo');
+    [edTopbar2,edToolbar2,edText2,edBook2,edQuote2,edMemo2].forEach(function(el){if(el){el.style.transition='transform .25s ease';el.style.transform='';}});
     setTimeout(cleanStyles,280);
   }
 

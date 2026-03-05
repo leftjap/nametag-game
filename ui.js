@@ -147,23 +147,33 @@ function renderWritingGrid() {
   nav.innerHTML = html;
 }
 
+// ═══ 에디터 탭 라벨 업데이트 ═══
+function updateEdTabLabel() {
+  var label = document.getElementById('edTabLabel');
+  if(label) label.textContent = TAB_META[activeTab] || '';
+}
+
 window.addEventListener('resize', () => { renderWritingGrid(); renderChk(); updateBackBtnIcon(); });
-function switchTab(t) {
+function switchTab(t, keepLayout) {
   if(textTypes.includes(activeTab)) saveCurDoc(activeTab);
   activeTab = t;
   applyTabColor(t);
+  updateEdTabLabel();
   document.getElementById('editorText').style.display  = textTypes.includes(t) ? 'flex':'none';
   document.getElementById('editorBook').style.display  = t==='book'  ? 'flex':'none';
   document.getElementById('editorQuote').style.display = t==='quote' ? 'flex':'none';
   document.getElementById('editorMemo').style.display  = t==='memo'  ? 'flex':'none';
   document.getElementById('edToolbar').style.display   = ['book','quote'].includes(t) ? 'none':'flex';
   clearSearch(); hideRoutineCard(); switchListView('list');
-  // 태블릿: 사이드바 열려있으면 닫으면서 리스트로 전환
-  const app = document.getElementById('mainApp');
-  if(window.innerWidth >= 769 && window.innerWidth <= 1400 && app.classList.contains('tablet-side-open')) {
-    app.classList.remove('tablet-side-open');
+  if(!keepLayout) {
+    // 사이드바 메뉴에서 호출: 레이아웃 전환
+    const app = document.getElementById('mainApp');
+    if(window.innerWidth >= 769 && window.innerWidth <= 1400 && app.classList.contains('tablet-side-open')) {
+      app.classList.remove('tablet-side-open');
+    }
+    setMobileView('list');
   }
-  setMobileView('list'); updateBackBtnIcon(); if(textTypes.includes(t)) { const docs=getDocs(t);
+  updateBackBtnIcon(); if(textTypes.includes(t)) { const docs=getDocs(t);
  if(curIds[t])loadDoc(t,curIds[t],true); else if(docs.length)loadDoc(t,docs[0].id,true); else{const nd=newDoc(t);loadDoc(t,nd.id,true);} }
   if(t==='book')  { if(curBookId)loadBook(curBookId,true); else{const b=getBooks();if(b.length)loadBook(b[0].id,true);else newBook();} }
   if(t==='memo')  { if(curMemoId)loadMemo(curMemoId,true); else{const m=getMemos();if(m.length)loadMemo(m[0].id,true);else newMemoForm();} }
@@ -579,6 +589,13 @@ function renderListPanel() {
 function toggleEditorMenu(e) {
   e.stopPropagation();
 
+  // Aa 메뉴 닫기
+  var aaMenu = document.getElementById('aaDropdownMenu');
+  if(aaMenu) aaMenu.classList.remove('open');
+  // 탭 드롭다운 닫기
+  var tabDD = document.getElementById('edTabDropdown');
+  if(tabDD) tabDD.classList.remove('open');
+
   // 이미 팝업이 열려 있으면 닫기
   const overlay = document.getElementById('lpPopupOverlay');
   if(overlay && overlay.classList.contains('open')) {
@@ -628,6 +645,10 @@ function toggleEditorMenu(e) {
   menuHtml += '<span>본문 복사</span>';
   menuHtml += '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>';
   menuHtml += '<div class="lp-popup-sep"></div>';
+  menuHtml += '<div class="lp-popup-menu-item" onclick="lpPopupAction(\'photo\')">';
+  menuHtml += '<span>사진 추가</span>';
+  menuHtml += '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
+  menuHtml += '<div class="lp-popup-sep"></div>';
   menuHtml += '<div class="lp-popup-menu-item danger" onclick="lpPopupAction(\'delete\')">';
   menuHtml += '<span>삭제</span>';
   menuHtml += '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>';
@@ -657,70 +678,6 @@ function toggleEditorMenu(e) {
   window._liftedClone = null;
   overlay.classList.add('open');
   requestAnimationFrame(function() { card.classList.add('open'); });
-}
-
-function editorMenuAction(action) {
-  const menu = document.getElementById('editorDropdownMenu');
-  menu.classList.remove('open');
-
-  if(action==='wordcount') return;
-
-  if(action==='pin') {
-    let id=null, type=activeTab;
-    if(textTypes.includes(activeTab)) id=curIds[activeTab];
-    else if(activeTab==='book') id=curBookId;
-    else if(activeTab==='quote') id=curQuoteId;
-    else if(activeTab==='memo') id=curMemoId;
-    if(id) {
-      const fakeEvent = {stopPropagation:()=>{}};
-      togglePin(type, id, fakeEvent);
-    }
-    return;
-  }
-
-  if(action==='copymd') {
-    const target = activeTab==='memo' ? document.getElementById('memo-body') : document.getElementById('edBody');
-    if(!target) return;
-    let md = '';
-    function traverse(el) {
-      if(el.nodeType===Node.TEXT_NODE) { md+=el.nodeValue; return; }
-      if(el.nodeType!==Node.ELEMENT_NODE) return;
-      const tag=el.tagName.toLowerCase();
-      if(tag==='br') { md+='\n'; return; }
-      if(tag==='h1') md+='\n# ';
-      if(tag==='h2') md+='\n## ';
-      if(tag==='h3') md+='\n### ';
-      if(tag==='blockquote') md+='\n> ';
-      if(tag==='li') md+='\n- ';
-      if(tag==='hr') { md+='\n---\n'; return; }
-      if(tag==='img') { return; }
-      for(let child of el.childNodes) traverse(child);
-      if(['div','p','h1','h2','h3','blockquote','li'].includes(tag)) md+='\n';
-    }
-    traverse(target);
-    md = md.replace(/\n{3,}/g,'\n\n').trim();
-    navigator.clipboard.writeText(md).then(()=>{
-      const status = document.getElementById('edSaveStatus');
-      if(status) { status.style.display='inline'; status.textContent='복사됨'; setTimeout(()=>{status.style.display='none';},1500); }
-    }).catch(()=>{});
-    return;
-  }
-
- 
-
-  if(action==='delete') {
-    const fakeEvent = {stopPropagation:()=>{}};
-    if(textTypes.includes(activeTab) && curIds[activeTab]) {
-      delDoc(activeTab, curIds[activeTab], fakeEvent);
-    } else if(activeTab==='book' && curBookId) {
-      delBook(curBookId, fakeEvent);
-    } else if(activeTab==='quote' && curQuoteId) {
-      delQuote(curQuoteId, fakeEvent);
-    } else if(activeTab==='memo' && curMemoId) {
-      delMemo(curMemoId, fakeEvent);
-    }
-    return;
-  }
 }
 
 document.addEventListener('click', e => {
@@ -1038,6 +995,9 @@ function lpPopupAction(action) {
     }
     navigator.clipboard.writeText(md.trim()).catch(() => {});
     closeLpPopup();
+  } else if (action === 'photo') {
+    closeLpPopup();
+    document.getElementById('fileInput').click();
   } else if (action === 'delete') {
     closeLpPopup();
     const fakeEvent = { stopPropagation: () => {} };

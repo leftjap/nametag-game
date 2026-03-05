@@ -493,6 +493,8 @@ function init() {
     if (naviDocs.length) loadDoc('navi', naviDocs[0].id, true);
     else { const nd = newDoc('navi'); loadDoc('navi', nd.id, true); }
 
+    if(typeof updateEdTabLabel==='function') updateEdTabLabel();
+    if(typeof updateEdTabLabel==='function') updateEdTabLabel();
     if (GAS_URL) SYNC.setSyncStatus('완료됨', 'ok');
     else SYNC.setSyncStatus('로컬 전용', 'error');
 
