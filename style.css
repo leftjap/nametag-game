@@ -817,7 +817,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .mobile-nav-btn{display:flex!important}
   .mobile-back-btn{display:flex!important;width:34px;height:34px;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--tx-m);margin-left:-6px}
   .mobile-back-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  .ed-btn-done{display:block;background:none;border:none;color:var(--tab-color);font-size:14px;font-weight:600;cursor:pointer;padding:6px 10px}
+  .ed-btn-done{display:none}
   .pc-only{display:none!important}
 
   .edge-swipe-zone{

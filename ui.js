@@ -801,9 +801,10 @@ function showContextMenuAt(item, x, y) {
   const txt = target ? target.textContent.trim() : '';
   const chars = txt.replace(/\s/g, '').length;
   const pages = (chars / 200).toFixed(1);
+  const words = txt.split(/\s+/).filter(x=>x).length;
   const charEl = document.getElementById('menuCharCount');
   const pageEl = document.getElementById('menuPageCount');
-  if (charEl) charEl.textContent = chars.toLocaleString() + '자';
+  if (charEl) charEl.textContent = words.toLocaleString() + '단어';
   if (pageEl) pageEl.textContent = pages + '매';
 
   const pinLabel = document.getElementById('menuPinLabel');
