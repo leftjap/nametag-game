@@ -1095,6 +1095,22 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     touch-action:pan-y;
   }
 }
+/* ═══ PC 최소폭: 에디터(본문) 우선 표시 ═══ */
+@media(max-width:768px) and (pointer:fine){
+  .editor{
+    transform:translateX(0) !important;
+    visibility:visible !important;
+  }
+  .app.view-list .editor{
+    transform:translateX(0) !important;
+    visibility:visible !important;
+  }
+  .app.view-list .list-panel{
+    transform:translateX(-100%) !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+}
 /* ═══ 루틴 카드 (2단 리스트 상단) ═══ */
 .pane-routine{
   padding:0;
