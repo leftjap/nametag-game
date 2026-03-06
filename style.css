@@ -298,7 +298,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .photo-date-block{position:absolute;right:12px;bottom:10px;left:auto;text-align:right;pointer-events:none;line-height:1;z-index:2}
 .photo-day-num{display:block;font-family:'Inter',-apple-system,'Helvetica Neue',sans-serif;font-size:40px;font-weight:400;color:white;letter-spacing:-1.5px;line-height:.9;text-shadow:0 2px 10px rgba(0,0,0,.6)}
 .photo-cell.solo .photo-day-num{font-size:56px}
-.photo-ym{display:block;font-size:12px;font-weight:500;color:rgba(255,255,255,.85);margin-top:4px;letter-spacing:.3px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.photo-ym{display:block;font-size:14px;font-weight:500;color:rgba(255,255,255,.85);margin-top:4px;letter-spacing:.3px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
 .photo-cell.solo .photo-ym{font-size:12px}
 
 /* ═══ 캘린더 ═══ */
