@@ -1286,7 +1286,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   letter-spacing:-0.5px;line-height:1.2;
 }
 .rhythm-stat-unit{font-size:12px;color:var(--tx-m);font-weight:400}
-.rhythm-stat-label{font-size:13px;color:var(--tx);font-weight:400;margin-top:1px}
+.rhythm-stat-label{font-size:13px;color:var(--tx-m);font-weight:400;margin-top:1px}
 
 .rhythm-chart{
   display:flex;align-items:flex-end;gap:2px;
