@@ -749,17 +749,15 @@ function saveExpenseForm(mode = 'normal') {
     // 모달: 닫고 대시보드 갱신
     closeExpenseModal();
     if (window.innerWidth > 768) {
-      renderExpenseDashboardList();
-      showExpenseFullDashboard();
+      renderExpenseDashboard('pc');
     }
     return;
   } else if (window.innerWidth <= 768) {
     // 모바일: 대시보드 화면으로 전환
-    renderExpenseDashboard();
+    renderExpenseDashboard('mobile');
     setMobileView('list');
   } else {
     // PC 에디터: 폼 초기화
-    renderExpenseDashboard();
     newExpenseForm();
   }
 }
