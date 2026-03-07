@@ -233,6 +233,12 @@ function switchTab(t, keepLayout) {
       // 에디터: 입력 폼
       newExpenseForm();
       renderExpenseCategoryGrid();
+
+      // 모바일: 사이드바 닫고 리스트 뷰로 전환
+      var mApp = document.getElementById('mainApp');
+      mApp.classList.remove('view-side');
+      mApp.classList.remove('view-editor');
+      mApp.classList.add('view-list');
     }
   } else {
     // ── 가계부에서 나올 때 복원 ──
