@@ -175,7 +175,8 @@ function setupGesturesAndUI() {
     else if (savedState === 'list'   && savedDir === 'right' && (pctMoved > 0.4 || (mVelocity > 0.5 && pctMoved > 0.2))) didSwipe = true;
     else if (savedState === 'editor' && savedDir === 'right' && (pctMoved > 0.4 || (mVelocity > 0.5 && pctMoved > 0.2))) didSwipe = true;
 
-    // 가계부 모바일: 우 스와이프 시 사이드바 대신 B→A 또는 무시
+    // 가계부 모바일: 우 스와이프 시 B(전체내역)→A(대시보드) 전환
+    // A(대시보드)에서는 일반 스와이프 로직으로 fallthrough하여 사이드바 이동 허용
     if (savedDir === 'right'
         && typeof activeTab !== 'undefined' && activeTab === 'expense') {
       var mDetail = document.getElementById('pane-expense-detail');
@@ -183,11 +184,10 @@ function setupGesturesAndUI() {
       if (mDetailVisible) {
         animateBack();
         setTimeout(function() { showExpenseDashboardFromDetailMobile(); }, 50);
-      } else {
-        animateBack();
+        swiping = false; swipeDir = null; decided = false; startState = null;
+        return;
       }
-      swiping = false; swipeDir = null; decided = false; startState = null;
-      return;
+      // mDetailVisible이 false인 경우: return하지 않고 아래 일반 스와이프 로직으로 계속 진행
     }
 
     if ((savedState === 'side' && savedDir === 'right') || (savedState === 'editor' && savedDir === 'left')) {
