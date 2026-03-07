@@ -138,10 +138,19 @@ function setupGesturesAndUI() {
       if (sideEl) sideEl.style.transform = `translate3d(${move}px,0,0)`;
       if (listEl) { listEl.style.transform = `translate3d(${Math.max(0, _sideW + dx)}px,0,0)`; listEl.style.opacity = String(Math.min(1, 0.4 + prog * 0.6)); }
     } else if (startState === 'list' && swipeDir === 'right') {
-      const move = Math.max(0, Math.min(dx, _sideW));
-      const prog = move / _sideW;
-      if (sideEl) sideEl.style.transform = `translate3d(${-_sideW + move}px,0,0)`;
-      if (listEl) { listEl.style.transform = `translate3d(${move}px,0,0)`; listEl.style.opacity = String(Math.max(0.5, 1 - prog * 0.5)); }
+      // 가계부 B(전체내역) 화면이면 detail pane만 밀기
+      var _mDetailMove = (typeof activeTab !== 'undefined' && activeTab === 'expense')
+        ? document.getElementById('pane-expense-detail') : null;
+      var _mDetailVisibleMove = _mDetailMove && window.getComputedStyle(_mDetailMove).display !== 'none';
+      if (_mDetailVisibleMove) {
+        var moveExp = Math.max(0, dx);
+        _mDetailMove.style.transform = 'translate3d(' + moveExp + 'px,0,0)';
+      } else {
+        const move = Math.max(0, Math.min(dx, _sideW));
+        const prog = move / _sideW;
+        if (sideEl) sideEl.style.transform = `translate3d(${-_sideW + move}px,0,0)`;
+        if (listEl) { listEl.style.transform = `translate3d(${move}px,0,0)`; listEl.style.opacity = String(Math.max(0.5, 1 - prog * 0.5)); }
+      }
     } else if (startState === 'editor' && swipeDir === 'left') {
       const maxRubber = 80, raw = Math.max(0, Math.abs(dx));
       const rubberDx  = maxRubber * (1 - Math.exp(-raw / maxRubber));
@@ -182,8 +191,49 @@ function setupGesturesAndUI() {
       var mDetail = document.getElementById('pane-expense-detail');
       var mDetailVisible = mDetail && window.getComputedStyle(mDetail).display !== 'none';
       if (mDetailVisible) {
-        animateBack();
-        setTimeout(function() { showExpenseDashboardFromDetailMobile(); }, 50);
+        var _vwExp = window.innerWidth;
+        var pctMovedExp = Math.abs(dx) / _vwExp;
+        var didSwipeExp = pctMovedExp > 0.4 || (mVelocity > 0.5 && pctMovedExp > 0.2);
+        // 먼저 side, list-panel, editor의 스와이프 중간 상태를 원래로 되돌림
+        allEls.forEach(function(el) { if (el) { el.style.transition = 'none'; el.style.transform = ''; el.style.opacity = ''; } });
+        if (sideEl) {
+          var sh = sideEl.querySelector('.side-hdr'), ss = sideEl.querySelector('.side-scroll');
+          if (sh) { sh.style.transition = 'none'; sh.style.transform = ''; }
+          if (ss) { ss.style.transition = 'none'; ss.style.transform = ''; }
+        }
+        var rp = document.getElementById('sideRubber');
+        if (rp) { rp.style.transition = 'none'; rp.style.width = '0'; }
+        if (didSwipeExp) {
+          // pane-expense-detail을 현재 dx 위치에서 화면 오른쪽 끝으로 슬라이드 아웃
+          var currentDx = Math.max(0, dx);
+          mDetail.style.transition = 'none';
+          mDetail.style.transform = 'translate3d(' + currentDx + 'px,0,0)';
+          mDetail.style.position = 'relative';
+          var remainDurExp = Math.max(0.15, 0.3 * (1 - pctMovedExp));
+          var remainStrExp = remainDurExp.toFixed(2) + 's';
+          requestAnimationFrame(function() {
+            mDetail.style.transition = 'transform ' + remainStrExp + ' cubic-bezier(.25,.46,.45,.94)';
+            mDetail.style.transform = 'translate3d(' + _vwExp + 'px,0,0)';
+            setTimeout(function() {
+              mDetail.style.transition = '';
+              mDetail.style.transform = '';
+              mDetail.style.position = '';
+              showExpenseDashboardFromDetailMobile();
+            }, Math.round(remainDurExp * 1000) + 30);
+          });
+        } else {
+          // 스와이프 부족: detail pane이 밀려 있었다면 제자리로 복귀
+          mDetail.style.transition = 'transform 0.3s cubic-bezier(.25,.46,.45,.94)';
+          mDetail.style.transform = 'translate3d(0,0,0)';
+          setTimeout(function() {
+            mDetail.style.transition = '';
+            mDetail.style.transform = '';
+          }, 350);
+        }
+        // 패널 인라인 스타일 정리
+        requestAnimationFrame(function() {
+          allEls.forEach(function(el) { if (el) { el.style.transition = ''; } });
+        });
         swiping = false; swipeDir = null; decided = false; startState = null;
         return;
       }
