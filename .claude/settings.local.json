@@ -1,8 +1,7 @@
 {
+  "autoApprove": ["Bash", "Write", "Edit"],
   "permissions": {
-    "allow": [
-      "Bash",
-      "Write"
-    ]
+    "allow": ["Bash", "Write", "Edit"],
+    "deny": []
   }
 }
