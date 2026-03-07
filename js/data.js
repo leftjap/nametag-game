@@ -7,7 +7,7 @@ let activeTab = 'navi';
 const textTypes = ['navi', 'fiction', 'blog'];
 const TAB_META  = {
   navi: '오늘의 네비', fiction: '단편 습작', blog: '블로그',
-  book: '서재', quote: '어구', memo: '메모'
+  book: '서재', quote: '어구', memo: '메모', expense: '가계부'
 };
 
 function currentLocProfile() {
@@ -355,4 +355,148 @@ function togglePin(type, id, e) {
   else                       S(K.docs,   items);
   renderListPanel();
   SYNC.scheduleDatabaseSave();
+}
+
+// ═══════════════════════════════════════
+// 가계부 (Expense) CRUD
+// ═══════════════════════════════════════
+function getExpenses() {
+  return L(K.expenses) || [];
+}
+
+function saveExpenses(arr) {
+  S(K.expenses, arr);
+}
+
+function newExpense(data) {
+  const expense = {
+    id: Date.now().toString(),
+    amount: data.amount || 0,
+    category: data.category || 'etc',
+    merchant: data.merchant || '',
+    card: data.card || '',
+    memo: data.memo || '',
+    date: data.date || today(),
+    time: data.time || '',
+    created: new Date().toISOString(),
+    source: data.source || 'manual'
+  };
+  const expenses = getExpenses();
+  expenses.unshift(expense);
+  saveExpenses(expenses);
+  return expense;
+}
+
+function updateExpense(id, data) {
+  const expenses = getExpenses();
+  const idx = expenses.findIndex(e => e.id === id);
+  if (idx !== -1) {
+    Object.assign(expenses[idx], data);
+    saveExpenses(expenses);
+  }
+}
+
+function delExpense(id) {
+  saveExpenses(getExpenses().filter(e => e.id !== id));
+}
+
+// ═══════════════════════════════════════
+// 가계부 통계 함수
+// ═══════════════════════════════════════
+function getMonthExpenses(yearMonth) {
+  return getExpenses().filter(e => e.date.startsWith(yearMonth));
+}
+
+function getMonthTotal(yearMonth) {
+  return getMonthExpenses(yearMonth).reduce((s, e) => s + e.amount, 0);
+}
+
+function getDayExpenses(dateStr) {
+  return getExpenses().filter(e => e.date === dateStr);
+}
+
+function getDayTotal(dateStr) {
+  return getDayExpenses(dateStr).reduce((s, e) => s + e.amount, 0);
+}
+
+function getExpensePace() {
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const thisYM = getLocalYMD(now).slice(0, 7);
+
+  const thisMonthSoFar = getMonthExpenses(thisYM)
+    .filter(e => parseInt(e.date.slice(8, 10)) <= dayOfMonth)
+    .reduce((s, e) => s + e.amount, 0);
+
+  let pastTotals = [];
+  for (let i = 1; i <= 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const daysInThatMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    const compareTo = Math.min(dayOfMonth, daysInThatMonth);
+    const total = getMonthExpenses(ym)
+      .filter(e => parseInt(e.date.slice(8, 10)) <= compareTo)
+      .reduce((s, e) => s + e.amount, 0);
+    if (total > 0) pastTotals.push(total);
+  }
+
+  if (pastTotals.length === 0) return null;
+
+  const avg = pastTotals.reduce((a, b) => a + b, 0) / pastTotals.length;
+  const diff = thisMonthSoFar - avg;
+  const pct = avg > 0 ? Math.round(Math.abs(diff) / avg * 100) : 0;
+
+  return {
+    current: thisMonthSoFar,
+    average: Math.round(avg),
+    diff: Math.round(diff),
+    pct,
+    isLess: diff < 0
+  };
+}
+
+function getProjectedMonthTotal() {
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const thisYM = getLocalYMD(now).slice(0, 7);
+  const soFar = getMonthTotal(thisYM);
+  if (dayOfMonth === 0) return 0;
+  return Math.round(soFar / dayOfMonth * daysInMonth);
+}
+
+function getMonthlyAverage() {
+  const now = new Date();
+  let totals = [];
+  for (let i = 1; i <= 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const t = getMonthTotal(ym);
+    if (t > 0) totals.push(t);
+  }
+  if (totals.length === 0) return 0;
+  return Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
+}
+
+function getCategoryBreakdown(yearMonth) {
+  const expenses = getMonthExpenses(yearMonth);
+  const map = {};
+  EXPENSE_CATEGORIES.forEach(c => { map[c.id] = 0; });
+  expenses.forEach(e => { map[e.category] = (map[e.category] || 0) + e.amount; });
+  return EXPENSE_CATEGORIES
+    .map(c => ({ ...c, amount: map[c.id] }))
+    .filter(c => c.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+}
+
+function getMonthlyTrend() {
+  const now = new Date();
+  const result = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = (d.getMonth() + 1) + '월';
+    result.push({ ym, label, total: getMonthTotal(ym), isCurrent: i === 0 });
+  }
+  return result;
 }

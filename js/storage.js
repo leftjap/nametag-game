@@ -5,11 +5,12 @@
 // ═══ 앱 상수 ═══
 const APP_TOKEN = 'nametag2026';
 const K = {
-  docs:   'gb_docs',
-  checks: 'gb_chk',
-  books:  'gb_books',
-  quotes: 'gb_quotes',
-  memos:  'gb_memos'
+  docs:      'gb_docs',
+  checks:    'gb_chk',
+  books:     'gb_books',
+  quotes:    'gb_quotes',
+  memos:     'gb_memos',
+  expenses:  'gb_expenses'
 };
 
 // ═══ LocalStorage 읽기/쓰기 ═══
@@ -183,4 +184,74 @@ function injectMockData() {
     { id:'q5', text:'매일 조금씩, 꾸준히. 그것이 가장 강력한 마법이다.', by:'무라카미 하루키', created: new Date(now - day*7).toISOString(), pinned: false }
   ];
   S(K.quotes, quotes);
+
+  // 가계부 모의 데이터
+  if (!L(K.expenses) || L(K.expenses).length === 0) {
+    const expNow = Date.now();
+    const expDay = 86400000;
+    const sampleExpenses = [
+      { id:'ex1', amount:7700, category:'food', merchant:'세븐일레븐 홍대7번출구', card:'삼성카드', memo:'', date:getLocalYMD(new Date()), time:'18:30', created:new Date().toISOString(), source:'sms' },
+      { id:'ex2', amount:39113, category:'etc', merchant:'삼성화재', card:'KB국민계좌', memo:'보험료', date:getLocalYMD(new Date(expNow - expDay)), time:'09:00', created:new Date(expNow - expDay).toISOString(), source:'sms' },
+      { id:'ex3', amount:25101, category:'etc', merchant:'삼성화재', card:'KB국민계좌', memo:'', date:getLocalYMD(new Date(expNow - expDay)), time:'09:01', created:new Date(expNow - expDay).toISOString(), source:'sms' },
+      { id:'ex4', amount:12000, category:'food', merchant:'김치찌개집', card:'신한카드', memo:'점심', date:getLocalYMD(new Date(expNow - expDay*2)), time:'12:30', created:new Date(expNow - expDay*2).toISOString(), source:'manual' },
+      { id:'ex5', amount:4500, category:'food', merchant:'스타벅스', card:'삼성카드', memo:'', date:getLocalYMD(new Date(expNow - expDay*2)), time:'15:00', created:new Date(expNow - expDay*2).toISOString(), source:'sms' },
+      { id:'ex6', amount:8200, category:'transport', merchant:'카카오T 택시', card:'카카오페이', memo:'', date:getLocalYMD(new Date(expNow - expDay*2)), time:'19:00', created:new Date(expNow - expDay*2).toISOString(), source:'sms' },
+      { id:'ex7', amount:67800, category:'living', merchant:'이마트 마포점', card:'삼성카드', memo:'장보기', date:getLocalYMD(new Date(expNow - expDay*3)), time:'16:00', created:new Date(expNow - expDay*3).toISOString(), source:'sms' },
+      { id:'ex8', amount:393199, category:'living', merchant:'쿠팡', card:'삼성카드', memo:'', date:getLocalYMD(new Date(expNow - expDay*4)), time:'10:00', created:new Date(expNow - expDay*4).toISOString(), source:'sms' },
+      { id:'ex9', amount:117004, category:'utility', merchant:'아파트 관리비', card:'KB국민계좌', memo:'3월 관리비', date:getLocalYMD(new Date(expNow - expDay*2)), time:'00:00', created:new Date(expNow - expDay*2).toISOString(), source:'manual' },
+      { id:'ex10', amount:58353, category:'pet', merchant:'서울동물병원', card:'신한카드', memo:'정기검진', date:getLocalYMD(new Date(expNow - expDay*6)), time:'11:00', created:new Date(expNow - expDay*6).toISOString(), source:'sms' }
+    ];
+    // 이전 달 데이터도 추가 (페이스 비교용)
+    const prevMonth = new Date();
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    const prevYM = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth()+1).padStart(2,'0')}`;
+    for (let i = 1; i <= 28; i++) {
+      const d = `${prevYM}-${String(i).padStart(2,'0')}`;
+      if (Math.random() > 0.4) {
+        const amt = Math.round((Math.random() * 80000 + 5000) / 100) * 100;
+        const cats = ['food','living','transport','utility','medical','pet','culture','etc'];
+        sampleExpenses.push({
+          id: 'ex_prev_' + i, amount: amt,
+          category: cats[Math.floor(Math.random() * cats.length)],
+          merchant: '샘플가맹점', card: '삼성카드', memo: '',
+          date: d, time: '12:00',
+          created: new Date(d + 'T12:00:00').toISOString(), source: 'sms'
+        });
+      }
+    }
+    S(K.expenses, sampleExpenses);
+  }
+}
+
+// ═══════════════════════════════════════
+// 가계부 카테고리 상수
+// ═══════════════════════════════════════
+const EXPENSE_CATEGORIES = [
+  { id: 'food',      name: '식비',     color: '#e87461' },
+  { id: 'living',    name: '생활',     color: '#f0a848' },
+  { id: 'transport', name: '교통',     color: '#5a8ec4' },
+  { id: 'utility',   name: '공과금',   color: '#7cb87c' },
+  { id: 'loan',      name: '대출',     color: '#8b8b8b' },
+  { id: 'medical',   name: '의료',     color: '#9a6cb8' },
+  { id: 'pet',       name: '반려동물', color: '#d4789a' },
+  { id: 'culture',   name: '문화',     color: '#6ab0a0' },
+  { id: 'etc',       name: '기타',     color: '#b0b0b8' }
+];
+
+// ═══════════════════════════════════════
+// 금액 포맷 유틸
+// ═══════════════════════════════════════
+function formatAmount(n) {
+  if (n >= 10000) {
+    const man = Math.round(n / 10000);
+    return man + '만';
+  }
+  return n.toLocaleString();
+}
+
+function formatAmountShort(n) {
+  if (n >= 100000) return '-' + Math.round(n / 10000) + '만';
+  if (n >= 10000) return '-' + (n / 10000).toFixed(1) + '만';
+  if (n >= 1000) return '-' + (n / 1000).toFixed(1) + 'k';
+  return '-' + n;
 }

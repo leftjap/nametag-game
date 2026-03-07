@@ -162,6 +162,19 @@
       </div>
     </div>
 
+    <!-- 가계부 -->
+    <div class="sec sec-border">
+      <div class="expense-compact" onclick="switchTab('expense'); setMobileView('list');">
+        <div class="expense-compact-left">
+          <span class="expense-compact-label">가계부</span>
+        </div>
+        <div class="expense-compact-right">
+          <span class="expense-compact-amount" id="expenseCompactAmount"></span>
+          <svg class="expense-compact-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
     <!-- 기록 통계 -->
     <div class="sec" style="padding-bottom:40px;">
       <div class="sec-t" style="display:flex; justify-content:space-between; align-items:center;">기록</div>
@@ -247,6 +260,16 @@
       <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow">토</div>
     </div>
     <div class="cal-wrap" id="calWrap"></div>
+  </div>
+
+  <!-- 가계부 대시보드 -->
+  <div class="pane-expense-dashboard" id="pane-expense-dashboard" style="display:none">
+    <div id="expenseDashboard"></div>
+  </div>
+
+  <!-- 가계부 전체 내역 -->
+  <div class="pane-expense-detail" id="pane-expense-detail" style="display:none">
+    <div id="expenseDetail"></div>
   </div>
 
   <!-- 새 글 FAB -->
@@ -424,6 +447,71 @@
     </div>
   </div>
 
+  <!-- 가계부 입력/수정 에디터 -->
+  <div id="editorExpense" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="editor-scroll-area">
+      <div class="editor-content-wrap">
+
+        <!-- 지출/수입 토글 -->
+        <div class="expense-type-toggle" id="expenseTypeToggle">
+          <button class="expense-type-btn active" data-type="expense" onclick="setExpenseType('expense')">지출</button>
+          <button class="expense-type-btn" data-type="income" onclick="setExpenseType('income')">수입</button>
+        </div>
+
+        <!-- 금액 입력 -->
+        <div class="expense-amount-field">
+          <input type="text" inputmode="numeric" id="expenseAmountInput"
+                 class="expense-amount-input" placeholder="금액을 입력하세요"
+                 oninput="formatExpenseAmount(this)">
+          <span class="expense-amount-unit">원</span>
+        </div>
+
+        <!-- 지출처 입력 -->
+        <div class="expense-merchant-field">
+          <input type="text" id="expenseMerchantInput"
+                 class="expense-merchant-input" placeholder="지출처를 입력하세요">
+        </div>
+
+        <!-- 날짜/시간 -->
+        <div class="expense-date-field">
+          <span class="expense-date-label">지출일시</span>
+          <span class="expense-date-value" id="expenseDateValue" onclick="openExpenseDatePicker()"></span>
+        </div>
+
+        <!-- 카테고리 선택 -->
+        <div class="expense-category-section">
+          <span class="expense-section-label">카테고리</span>
+          <div class="expense-category-grid" id="expenseCategoryGrid">
+            <!-- JS에서 EXPENSE_CATEGORIES 기반 렌더링 -->
+          </div>
+        </div>
+
+        <!-- 카드/결제수단 (선택) -->
+        <div class="expense-optional-field">
+          <input type="text" id="expenseCardInput"
+                 class="expense-optional-input" placeholder="카드/결제수단 (선택)">
+        </div>
+
+        <!-- 메모 (선택) -->
+        <div class="expense-optional-field">
+          <input type="text" id="expenseMemoInput"
+                 class="expense-optional-input" placeholder="메모 (선택)">
+        </div>
+
+        <!-- 문자 붙여넣기 버튼 -->
+        <button class="expense-paste-btn" id="expensePasteBtn" onclick="pasteFromClipboard()">
+          문자 붙여넣기
+        </button>
+
+        <!-- 저장 버튼 -->
+        <button class="expense-save-btn" id="expenseSaveBtn" onclick="saveExpenseForm()">
+          확인
+        </button>
+
+      </div>
+    </div>
+  </div>
+
 </div><!-- /.editor -->
 
 <!-- ─── 위치 모달 ─── -->
@@ -451,14 +539,15 @@
 </div><!-- /#mainApp -->
 
 <!-- ═══ JS 로드 순서: 의존성 순서대로 ═══ -->
-<script src="js/storage.js?v=62"></script>   <!-- 1. 기본 유틸, LocalStorage, 날짜 -->
-<script src="js/routine.js?v=62"></script>   <!-- 2. 루틴 데이터 + 렌더링 -->
-<script src="js/data.js?v=62"></script>      <!-- 3. 문서/책/어구/메모 CRUD -->
-<script src="js/ui.js?v=62"></script>        <!-- 4. UI 전환, 리스트 렌더링 -->
-<script src="js/editor.js?v=62"></script>    <!-- 5. 에디터 툴바, 미디어 -->
+<script src="js/storage.js?v=63"></script>   <!-- 1. 기본 유틸, LocalStorage, 날짜 -->
+<script src="js/routine.js?v=63"></script>   <!-- 2. 루틴 데이터 + 렌더링 -->
+<script src="js/data.js?v=63"></script>      <!-- 3. 문서/책/어구/메모/가계부 CRUD -->
+<script src="js/sms-parser.js?v=63"></script> <!-- 3-1. SMS 파싱 -->
+<script src="js/ui.js?v=63"></script>        <!-- 4. UI 전환, 리스트 렌더링 -->
+<script src="js/editor.js?v=63"></script>    <!-- 5. 에디터 툴바, 미디어 -->
 <script src="js/gesture.js?v=63"></script>   <!-- 6. 제스처 (모바일/태블릿/PC) -->
-<script src="js/sync.js?v=62"></script>      <!-- 7. GAS 동기화 -->
-<script src="js/app.js?v=62"></script>       <!-- 8. 인증, init, 진입점 -->
+<script src="js/sync.js?v=63"></script>      <!-- 7. GAS 동기화 -->
+<script src="js/app.js?v=63"></script>       <!-- 8. 인증, init, 진입점 -->
 
 </body>
 </html>
