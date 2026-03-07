@@ -24,6 +24,8 @@ function showExpenseDetail(yearMonth) {
 
 function renderExpenseDashboard() {
   const container = document.getElementById('expenseDashboard');
+  if (!container) return;
+
   const thisYM = today().slice(0, 7);
   const pace = getExpensePace();
   const projected = getProjectedMonthTotal();
@@ -34,8 +36,9 @@ function renderExpenseDashboard() {
 
   // ① 이달 총액 + 페이스
   const thisMonthTotal = getMonthTotal(thisYM);
+  const totalDisplay = thisMonthTotal > 0 ? formatAmount(thisMonthTotal) : '0';
   html += `<div class="exp-summary">
-    <div class="exp-summary-title">오늘까지 ${formatAmount(thisMonthTotal)}원 썼어요</div>`;
+    <div class="exp-summary-title">오늘까지 ${totalDisplay}원 썼어요</div>`;
   if (pace) {
     const paceText = pace.isLess
       ? `지난달보다 ${formatAmount(Math.abs(pace.diff))}원 덜 쓰는 중`

@@ -47,6 +47,7 @@ async function showApp() {
   SYNC.setSyncStatus('동기화 중', 'syncing');
   await SYNC.loadDatabase();
   injectMockData();
+  injectExpenseMockData();
   // 태블릿뷰: ed-topbar-right를 body로 이동하여 스와이프 영향 차단
   if (window.innerWidth >= 769 && window.innerWidth <= 1400) {
     const topbarRight = document.querySelector('.editor .ed-topbar-right');

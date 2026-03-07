@@ -143,6 +143,18 @@ function switchTab(t, keepLayout) {
   applyTabColor(t);
   updateEdTabLabel();
 
+  // 사이드바 메뉴 활성 표시
+  const sideMenus = document.querySelectorAll('.side-menu');
+  sideMenus.forEach(m => m.classList.remove('on'));
+  const activeMenu = document.querySelector(`.side-menu[data-tab="${t}"]`);
+  if (activeMenu) activeMenu.classList.add('on');
+
+  // 가계부 compact 활성 표시
+  const expCompact = document.querySelector('.expense-compact');
+  if (expCompact) {
+    expCompact.classList.toggle('on', t === 'expense');
+  }
+
   document.getElementById('editorText').style.display  = textTypes.includes(t) ? 'flex' : 'none';
   document.getElementById('editorBook').style.display  = t === 'book'  ? 'flex' : 'none';
   document.getElementById('editorQuote').style.display = t === 'quote' ? 'flex' : 'none';
