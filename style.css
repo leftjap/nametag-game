@@ -2367,7 +2367,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* ═══ 검색 바 ═══ */
 .exp-search-bar {
   padding: 12px 20px;
-  background: var(--bg-white);
+  background: transparent;
   border-bottom: 1px solid var(--border-l);
 }
 
@@ -2376,7 +2376,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   padding: 10px 16px;
   border: 1px solid var(--border-l);
   border-radius: 8px;
-  background: var(--bg-white);
+  background: var(--bg);
   color: var(--tx);
   font-size: 14px;
 }
@@ -2510,4 +2510,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .expense-full-content {
     padding: 24px 24px 100px;
   }
+}
+
+/* 가계부 대시보드(A)와 전체 내역(B) 배경 통일 */
+#expFullDashboardPane,
+#expFullDetailPane {
+  background: var(--bg-white);
 }
