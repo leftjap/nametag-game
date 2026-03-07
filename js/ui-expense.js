@@ -308,3 +308,122 @@ function renderExpenseTimeline(yearMonth) {
 function filterExpenseDetail() {
   // TODO: 검색 필터링 구현
 }
+
+// ═══════════════════════════════════════
+// PC/태블릿용 풀 대시보드 (2+3단 통합)
+// ═══════════════════════════════════════
+function showExpenseFullDashboard() {
+  const container = document.getElementById('expenseDashboardWrap');
+  if (!container) return;
+
+  const thisYM = today().slice(0, 7);
+  const pace = getExpensePace();
+  const projected = getProjectedMonthTotal();
+  const trend = getMonthlyTrend();
+  const catBreakdown = getCategoryBreakdown(thisYM);
+
+  let html = '';
+
+  // ① 이달 요약
+  const thisMonthTotal = getMonthTotal(thisYM);
+  const totalDisplay = thisMonthTotal > 0 ? formatAmount(thisMonthTotal) : '0';
+  html += `<div class="exp-summary">
+    <div class="exp-summary-title">이달 총액: ${totalDisplay}원</div>`;
+  if (pace) {
+    const paceText = pace.isLess
+      ? `지난달보다 ${formatAmount(Math.abs(pace.diff))}원 덜 쓰는 중`
+      : `지난달보다 ${formatAmount(pace.diff)}원 더 쓰는 중`;
+    const paceClass = pace.isLess ? '' : 'over';
+    html += `<div class="exp-summary-sub ${paceClass}">${paceText}</div>`;
+  }
+  html += '</div>';
+
+  // ② 2열 구간: 누적 차트 + 카테고리 비율
+  html += '<div class="expense-dashboard-grid">';
+  html += '<div class="exp-chart-section">';
+  html += renderCumulativeChart(thisYM);
+  html += '</div>';
+  html += '<div class="exp-category-section">';
+  html += renderCategoryChart(catBreakdown);
+  html += '</div>';
+  html += '</div>';
+
+  // ③ 예상 지출 + 막대 차트
+  html += `<div class="exp-projection">
+    <div class="exp-projection-title">이번 달엔 ${formatAmount(projected)}원 쓸 것 같아요</div>
+    <div class="exp-projection-sub">한 달에 평균 ${formatAmount(getMonthlyAverage())}원 정도 써요</div>`;
+  html += renderMonthlyBarChart(trend);
+  html += '</div>';
+
+  // ④ 월간 캘린더
+  html += renderMonthCalendar(thisYM);
+
+  // ⑤ 일별 타임라인
+  html += renderExpenseTimeline(thisYM);
+
+  // ⑥ FAB 버튼 (하단 고정)
+  html += `<div style="position:fixed;bottom:32px;right:32px;z-index:100;">
+    <button class="fab-btn" onclick="openExpenseModal()" style="width:56px;height:56px;">
+      <svg viewBox="0 0 24 24" fill="white"><line x1="12" y1="5" x2="12" y2="19" stroke="white" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke="white" stroke-width="2"/></svg>
+    </button>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// 카테고리별 비율 차트 (수평 바)
+// ═══════════════════════════════════════
+function renderCategoryChart(catBreakdown) {
+  const maxAmount = Math.max(...catBreakdown.map(c => c.amount), 1);
+  let html = '<div class="exp-category-chart">';
+  html += '<div class="exp-category-title">카테고리별 지출</div>';
+
+  catBreakdown.forEach(cat => {
+    const pct = (cat.amount / maxAmount) * 100;
+    const catInfo = EXPENSE_CATEGORIES.find(c => c.id === cat.category);
+    const catName = catInfo ? catInfo.name : cat.category;
+    const catColor = catInfo ? catInfo.color : '#b0b0b8';
+
+    html += `<div class="exp-category-row">
+      <div class="exp-category-name" style="color:${catColor}">${catName}</div>
+      <div class="exp-category-bar-wrap">
+        <div class="exp-category-bar" style="width:${Math.max(pct, 5)}%;background:${catColor}"></div>
+      </div>
+      <div class="exp-category-amount">${formatAmount(cat.amount)}</div>
+    </div>`;
+  });
+
+  html += '</div>';
+  return html;
+}
+
+// ═══════════════════════════════════════
+// 모달 함수
+// ═══════════════════════════════════════
+function openExpenseModal(expenseId) {
+  const modal = document.getElementById('expenseModalOverlay');
+  if (!modal) return;
+
+  // 모달용 폼 초기화
+  if (expenseId) {
+    const exp = getExpenses().find(e => e.id === expenseId);
+    if (exp) loadExpense(expenseId, 'modal');
+  } else {
+    newExpenseForm('modal');
+  }
+
+  renderExpenseCategoryGrid('modal');
+  modal.style.display = 'flex';
+}
+
+function closeExpenseModal() {
+  const modal = document.getElementById('expenseModalOverlay');
+  if (modal) modal.style.display = 'none';
+}
+
+function onExpenseModalOverlayClick(e) {
+  if (e.target.id === 'expenseModalOverlay') {
+    closeExpenseModal();
+  }
+}

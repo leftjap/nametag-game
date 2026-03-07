@@ -565,30 +565,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let curExpenseId = null;
 
-function newExpenseForm() {
+function newExpenseForm(mode = 'normal') {
   curExpenseId = null;
-  document.getElementById('expenseAmountInput').value = '';
-  document.getElementById('expenseMerchantInput').value = '';
-  document.getElementById('expenseCardInput').value = '';
-  document.getElementById('expenseMemoInput').value = '';
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  document.getElementById('expenseAmountInput' + suffix).value = '';
+  document.getElementById('expenseMerchantInput' + suffix).value = '';
+  document.getElementById('expenseCardInput' + suffix).value = '';
+  document.getElementById('expenseMemoInput' + suffix).value = '';
   const now = new Date();
-  document.getElementById('expenseDateValue').textContent = formatExpenseDate(now);
-  clearCategorySelection();
-  updateExpenseSaveBtn();
+  document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(now);
+  clearCategorySelection(mode);
+  updateExpenseSaveBtn(mode);
 }
 
-function loadExpense(id) {
+function loadExpense(id, mode = 'normal') {
   const e = getExpenses().find(x => x.id === id);
   if (!e) return;
   curExpenseId = id;
-  document.getElementById('expenseAmountInput').value = e.amount.toLocaleString();
-  document.getElementById('expenseMerchantInput').value = e.merchant;
-  document.getElementById('expenseCardInput').value = e.card;
-  document.getElementById('expenseMemoInput').value = e.memo;
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  document.getElementById('expenseAmountInput' + suffix).value = e.amount.toLocaleString();
+  document.getElementById('expenseMerchantInput' + suffix).value = e.merchant;
+  document.getElementById('expenseCardInput' + suffix).value = e.card;
+  document.getElementById('expenseMemoInput' + suffix).value = e.memo;
   const d = new Date(e.date + 'T' + (e.time || '00:00'));
-  document.getElementById('expenseDateValue').textContent = formatExpenseDate(d);
-  selectCategory(e.category);
-  updateExpenseSaveBtn();
+  document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(d);
+  selectCategory(e.category, mode);
+  updateExpenseSaveBtn(mode);
 }
 
 function formatExpenseAmount(input) {
@@ -598,17 +600,23 @@ function formatExpenseAmount(input) {
   updateExpenseSaveBtn();
 }
 
-function renderExpenseCategoryGrid() {
-  const grid = document.getElementById('expenseCategoryGrid');
+function renderExpenseCategoryGrid(mode = 'normal') {
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  const grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (!grid) return;
   grid.innerHTML = EXPENSE_CATEGORIES.map(c =>
-    `<button class="expense-cat-btn" data-cat="${c.id}" onclick="selectCategory('${c.id}')">
+    `<button class="expense-cat-btn" data-cat="${c.id}" data-mode="${mode}" onclick="selectCategory('${c.id}', '${mode}')">
       <span class="expense-cat-name">${c.name}</span>
     </button>`
   ).join('');
 }
 
-function selectCategory(catId) {
-  document.querySelectorAll('.expense-cat-btn').forEach(btn => {
+function selectCategory(catId, mode = 'normal') {
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  const grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (!grid) return;
+  const btns = grid.querySelectorAll('.expense-cat-btn');
+  btns.forEach(btn => {
     const isSelected = btn.getAttribute('data-cat') === catId;
     btn.classList.toggle('selected', isSelected);
     if (isSelected) {
@@ -620,13 +628,20 @@ function selectCategory(catId) {
   });
 }
 
-function getSelectedCategory() {
-  const sel = document.querySelector('.expense-cat-btn.selected');
+function getSelectedCategory(mode = 'normal') {
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  const grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (!grid) return 'etc';
+  const sel = grid.querySelector('.expense-cat-btn.selected');
   return sel ? sel.getAttribute('data-cat') : 'etc';
 }
 
-function clearCategorySelection() {
-  document.querySelectorAll('.expense-cat-btn').forEach(btn => {
+function clearCategorySelection(mode = 'normal') {
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  const grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (!grid) return;
+  const btns = grid.querySelectorAll('.expense-cat-btn');
+  btns.forEach(btn => {
     btn.classList.remove('selected');
     btn.style.borderColor = '';
   });
@@ -649,9 +664,10 @@ function parseExpenseDateText(text) {
   return { date: `${y}-${m}-${d}`, time: `${match[3].padStart(2, '0')}:${match[4]}` };
 }
 
-function updateExpenseSaveBtn() {
-  const val = document.getElementById('expenseAmountInput').value.replace(/,/g, '');
-  const btn = document.getElementById('expenseSaveBtn');
+function updateExpenseSaveBtn(mode = 'normal') {
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  const val = document.getElementById('expenseAmountInput' + suffix).value.replace(/,/g, '');
+  const btn = document.getElementById('expenseSaveBtn' + suffix);
   if (btn) {
     const hasAmount = parseInt(val) > 0;
     btn.disabled = !hasAmount;
@@ -660,9 +676,17 @@ function updateExpenseSaveBtn() {
 }
 
 function setExpenseType(type) {
-  document.querySelectorAll('.expense-type-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-type') === type);
-  });
+  // 활성화된 모달이 있으면 모달의 토글만 업데이트, 아니면 일반 토글 업데이트
+  const modal = document.getElementById('expenseModalOverlay');
+  const isModalOpen = modal && modal.style.display !== 'none';
+
+  const selector = isModalOpen ? '#expenseTypeToggleModal' : '#expenseTypeToggle';
+  const container = document.querySelector(selector);
+  if (container) {
+    container.querySelectorAll('.expense-type-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-type') === type);
+    });
+  }
 }
 
 function openExpenseDatePicker() {
@@ -670,7 +694,7 @@ function openExpenseDatePicker() {
   alert('날짜 선택 기능은 추후 구현됩니다.');
 }
 
-async function pasteFromClipboard() {
+async function pasteFromClipboard(mode = 'normal') {
   try {
     const text = await navigator.clipboard.readText();
     if (!text || !text.trim()) {
@@ -682,31 +706,33 @@ async function pasteFromClipboard() {
       alert('카드 문자 형식을 인식할 수 없습니다.\n직접 입력해주세요.');
       return;
     }
-    document.getElementById('expenseAmountInput').value = parsed.amount.toLocaleString();
-    document.getElementById('expenseMerchantInput').value = parsed.merchant;
-    document.getElementById('expenseCardInput').value = parsed.card;
+    const suffix = mode === 'modal' ? 'Modal' : '';
+    document.getElementById('expenseAmountInput' + suffix).value = parsed.amount.toLocaleString();
+    document.getElementById('expenseMerchantInput' + suffix).value = parsed.merchant;
+    document.getElementById('expenseCardInput' + suffix).value = parsed.card;
     if (parsed.date) {
       const d = new Date(parsed.date + 'T' + (parsed.time || '00:00'));
-      document.getElementById('expenseDateValue').textContent = formatExpenseDate(d);
+      document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(d);
     }
-    selectCategory(parsed.category);
-    updateExpenseSaveBtn();
-    document.getElementById('expenseAmountInput').focus();
+    selectCategory(parsed.category, mode);
+    updateExpenseSaveBtn(mode);
+    document.getElementById('expenseAmountInput' + suffix).focus();
   } catch (err) {
     alert('클립보드를 읽을 수 없습니다.\n브라우저 설정에서 권한을 허용해주세요.');
   }
 }
 
-function saveExpenseForm() {
-  const amountStr = document.getElementById('expenseAmountInput').value.replace(/,/g, '');
+function saveExpenseForm(mode = 'normal') {
+  const suffix = mode === 'modal' ? 'Modal' : '';
+  const amountStr = document.getElementById('expenseAmountInput' + suffix).value.replace(/,/g, '');
   const amount = parseInt(amountStr);
   if (!amount || amount <= 0) return;
 
-  const merchant = document.getElementById('expenseMerchantInput').value.trim();
-  const card = document.getElementById('expenseCardInput').value.trim();
-  const memo = document.getElementById('expenseMemoInput').value.trim();
-  const category = getSelectedCategory();
-  const dateText = document.getElementById('expenseDateValue').textContent;
+  const merchant = document.getElementById('expenseMerchantInput' + suffix).value.trim();
+  const card = document.getElementById('expenseCardInput' + suffix).value.trim();
+  const memo = document.getElementById('expenseMemoInput' + suffix).value.trim();
+  const category = getSelectedCategory(mode);
+  const dateText = document.getElementById('expenseDateValue' + suffix).textContent;
   const { date, time } = parseExpenseDateText(dateText);
 
   if (curExpenseId) {
@@ -715,13 +741,21 @@ function saveExpenseForm() {
     newExpense({ amount, category, merchant, card, memo, date, time, source: 'manual' });
   }
 
-  renderExpenseDashboard();
+  // UI 업데이트 및 정리
   updateExpenseCompact();
   SYNC.scheduleDatabaseSave();
 
-  if (window.innerWidth <= 768) {
+  if (mode === 'modal') {
+    // 모달: 닫고 대시보드 갱신
+    closeExpenseModal();
+    showExpenseFullDashboard();
+  } else if (window.innerWidth <= 768) {
+    // 모바일: 대시보드 화면으로 전환
+    renderExpenseDashboard();
     setMobileView('list');
   } else {
+    // PC 에디터: 폼 초기화
+    renderExpenseDashboard();
     newExpenseForm();
   }
 }

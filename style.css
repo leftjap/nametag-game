@@ -2091,4 +2091,125 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .expense-save-btn:hover { opacity: .9; }
 .expense-save-btn:disabled { opacity: .4; cursor: default; }
 
+/* ═══ 가계부 풀 대시보드 (PC/태블릿) ═══ */
+.expense-dashboard-wrap {
+  max-width: 960px; margin: 0 auto; padding: 32px 40px 100px;
+}
+
+.expense-dashboard-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;
+}
+
+.exp-chart-section, .exp-category-section {
+  padding: 24px; background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.exp-category-title {
+  font-size: 16px; font-weight: 600; color: var(--tx); margin-bottom: 16px;
+}
+
+.exp-category-chart {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.exp-category-row {
+  display: grid; grid-template-columns: 80px 1fr 100px; gap: 12px; align-items: center;
+}
+
+.exp-category-name {
+  font-size: 13px; font-weight: 500;
+}
+
+.exp-category-bar-wrap {
+  height: 20px; background: rgba(0,0,0,.05); border-radius: 6px; overflow: hidden;
+}
+
+.exp-category-bar {
+  height: 100%; border-radius: 6px;
+}
+
+.exp-category-amount {
+  font-size: 13px; font-weight: 600; color: var(--tx-d); text-align: right;
+}
+
+/* 모달 (PC/태블릿 입력 폼) */
+#expenseModalOverlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.5); z-index: 200; align-items: center; justify-content: center;
+}
+
+#expenseModalOverlay.open {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--bg); border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.15);
+  overflow: hidden; max-height: 85vh; overflow-y: auto;
+}
+
+.modal-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px; border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+}
+
+.modal-title {
+  font-size: 18px; font-weight: 600; color: var(--tx);
+}
+
+.modal-close {
+  width: 36px; height: 36px; border: none; background: transparent;
+  font-size: 24px; cursor: pointer; color: var(--tx-d); transition: .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.modal-close:hover {
+  background: rgba(0,0,0,.05); color: var(--tx);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* FAB 버튼 */
+.fab-btn {
+  width: 56px; height: 56px; border-radius: 50%; border: none;
+  background: var(--tab-color); color: white; font-size: 24px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15); transition: .15s;
+}
+
+.fab-btn:hover {
+  transform: scale(1.1); box-shadow: 0 6px 16px rgba(0,0,0,.2);
+}
+
+.fab-btn:active {
+  transform: scale(0.95);
+}
+
+/* 모바일 (768px 이하) */
+@media (max-width: 768px) {
+  .expense-dashboard-wrap {
+    padding: 20px 16px 80px;
+  }
+
+  .expense-dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .exp-category-row {
+    grid-template-columns: 60px 1fr 80px;
+  }
+
+  .exp-category-name {
+    font-size: 12px;
+  }
+
+  .exp-category-amount {
+    font-size: 12px;
+  }
+}
+
 
