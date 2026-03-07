@@ -180,6 +180,10 @@ function switchTab(t, keepLayout) {
 
     if (w > 768) {
       // ── PC/태블릿 ──
+      // list-panel 숨기기
+      var listPanel = document.querySelector('.list-panel');
+      if (listPanel) listPanel.style.display = 'none';
+
       // editor 내부: 기존 에디터 패널 모두 숨기기
       document.getElementById('editorText').style.display = 'none';
       document.getElementById('editorBook').style.display = 'none';
@@ -196,13 +200,8 @@ function switchTab(t, keepLayout) {
 
       if (fab) fab.style.display = 'none';
 
-      // list-panel의 pane-expense-dashboard에 빈 콘텐츠
-      document.getElementById('pane-expense-dashboard').style.display = 'flex';
-      document.getElementById('pane-expense-detail').style.display = 'none';
-      document.getElementById('expenseDashboard').innerHTML = '';
-
-      // expFullDashboardPane에 대시보드 A 렌더
-      renderExpenseDashboard('pc');
+      // 원페이지 대시보드 렌더
+      renderExpenseFullDashboard();
     } else {
       // ── 모바일 ──
       // editorExpense 표시, 입력 폼 렌더
@@ -224,13 +223,17 @@ function switchTab(t, keepLayout) {
       // pane-expense-dashboard 표시, 대시보드 A 렌더
       document.getElementById('pane-expense-dashboard').style.display = 'flex';
       document.getElementById('pane-expense-detail').style.display = 'none';
-      renderExpenseDashboard('mobile');
+      renderExpenseDashboardMobile();
 
       // 에디터: 입력 폼
       newExpenseForm();
       renderExpenseCategoryGrid();
     }
   } else {
+    // ── 가계부에서 나올 때 복원 ──
+    var listPanel = document.querySelector('.list-panel');
+    if (listPanel) listPanel.style.display = '';
+
     // 가계부 pane 숨기기
     document.getElementById('pane-expense-dashboard').style.display = 'none';
     document.getElementById('pane-expense-detail').style.display = 'none';

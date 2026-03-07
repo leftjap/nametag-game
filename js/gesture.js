@@ -570,6 +570,8 @@ function setupTabletPCGestures() {
   // ─── 공통 핸들러 ───
   function handleStart(x, y, target) {
     if (window.innerWidth <= 768 || window.innerWidth > 1400) return;
+    // ── 가계부 탭이면 제스처 비활성화 ──
+    if (typeof activeTab !== 'undefined' && activeTab === 'expense') return;
     window._gestureFromEditable = false;
     if (!canStartGesture(target)) return;
     const pn = findPanel(target); if (!pn) return;
