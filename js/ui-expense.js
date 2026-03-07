@@ -319,8 +319,8 @@ function filterExpenseDetail() {
 // PC/태블릿용 풀 대시보드 (2+3단 통합)
 // ═══════════════════════════════════════
 function showExpenseFullDashboard() {
-  const fullDb = document.getElementById('expenseFullDashboard');
-  if (!fullDb) return;
+  const container = document.getElementById('expenseDashboardWrap');
+  if (!container) return;
 
   const thisYM = today().slice(0, 7);
   const pace = getExpensePace();
@@ -329,21 +329,6 @@ function showExpenseFullDashboard() {
   const catBreakdown = getCategoryBreakdown(thisYM);
 
   let html = '';
-
-  // 헤더
-  html += `<div class="exp-full-header">
-    <div class="exp-full-header-title">가계부</div>
-    <div class="exp-full-header-right">
-      <button class="ed-new-btn" onclick="openExpenseModal()" title="지출 입력" style="display:flex">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
-    </div>
-  </div>`;
-
-  // 콘텐츠 래퍼
-  html += '<div class="expense-dashboard-wrap">';
 
   // ① 이달 요약
   const thisMonthTotal = getMonthTotal(thisYM);
@@ -382,9 +367,7 @@ function showExpenseFullDashboard() {
   // ⑤ 일별 타임라인 (모달 모드: PC에서는 항목 클릭 시 모달)
   html += renderExpenseTimeline(thisYM, true);
 
-  html += '</div>'; // /.expense-dashboard-wrap
-
-  fullDb.innerHTML = html;
+  container.innerHTML = html;
 }
 
 // ═══════════════════════════════════════

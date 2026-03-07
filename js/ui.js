@@ -178,17 +178,29 @@ function switchTab(t, keepLayout) {
   if (t === 'expense') {
     const w = window.innerWidth;
     if (w > 768) {
-      // PC/태블릿: list-panel과 editor 모두 숨기고, 풀 대시보드만 표시
-      const listPanel = document.querySelector('.list-panel');
-      const editorPanel = document.querySelector('.editor');
+      // PC/태블릿: list-panel 숨기기 (list-closed/tablet-list-closed 클래스 사용)
+      const app = document.getElementById('mainApp');
       const fullDb = document.getElementById('expenseFullDashboard');
 
-      if (listPanel) listPanel.style.display = 'none';
-      if (editorPanel) editorPanel.style.display = 'none';
-      if (fullDb) {
-        fullDb.style.display = 'flex';
-        fullDb.style.flex = '1';
+      if (w >= 769 && w <= 1400) {
+        // 태블릿: tablet-list-closed 클래스
+        app.classList.add('tablet-list-closed');
+        app.classList.remove('tablet-side-open');
+      } else {
+        // PC: list-closed 클래스
+        app.classList.add('list-closed');
       }
+
+      // editor 내부: 기존 에디터 모두 숨기고 풀 대시보드만 표시
+      document.getElementById('editorText').style.display = 'none';
+      document.getElementById('editorBook').style.display = 'none';
+      document.getElementById('editorQuote').style.display = 'none';
+      document.getElementById('editorMemo').style.display = 'none';
+      document.getElementById('editorExpense').style.display = 'none';
+      document.getElementById('editorDayList').style.display = 'none';
+      document.getElementById('edToolbar').style.display = 'none';
+
+      if (fullDb) fullDb.style.display = 'flex';
 
       // 풀 대시보드 렌더링
       showExpenseFullDashboard();
@@ -210,19 +222,30 @@ function switchTab(t, keepLayout) {
     }
   } else {
     // 다른 탭: 레이아웃 복원
-    const listPanel = document.querySelector('.list-panel');
-    const editorPanel = document.querySelector('.editor');
+    const app = document.getElementById('mainApp');
+    const w = window.innerWidth;
     const fullDb = document.getElementById('expenseFullDashboard');
 
-    if (listPanel) listPanel.style.display = '';
-    if (editorPanel) editorPanel.style.display = '';
-    if (fullDb) {
-      fullDb.style.display = 'none';
-      fullDb.style.flex = '';
+    // list-closed/tablet-list-closed 제거
+    if (w >= 769 && w <= 1400) {
+      if (app.classList.contains('tablet-list-closed')) {
+        app.classList.remove('tablet-list-closed');
+      }
+    } else if (w > 1400) {
+      if (app.classList.contains('list-closed')) {
+        app.classList.remove('list-closed');
+      }
     }
 
+    // 풀 대시보드 숨기기
+    if (fullDb) fullDb.style.display = 'none';
+
+    // 가계부 pane 숨기기
+    document.getElementById('pane-expense-dashboard').style.display = 'none';
+    document.getElementById('pane-expense-detail').style.display = 'none';
+
     // 모달 닫기
-    if (window.closeExpenseModal) closeExpenseModal();
+    if (typeof closeExpenseModal === 'function') closeExpenseModal();
 
     // 뷰 스위처, 검색 복원
     const vs = document.getElementById('viewSwitcher');
@@ -949,6 +972,12 @@ function handleNew() {
 }
 
 function handleBackBtn() {
+  // 가계부 탭이면 다른 탭으로 전환
+  if (activeTab === 'expense') {
+    switchTab('navi');
+    return;
+  }
+
   const w = window.innerWidth;
   if (w >= 769 && w <= 1400) {
     const app = document.getElementById('mainApp');
