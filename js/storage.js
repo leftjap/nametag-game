@@ -223,7 +223,8 @@ function formatAmountShort(n) {
 // 가계부 모의 데이터 주입
 // ═══════════════════════════════════════
 function injectExpenseMockData() {
-  if (L(K.expenses) && L(K.expenses).length > 0) return;
+  var existing = L(K.expenses);
+  if (existing && existing.length > 5) return;
 
   const sampleExpenses = [];
   const _now = new Date();
