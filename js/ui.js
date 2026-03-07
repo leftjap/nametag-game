@@ -178,15 +178,20 @@ function switchTab(t, keepLayout) {
   if (t === 'expense') {
     const w = window.innerWidth;
     if (w > 768) {
-      // PC/태블릿: list-panel 숨기고, editor를 대시보드로 확장
+      // PC/태블릿: list-panel과 editor 모두 숨기고, 풀 대시보드만 표시
       const listPanel = document.querySelector('.list-panel');
+      const editorPanel = document.querySelector('.editor');
+      const fullDb = document.getElementById('expenseFullDashboard');
+
       if (listPanel) listPanel.style.display = 'none';
-      // editor의 기본 flex 비율 복원 (전체 영역 사용)
-      const editor = document.querySelector('.editor');
-      if (editor) editor.style.flex = '1';
-      // 풀 대시보드 표시
+      if (editorPanel) editorPanel.style.display = 'none';
+      if (fullDb) {
+        fullDb.style.display = 'flex';
+        fullDb.style.flex = '1';
+      }
+
+      // 풀 대시보드 렌더링
       showExpenseFullDashboard();
-      // 메모: 모바일에서는 setMobileView('list')로 대시보드 표시됨
     } else {
       // 모바일: 기존 구조 유지 (pane-list에 대시보드, editor에 폼)
       document.getElementById('pane-list').style.display = 'none';
@@ -206,11 +211,19 @@ function switchTab(t, keepLayout) {
   } else {
     // 다른 탭: 레이아웃 복원
     const listPanel = document.querySelector('.list-panel');
+    const editorPanel = document.querySelector('.editor');
+    const fullDb = document.getElementById('expenseFullDashboard');
+
     if (listPanel) listPanel.style.display = '';
-    const editor = document.querySelector('.editor');
-    if (editor) editor.style.flex = '';
+    if (editorPanel) editorPanel.style.display = '';
+    if (fullDb) {
+      fullDb.style.display = 'none';
+      fullDb.style.flex = '';
+    }
+
     // 모달 닫기
     if (window.closeExpenseModal) closeExpenseModal();
+
     // 뷰 스위처, 검색 복원
     const vs = document.getElementById('viewSwitcher');
     if (vs) vs.style.display = 'flex';

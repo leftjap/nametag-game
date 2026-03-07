@@ -196,7 +196,7 @@ function renderRecentExpenses(yearMonth) {
       html += `<div class="exp-date-header">${dayName} · ${d.getMonth() + 1}월 ${d.getDate()}일</div>`;
     }
     daySum += e.amount;
-    html += `<div class="exp-item" onclick="loadExpense('${e.id}'); switchTab('expense');">
+    html += `<div class="exp-item" onclick="loadExpense('${e.id}'); setMobileView('editor');">
       <div class="exp-item-merchant">${e.merchant}</div>
       <div class="exp-item-amount">${e.amount.toLocaleString()}</div>
     </div>`;
@@ -270,7 +270,7 @@ function renderMonthCalendar(yearMonth) {
   return html;
 }
 
-function renderExpenseTimeline(yearMonth) {
+function renderExpenseTimeline(yearMonth, useModal) {
   const expenses = getMonthExpenses(yearMonth)
     .sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
 
@@ -291,7 +291,13 @@ function renderExpenseTimeline(yearMonth) {
       html += `<div class="exp-date-header">${dayName} · ${d.getMonth() + 1}월 ${d.getDate()}일</div>`;
     }
     daySum += e.amount;
-    html += `<div class="exp-item" onclick="loadExpense('${e.id}'); switchTab('expense');">
+
+    // useModal=true이면 모달 열기, 아니면 화면 전환
+    const clickAction = useModal
+      ? `openExpenseModal('${e.id}')`
+      : `loadExpense('${e.id}'); setMobileView('editor');`;
+
+    html += `<div class="exp-item" onclick="${clickAction}">
       <div class="exp-item-merchant">${e.merchant}</div>
       <div class="exp-item-amount">${e.amount.toLocaleString()}</div>
     </div>`;
@@ -313,8 +319,8 @@ function filterExpenseDetail() {
 // PC/태블릿용 풀 대시보드 (2+3단 통합)
 // ═══════════════════════════════════════
 function showExpenseFullDashboard() {
-  const container = document.getElementById('expenseDashboardWrap');
-  if (!container) return;
+  const fullDb = document.getElementById('expenseFullDashboard');
+  if (!fullDb) return;
 
   const thisYM = today().slice(0, 7);
   const pace = getExpensePace();
@@ -323,6 +329,21 @@ function showExpenseFullDashboard() {
   const catBreakdown = getCategoryBreakdown(thisYM);
 
   let html = '';
+
+  // 헤더
+  html += `<div class="exp-full-header">
+    <div class="exp-full-header-title">가계부</div>
+    <div class="exp-full-header-right">
+      <button class="ed-new-btn" onclick="openExpenseModal()" title="지출 입력" style="display:flex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>`;
+
+  // 콘텐츠 래퍼
+  html += '<div class="expense-dashboard-wrap">';
 
   // ① 이달 요약
   const thisMonthTotal = getMonthTotal(thisYM);
@@ -340,10 +361,10 @@ function showExpenseFullDashboard() {
 
   // ② 2열 구간: 누적 차트 + 카테고리 비율
   html += '<div class="expense-dashboard-grid">';
-  html += '<div class="exp-chart-section">';
+  html += '<div class="exp-grid-card">';
   html += renderCumulativeChart(thisYM);
   html += '</div>';
-  html += '<div class="exp-category-section">';
+  html += '<div class="exp-grid-card">';
   html += renderCategoryChart(catBreakdown);
   html += '</div>';
   html += '</div>';
@@ -358,17 +379,12 @@ function showExpenseFullDashboard() {
   // ④ 월간 캘린더
   html += renderMonthCalendar(thisYM);
 
-  // ⑤ 일별 타임라인
-  html += renderExpenseTimeline(thisYM);
+  // ⑤ 일별 타임라인 (모달 모드: PC에서는 항목 클릭 시 모달)
+  html += renderExpenseTimeline(thisYM, true);
 
-  // ⑥ FAB 버튼 (하단 고정)
-  html += `<div style="position:fixed;bottom:32px;right:32px;z-index:100;">
-    <button class="fab-btn" onclick="openExpenseModal()" style="width:56px;height:56px;">
-      <svg viewBox="0 0 24 24" fill="white"><line x1="12" y1="5" x2="12" y2="19" stroke="white" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke="white" stroke-width="2"/></svg>
-    </button>
-  </div>`;
+  html += '</div>'; // /.expense-dashboard-wrap
 
-  container.innerHTML = html;
+  fullDb.innerHTML = html;
 }
 
 // ═══════════════════════════════════════
@@ -381,9 +397,8 @@ function renderCategoryChart(catBreakdown) {
 
   catBreakdown.forEach(cat => {
     const pct = (cat.amount / maxAmount) * 100;
-    const catInfo = EXPENSE_CATEGORIES.find(c => c.id === cat.category);
-    const catName = catInfo ? catInfo.name : cat.category;
-    const catColor = catInfo ? catInfo.color : '#b0b0b8';
+    const catName = cat.name;
+    const catColor = cat.color;
 
     html += `<div class="exp-category-row">
       <div class="exp-category-name" style="color:${catColor}">${catName}</div>

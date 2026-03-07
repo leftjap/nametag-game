@@ -2188,6 +2188,85 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   transform: scale(0.95);
 }
 
+/* ═══ 풀 대시보드 기본 스타일 ═══ */
+#expenseFullDashboard {
+  background: var(--bg);
+  overflow-y: auto;
+  position: relative;
+}
+
+/* 풀 대시보드 헤더 */
+.exp-full-header {
+  height: 60px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.exp-full-header-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--tx);
+}
+
+.exp-full-header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 풀 대시보드 콘텐츠 카드 */
+.exp-grid-card {
+  background: var(--bg);
+  border: 1px solid var(--border-l);
+  border-radius: 14px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* 그리드 카드 내부 차트 스타일 조정 */
+.exp-grid-card .exp-chart-wrap {
+  padding: 0;
+  border-bottom: none;
+  margin: 0;
+}
+
+.exp-grid-card .exp-category-chart {
+  padding: 0;
+}
+
+/* PC에서 안전 영역 처리 */
+@media (min-width: 769px) {
+  #expenseFullDashboard {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .exp-full-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* 태블릿에서 헤더 조정 */
+@media (min-width: 769px) and (max-width: 1400px) {
+  .exp-full-header {
+    height: 90px;
+    min-height: 90px;
+    padding: 0 20px;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .expense-dashboard-wrap {
+    padding: 24px 20px 100px;
+  }
+}
+
 /* 모바일 (768px 이하) */
 @media (max-width: 768px) {
   .expense-dashboard-wrap {

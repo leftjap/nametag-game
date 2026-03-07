@@ -447,80 +447,6 @@
     </div>
   </div>
 
-  <!-- 가계부 풀 대시보드 (PC/태블릿) -->
-  <div id="expenseFullDashboard" style="display:none;flex-direction:column;flex:1;overflow-y:auto">
-    <div class="expense-dashboard-wrap" id="expenseDashboardWrap">
-      <!-- JS에서 렌더링 -->
-    </div>
-  </div>
-
-  <!-- 가계부 입력/수정 모달 (PC/태블릿 전용) -->
-  <div class="modal-overlay" id="expenseModalOverlay" style="display:none" onclick="onExpenseModalOverlayClick(event)">
-    <div class="modal-card" style="max-width:480px;max-height:85vh;overflow-y:auto">
-      <div class="modal-hdr">
-        <div class="modal-title">지출 입력</div>
-        <button class="modal-close" onclick="closeExpenseModal()">×</button>
-      </div>
-      <div class="modal-body" style="padding:20px">
-        <!-- 지출/수입 토글 -->
-        <div class="expense-type-toggle" id="expenseTypeToggleModal">
-          <button class="expense-type-btn active" data-type="expense" onclick="setExpenseType('expense')">지출</button>
-          <button class="expense-type-btn" data-type="income" onclick="setExpenseType('income')">수입</button>
-        </div>
-
-        <!-- 금액 입력 -->
-        <div class="expense-amount-field">
-          <input type="text" inputmode="numeric" id="expenseAmountInputModal"
-                 class="expense-amount-input" placeholder="금액을 입력하세요"
-                 oninput="formatExpenseAmount(this)">
-          <span class="expense-amount-unit">원</span>
-        </div>
-
-        <!-- 지출처 입력 -->
-        <div class="expense-merchant-field">
-          <input type="text" id="expenseMerchantInputModal"
-                 class="expense-merchant-input" placeholder="지출처를 입력하세요">
-        </div>
-
-        <!-- 날짜/시간 -->
-        <div class="expense-date-field">
-          <span class="expense-date-label">지출일시</span>
-          <span class="expense-date-value" id="expenseDateValueModal" onclick="openExpenseDatePicker()"></span>
-        </div>
-
-        <!-- 카테고리 선택 -->
-        <div class="expense-category-section">
-          <span class="expense-section-label">카테고리</span>
-          <div class="expense-category-grid" id="expenseCategoryGridModal">
-            <!-- JS에서 렌더링 -->
-          </div>
-        </div>
-
-        <!-- 카드/결제수단 (선택) -->
-        <div class="expense-optional-field">
-          <input type="text" id="expenseCardInputModal"
-                 class="expense-optional-input" placeholder="카드/결제수단 (선택)">
-        </div>
-
-        <!-- 메모 (선택) -->
-        <div class="expense-optional-field">
-          <input type="text" id="expenseMemoInputModal"
-                 class="expense-optional-input" placeholder="메모 (선택)">
-        </div>
-
-        <!-- 문자 붙여넣기 버튼 -->
-        <button class="expense-paste-btn" id="expensePasteBtnModal" onclick="pasteFromClipboard('modal')">
-          문자 붙여넣기
-        </button>
-
-        <!-- 저장 버튼 -->
-        <button class="expense-save-btn" id="expenseSaveBtnModal" onclick="saveExpenseForm('modal')">
-          확인
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- 가계부 입력/수정 에디터 (모바일) -->
   <div id="editorExpense" style="display:none;flex-direction:column;flex:1;overflow:hidden">
     <div class="editor-scroll-area">
@@ -587,6 +513,80 @@
   </div>
 
 </div><!-- /.editor -->
+
+<!-- 가계부 풀 대시보드 (PC/태블릿 — 2+3단 합침) -->
+<div id="expenseFullDashboard" style="display:none;flex-direction:column;flex:1;overflow-y:auto">
+  <div class="expense-dashboard-wrap" id="expenseDashboardWrap">
+    <!-- JS에서 렌더링 -->
+  </div>
+</div>
+
+<!-- 가계부 입력/수정 모달 (전역 — PC/태블릿) -->
+<div class="modal-overlay" id="expenseModalOverlay" style="display:none" onclick="onExpenseModalOverlayClick(event)">
+  <div class="modal-card" style="max-width:480px;max-height:85vh;overflow-y:auto">
+    <div class="modal-hdr">
+      <div class="modal-title">지출 입력</div>
+      <button class="modal-close" onclick="closeExpenseModal()">×</button>
+    </div>
+    <div class="modal-body" style="padding:20px">
+      <!-- 지출/수입 토글 -->
+      <div class="expense-type-toggle" id="expenseTypeToggleModal">
+        <button class="expense-type-btn active" data-type="expense" onclick="setExpenseType('expense')">지출</button>
+        <button class="expense-type-btn" data-type="income" onclick="setExpenseType('income')">수입</button>
+      </div>
+
+      <!-- 금액 입력 -->
+      <div class="expense-amount-field">
+        <input type="text" inputmode="numeric" id="expenseAmountInputModal"
+               class="expense-amount-input" placeholder="금액을 입력하세요"
+               oninput="formatExpenseAmount(this)">
+        <span class="expense-amount-unit">원</span>
+      </div>
+
+      <!-- 지출처 입력 -->
+      <div class="expense-merchant-field">
+        <input type="text" id="expenseMerchantInputModal"
+               class="expense-merchant-input" placeholder="지출처를 입력하세요">
+      </div>
+
+      <!-- 날짜/시간 -->
+      <div class="expense-date-field">
+        <span class="expense-date-label">지출일시</span>
+        <span class="expense-date-value" id="expenseDateValueModal" onclick="openExpenseDatePicker()"></span>
+      </div>
+
+      <!-- 카테고리 선택 -->
+      <div class="expense-category-section">
+        <span class="expense-section-label">카테고리</span>
+        <div class="expense-category-grid" id="expenseCategoryGridModal">
+          <!-- JS에서 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 카드/결제수단 (선택) -->
+      <div class="expense-optional-field">
+        <input type="text" id="expenseCardInputModal"
+               class="expense-optional-input" placeholder="카드/결제수단 (선택)">
+      </div>
+
+      <!-- 메모 (선택) -->
+      <div class="expense-optional-field">
+        <input type="text" id="expenseMemoInputModal"
+               class="expense-optional-input" placeholder="메모 (선택)">
+      </div>
+
+      <!-- 문자 붙여넣기 버튼 -->
+      <button class="expense-paste-btn" id="expensePasteBtnModal" onclick="pasteFromClipboard('modal')">
+        문자 붙여넣기
+      </button>
+
+      <!-- 저장 버튼 -->
+      <button class="expense-save-btn" id="expenseSaveBtnModal" onclick="saveExpenseForm('modal')">
+        확인
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ─── 위치 모달 ─── -->
 <div class="modal-overlay" id="modalOverlay" onclick="onLocationOverlayClick(event)">
