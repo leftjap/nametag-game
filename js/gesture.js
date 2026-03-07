@@ -175,25 +175,24 @@ function setupGesturesAndUI() {
     else if (savedState === 'list'   && savedDir === 'right' && (pctMoved > 0.4 || (mVelocity > 0.5 && pctMoved > 0.2))) didSwipe = true;
     else if (savedState === 'editor' && savedDir === 'right' && (pctMoved > 0.4 || (mVelocity > 0.5 && pctMoved > 0.2))) didSwipe = true;
 
+    // 가계부 모바일: 우 스와이프 시 사이드바 대신 B→A 또는 무시
+    if (savedDir === 'right'
+        && typeof activeTab !== 'undefined' && activeTab === 'expense') {
+      var mDetail = document.getElementById('pane-expense-detail');
+      var mDetailVisible = mDetail && window.getComputedStyle(mDetail).display !== 'none';
+      if (mDetailVisible) {
+        animateBack();
+        setTimeout(function() { showExpenseDashboardFromDetailMobile(); }, 50);
+      } else {
+        animateBack();
+      }
+      swiping = false; swipeDir = null; decided = false; startState = null;
+      return;
+    }
+
     if ((savedState === 'side' && savedDir === 'right') || (savedState === 'editor' && savedDir === 'left')) {
       animateBack();
     } else if (didSwipe) {
-      // 가계부: 대시보드(A) 또는 전체 내역(B) 보이는 상태에서 우 스와이프 차단
-      if (savedDir === 'right'
-          && typeof activeTab !== 'undefined' && activeTab === 'expense') {
-        var mDetail = document.getElementById('pane-expense-detail');
-        var mDetailVisible = mDetail && window.getComputedStyle(mDetail).display !== 'none';
-        if (mDetailVisible) {
-          // B→A: 전체 내역에서 대시보드로
-          animateBack();
-          setTimeout(function() { showExpenseDashboardFromDetailMobile(); }, 50);
-          return;
-        } else {
-          // A에서 우 스와이프: 사이드바 대신 무시
-          animateBack();
-          return;
-        }
-      }
       if (savedState === 'editor') {
         var curEditorX = editorEl ? editorEl.getBoundingClientRect().left : 0;
         var curListX = listEl ? listEl.getBoundingClientRect().left : 0;
