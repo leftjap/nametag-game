@@ -228,7 +228,7 @@ function switchTab(t, keepLayout) {
       // pane-expense-dashboard 표시, 대시보드 A 렌더
       document.getElementById('pane-expense-dashboard').style.display = 'flex';
       document.getElementById('pane-expense-detail').style.display = 'none';
-      renderExpenseDashboardMobile();
+      renderExpenseDashboard('mobile');
 
       // 에디터: 입력 폼
       newExpenseForm();
