@@ -2804,5 +2804,33 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-tl-item-divider {
   height: 1px;
   background: var(--border-l);
-  margin-left: 0;
+  margin-left: 48px;
+}
+
+/* 날짜 헤더 좌측 정렬 */
+.exp-tl-date-header {
+  text-align: left;
+}
+
+/* 카테고리 아이콘 */
+.exp-tl-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 12px;
+  color: var(--tx-m, #888);
+}
+
+/* 항목 레이아웃에 아이콘 반영 */
+.exp-tl-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  cursor: pointer;
 }

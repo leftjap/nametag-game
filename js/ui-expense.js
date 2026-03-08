@@ -2,6 +2,25 @@
 // ui-expense.js — 가계부 UI 렌더링
 // ═══════════════════════════════════════
 
+// 카테고리 아이콘 매핑
+var CATEGORY_ICONS = {
+  '식비': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 3v18M6 3v7c0 1.1.9 2 2 2h2a2 2 0 002-2V3M10 3v18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  '카페': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 8h1a4 4 0 010 8h-1M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8zM6 2v3M10 2v3M14 2v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  '교통': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 17a2 2 0 104 0 2 2 0 00-4 0zM15 17a2 2 0 104 0 2 2 0 00-4 0z" stroke="currentColor" stroke-width="1.8"/><path d="M3 17h2m4 0h6m4 0h2M5 13V7a2 2 0 012-2h10a2 2 0 012 2v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  '쇼핑': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  '생활': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  '의료': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  '문화': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  '통신': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M12 18h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  '교육': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 10l-10-6L2 10l10 6 10-6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  '저축': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 5c-1.5 0-2.8 1.4-3 2l-3.3 9.3A9 9 0 007 20a2 2 0 01-2-2V6a2 2 0 012-2h.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/></svg>',
+  '기타': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="6" cy="12" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/></svg>'
+};
+
+function getCategoryIcon(category) {
+  return CATEGORY_ICONS[category] || CATEGORY_ICONS['기타'];
+}
+
 function updateExpenseCompact() {
   const el = document.getElementById('expenseCompactAmount');
   if (!el) return;
@@ -297,6 +316,7 @@ function renderRecentExpenses(yearMonth) {
 
     items.forEach(function(item, idx) {
       html += '<div class="exp-tl-item" onclick="loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');">';
+      html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
       html += '<div class="exp-tl-item-left">';
       html += '<span class="exp-tl-item-name">' + (item.merchant || '미분류') + '</span>';
       if (item.memo) {
@@ -395,6 +415,7 @@ function renderExpenseTimeline(yearMonth, useModal) {
         : 'loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');';
 
       html += '<div class="exp-tl-item" onclick="' + clickAction + '">';
+      html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
       html += '<div class="exp-tl-item-left">';
       html += '<span class="exp-tl-item-name">' + (item.merchant || '미분류') + '</span>';
       if (item.memo) {
@@ -692,6 +713,7 @@ function renderExpenseFullTimeline(yearMonth, query = '') {
         : 'loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');';
 
       html += '<div class="exp-tl-item" onclick="' + clickAction + '">';
+      html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
       html += '<div class="exp-tl-item-left">';
       html += '<span class="exp-tl-item-name">' + (item.merchant || '미분류') + '</span>';
       if (item.memo) {
