@@ -2980,3 +2980,84 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-day-detail .exp-tl-item-divider {
   margin: 0 20px 0 68px;
 }
+
+/* ═══ 루틴 상세 분석 패널 ═══ */
+#editorRoutineDetail { flex-direction: column; }
+.routine-detail-scroll { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+.routine-detail-content { width: 100%; max-width: 720px; margin: 0 auto; padding: 32px 40px; }
+
+.routine-detail-wrapper {}
+.routine-detail-header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
+}
+.routine-detail-back {
+  padding: 8px 12px; background: none; border: 1px solid var(--border);
+  border-radius: 6px; font-size: 14px; color: var(--tx); cursor: pointer;
+  transition: .2s; font-family: 'Pretendard', sans-serif;
+}
+.routine-detail-back:hover { background: var(--bg); border-color: var(--tx-m); }
+.routine-detail-title { font-size: 28px; font-weight: 700; margin: 0; }
+
+.routine-detail-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--bg); border-radius: 12px; padding: 16px; text-align: center;
+  border: 1px solid var(--border);
+}
+.stat-label { font-size: 12px; color: var(--tx-m); margin-bottom: 8px; }
+.stat-value { font-size: 24px; font-weight: 700; color: var(--tab-color); }
+
+.routine-detail-dow {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 32px;
+}
+.dow-card {
+  background: var(--bg); border-radius: 12px; padding: 20px; text-align: center;
+  border: 1px solid var(--border);
+}
+.dow-card.best { border-color: #4CAF50; }
+.dow-card.worst { border-color: #FF5252; }
+.dow-label { font-size: 12px; color: var(--tx-m); }
+.dow-name { font-size: 20px; font-weight: 700; margin: 8px 0; }
+.dow-pct { font-size: 18px; color: var(--tab-color); }
+
+.routine-detail-chart {
+  background: var(--bg); border-radius: 12px; padding: 20px; margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+.chart-title { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+.dow-chart {
+  display: flex; gap: 8px; align-items: flex-end; height: 120px;
+}
+.dow-bar-wrapper {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.dow-bar-label { font-size: 12px; font-weight: 600; }
+.dow-bar-container { flex: 1; width: 100%; background: var(--border); border-radius: 4px; }
+.dow-bar { width: 100%; background: var(--tab-color); border-radius: 4px; transition: .2s; }
+.dow-bar-value { font-size: 11px; color: var(--tx-m); }
+
+.routine-detail-trend {
+  background: var(--bg); border-radius: 12px; padding: 20px; margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+.weekly-trend {
+  display: flex; gap: 8px; align-items: flex-end; height: 100px;
+}
+.week-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.week-label { font-size: 10px; text-align: center; }
+.week-bar { width: 100%; background: var(--ac); border-radius: 2px; min-height: 2px; }
+.week-pct { font-size: 10px; color: var(--tx-m); }
+
+.routine-overview-wrapper {}
+.routine-overview-title { font-size: 28px; font-weight: 700; margin: 0 0 24px; }
+.routine-list { display: flex; flex-direction: column; gap: 12px; }
+.routine-item {
+  background: var(--bg); border-radius: 12px; padding: 16px; cursor: pointer;
+  transition: .2s; border: 1px solid var(--border);
+}
+.routine-item:hover { border-color: var(--tab-color); background: color-mix(in srgb, var(--tab-color) 5%, var(--bg)); }
+.routine-item-name { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.routine-item-stats { display: flex; gap: 16px; font-size: 13px; color: var(--tx-m); }
