@@ -235,7 +235,7 @@ function renderMonthlyBarChart(trend) {
     var pct = (t.total / maxTotal) * 100;
     var isCurrentClass = t.isCurrent ? 'current' : '';
     html += '<div class="exp-bar-item ' + isCurrentClass + '">'
-      + (t.isCurrent ? '<div class="exp-bar-projected">예상</div>' : '')
+      + (t.isCurrent && t.ym === today().slice(0, 7) ? '<div class="exp-bar-projected">예상</div>' : '')
       + '<div class="exp-bar-value">' + Math.round(t.total / 10000) + '</div>'
       + '<div class="exp-bar-fill" style="height:' + Math.max(pct, 4) + '%"></div>'
       + '<div class="exp-bar-label">' + t.label + '</div>'
@@ -620,6 +620,25 @@ function renderExpenseFullDetail(yearMonth) {
       html += renderCategoryChart(catBreakdown);
       html += '<div class="exp-section-gap"></div>';
     }
+
+    var pastTrend = getMonthlyTrendAround(yearMonth);
+    var pastAvg = pastTrend.filter(function(t) { return !t.isCurrent && t.total > 0; });
+    var pastAvgAmount = pastAvg.length > 0 ? Math.round(pastAvg.reduce(function(s, t) { return s + t.total; }, 0) / pastAvg.length) : 0;
+    html += '<div class="exp-projection">';
+    html += '<div class="exp-projection-title">' + monthNum + '월에는 ' + formatAmount(monthTotal) + '원 썼어요</div>';
+    if (pastAvgAmount > 0) {
+      var diffFromAvg = monthTotal - pastAvgAmount;
+      if (diffFromAvg > 0) {
+        html += '<div class="exp-projection-sub">평균보다 ' + formatAmount(diffFromAvg) + '원 더 쓴 달이에요</div>';
+      } else if (diffFromAvg < 0) {
+        html += '<div class="exp-projection-sub">평균보다 ' + formatAmount(Math.abs(diffFromAvg)) + '원 덜 쓴 달이에요</div>';
+      } else {
+        html += '<div class="exp-projection-sub">평균과 비슷하게 썼어요</div>';
+      }
+    }
+    html += renderMonthlyBarChart(pastTrend);
+    html += '</div>';
+    html += '<div class="exp-section-gap"></div>';
   } else {
     // 현재 월 전체 내역: 기존 헤더
     html += '<div class="exp-detail-header">';
@@ -779,6 +798,25 @@ function renderExpenseFullDetailMobile(yearMonth) {
       html += renderCategoryChart(catBreakdown);
       html += '<div class="exp-section-gap"></div>';
     }
+
+    var pastTrend = getMonthlyTrendAround(yearMonth);
+    var pastAvg = pastTrend.filter(function(t) { return !t.isCurrent && t.total > 0; });
+    var pastAvgAmount = pastAvg.length > 0 ? Math.round(pastAvg.reduce(function(s, t) { return s + t.total; }, 0) / pastAvg.length) : 0;
+    html += '<div class="exp-projection">';
+    html += '<div class="exp-projection-title">' + monthNum + '월에는 ' + formatAmount(monthTotal) + '원 썼어요</div>';
+    if (pastAvgAmount > 0) {
+      var diffFromAvg = monthTotal - pastAvgAmount;
+      if (diffFromAvg > 0) {
+        html += '<div class="exp-projection-sub">평균보다 ' + formatAmount(diffFromAvg) + '원 더 쓴 달이에요</div>';
+      } else if (diffFromAvg < 0) {
+        html += '<div class="exp-projection-sub">평균보다 ' + formatAmount(Math.abs(diffFromAvg)) + '원 덜 쓴 달이에요</div>';
+      } else {
+        html += '<div class="exp-projection-sub">평균과 비슷하게 썼어요</div>';
+      }
+    }
+    html += renderMonthlyBarChart(pastTrend);
+    html += '</div>';
+    html += '<div class="exp-section-gap"></div>';
   } else {
     html += '<div class="exp-detail-header">';
     html += '<span class="exp-detail-title">' + fullMonthLabel + ' 전체 내역</span>';

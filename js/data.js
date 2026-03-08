@@ -500,3 +500,16 @@ function getMonthlyTrend() {
   }
   return result;
 }
+
+function getMonthlyTrendAround(centerYM) {
+  var centerDate = new Date(centerYM + '-01');
+  var result = [];
+  for (var i = -5; i <= 0; i++) {
+    var d = new Date(centerDate.getFullYear(), centerDate.getMonth() + i, 1);
+    var ym = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    var label = (d.getMonth() + 1) + '월';
+    var isCurrent = (ym === centerYM);
+    result.push({ ym: ym, label: label, total: getMonthTotal(ym), isCurrent: isCurrent });
+  }
+  return result;
+}
