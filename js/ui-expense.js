@@ -963,10 +963,8 @@ function renderSelectedDayExpenses(dateStr) {
   var dayTotal = expenses.reduce(function(s, e) { return s + e.amount; }, 0);
 
   var html = '<div class="exp-day-detail">';
-  html += '<div class="exp-day-detail-header">';
-  html += '<span class="exp-day-detail-date">' + month + '월 ' + day + '일 ' + dayName + '</span>';
-  html += '<span class="exp-day-detail-total">' + dayTotal.toLocaleString() + '원</span>';
-  html += '</div>';
+  html += '<div class="exp-tl-date-group">';
+  html += '<div class="exp-tl-date-header">' + month + '월 ' + day + '일 ' + dayName + '</div>';
 
   expenses.forEach(function(item, idx) {
     var clickAction = window.innerWidth > 768
@@ -988,6 +986,7 @@ function renderSelectedDayExpenses(dateStr) {
     }
   });
 
+  html += '</div>';
   html += '</div>';
   return html;
 }
