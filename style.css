@@ -2772,33 +2772,20 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   min-width: 0;
 }
 
-.exp-tl-item-name {
-  font-size: 15px;
-  font-weight: 600;
+.exp-tl-item-amount {
+  font-size: 16px;
+  font-weight: 700;
   color: var(--tx);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
-.exp-tl-item-memo {
+.exp-tl-item-sub {
   font-size: 12px;
   color: var(--tx-l);
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.exp-tl-item-right {
-  flex-shrink: 0;
-  margin-left: 12px;
-}
-
-.exp-tl-item-amount {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--tx);
-  font-variant-numeric: tabular-nums;
 }
 
 .exp-tl-item-divider {

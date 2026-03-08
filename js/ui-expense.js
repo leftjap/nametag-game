@@ -318,13 +318,12 @@ function renderRecentExpenses(yearMonth) {
       html += '<div class="exp-tl-item" onclick="loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');">';
       html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
       html += '<div class="exp-tl-item-left">';
-      html += '<span class="exp-tl-item-name">' + (item.merchant || '미분류') + '</span>';
-      if (item.memo) {
-        html += '<span class="exp-tl-item-memo">' + item.memo + '</span>';
+      html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
+      html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
+      if (item.payMethod) {
+        html += ' | ' + item.payMethod;
       }
-      html += '</div>';
-      html += '<div class="exp-tl-item-right">';
-      html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '</span>';
+      html += '</span>';
       html += '</div>';
       html += '</div>';
 
@@ -417,13 +416,12 @@ function renderExpenseTimeline(yearMonth, useModal) {
       html += '<div class="exp-tl-item" onclick="' + clickAction + '">';
       html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
       html += '<div class="exp-tl-item-left">';
-      html += '<span class="exp-tl-item-name">' + (item.merchant || '미분류') + '</span>';
-      if (item.memo) {
-        html += '<span class="exp-tl-item-memo">' + item.memo + '</span>';
+      html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
+      html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
+      if (item.payMethod) {
+        html += ' | ' + item.payMethod;
       }
-      html += '</div>';
-      html += '<div class="exp-tl-item-right">';
-      html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '</span>';
+      html += '</span>';
       html += '</div>';
       html += '</div>';
 
@@ -715,13 +713,12 @@ function renderExpenseFullTimeline(yearMonth, query = '') {
       html += '<div class="exp-tl-item" onclick="' + clickAction + '">';
       html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
       html += '<div class="exp-tl-item-left">';
-      html += '<span class="exp-tl-item-name">' + (item.merchant || '미분류') + '</span>';
-      if (item.memo) {
-        html += '<span class="exp-tl-item-memo">' + item.memo + '</span>';
+      html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
+      html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
+      if (item.payMethod) {
+        html += ' | ' + item.payMethod;
       }
-      html += '</div>';
-      html += '<div class="exp-tl-item-right">';
-      html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '</span>';
+      html += '</span>';
       html += '</div>';
       html += '</div>';
 
