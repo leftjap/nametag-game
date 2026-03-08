@@ -67,8 +67,9 @@ async function showApp() {
     } else {
       const app = document.getElementById('mainApp');
       app.classList.remove('view-side','view-list','view-editor');
-      if (window.innerWidth >= 769 && window.innerWidth <= 1024) {
-        app.classList.remove('tablet-side-open','tablet-list-closed');
+      if (window.innerWidth >= 769 && window.innerWidth <= 1400) {
+        app.classList.remove('tablet-list-closed');
+        app.classList.add('tablet-side-open');
       }
       renderListPanel();
     }
