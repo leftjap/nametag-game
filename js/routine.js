@@ -85,11 +85,16 @@ function showRoutineCard() {
   const weekEl = document.getElementById('routineCardWeek');
   if (weekEl) weekEl.textContent = weekLabel;
   renderRoutineCardBody();
+  if (window.innerWidth > 768) {
+    showRoutineOverview();
+  }
 }
 
 function hideRoutineCard() {
   const pane = document.getElementById('pane-routine');
   if (pane) pane.style.display = 'none';
+  var rdPane = document.getElementById('editorRoutineDetail');
+  if (rdPane) rdPane.style.display = 'none';
   if (currentListView === 'list') document.getElementById('pane-list').style.display = 'flex';
   else if (currentListView === 'photo') document.getElementById('pane-photo').style.display = 'block';
   else if (currentListView === 'calendar') document.getElementById('pane-calendar').style.display = 'block';
@@ -167,7 +172,7 @@ function renderChk() {
       return `<div class="chk-dot ${done?'done':''} ${isTd?'today':''}" onclick="event.stopPropagation();toggleDay('${r.id}','${dt}')"></div>`;
     }).join('');
 
-    h += `<div class="chk-row" onclick="toggleChk('${r.id}')">${blobHtml}`
+    h += `<div class="chk-row" onclick="selectRoutine('${r.id}')">${blobHtml}`
       + (doneCount > 0 ? `<span class="chk-pct">${pct}%</span>` : '')
       + `<div class="chk-left"><span class="chk-lb">${r.name}</span></div>`
       + `<div class="chk-dots">${dotHtml}</div>`
@@ -199,7 +204,7 @@ function renderRoutineCardBody() {
       return `<div class="chk-dot ${done?'done':''} ${isTd?'today':''}" onclick="event.stopPropagation();toggleDayCard('${r.id}','${dt}')"></div>`;
     }).join('');
 
-    h += `<div class="chk-row" onclick="toggleDayCard('${r.id}','${td}')">`
+    h += `<div class="chk-row" onclick="selectRoutine('${r.id}')">`
       + blobHtml
       + `<div class="chk-left"><span class="chk-lb">${r.name}</span></div>`
       + `<div class="chk-dots">${dotHtml}</div>`
@@ -504,6 +509,207 @@ function getRoutineStats(routineId) {
       return { name: name, pct: dowTotal[idx] > 0 ? Math.round((dowDone[idx] / dowTotal[idx]) * 100) : 0 };
     })
   };
+}
+
+// ═══ 루틴 상세 분석 UI ═══
+
+var _selectedRoutineId = null;
+
+function selectRoutine(id) {
+  if (window.innerWidth <= 768) {
+    toggleChk(id);
+    return;
+  }
+  _selectedRoutineId = id;
+  showRoutineDetail(id);
+
+  // 2단 선택 표시
+  document.querySelectorAll('.chk-row').forEach(function(row) {
+    row.classList.remove('chk-row-selected');
+  });
+  var rows = document.querySelectorAll('.chk-row');
+  var meta = ROUTINE_META;
+  for (var i = 0; i < meta.length; i++) {
+    if (meta[i].id === id && rows[i]) {
+      rows[i].classList.add('chk-row-selected');
+      break;
+    }
+  }
+}
+
+function showRoutineOverview() {
+  var panel = document.getElementById('editorRoutineDetail');
+  if (!panel) return;
+
+  // 에디터 패널 전환
+  document.getElementById('editorText').style.display = 'none';
+  document.getElementById('editorBook').style.display = 'none';
+  document.getElementById('editorQuote').style.display = 'none';
+  document.getElementById('editorMemo').style.display = 'none';
+  var dayList = document.getElementById('editorDayList');
+  if (dayList) dayList.style.display = 'none';
+  document.getElementById('editorExpense').style.display = 'none';
+  var fullDb = document.getElementById('expenseFullDashboard');
+  if (fullDb) fullDb.style.display = 'none';
+  document.getElementById('edToolbar').style.display = 'none';
+  panel.style.display = 'flex';
+
+  var wrap = document.getElementById('routineDetailWrap');
+  var chk = getChk();
+  var done = 0;
+  ROUTINE_META.forEach(function(r) { if (chk[r.id]) done++; });
+  var total = ROUTINE_META.length;
+
+  var html = '<div class="rd-overview">';
+  html += '<div class="rd-overview-title">오늘의 루틴</div>';
+  html += '<div class="rd-overview-progress">';
+  html += '<span class="rd-overview-done">' + done + '</span>';
+  html += '<span class="rd-overview-sep"> / ' + total + '</span>';
+  html += '</div>';
+  html += '<div class="rd-overview-bar-wrap"><div class="rd-overview-bar" style="width:' + (total > 0 ? (done / total) * 100 : 0) + '%"></div></div>';
+
+  html += '<div class="rd-overview-list">';
+  ROUTINE_META.forEach(function(r) {
+    var streak = getRoutineStreak(r.id);
+    var isDone = !!(chk[r.id]);
+    html += '<div class="rd-overview-item' + (isDone ? ' done' : '') + '" onclick="selectRoutine(\'' + r.id + '\')">';
+    html += '<div class="rd-overview-item-dot" style="background:' + r.color + '"></div>';
+    html += '<div class="rd-overview-item-name">' + r.name + '</div>';
+    html += '<div class="rd-overview-item-streak">';
+    if (streak.current > 0) {
+      html += streak.current + '일 연속';
+    } else {
+      html += '<span style="color:var(--tx-hint)">—</span>';
+    }
+    html += '</div>';
+    html += '<div class="rd-overview-item-check">' + (isDone ? '✓' : '') + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="rd-overview-hint">항목을 선택하면 상세 분석을 볼 수 있어요</div>';
+  html += '</div>';
+
+  wrap.innerHTML = html;
+}
+
+function showRoutineDetail(routineId) {
+  var panel = document.getElementById('editorRoutineDetail');
+  if (!panel) return;
+
+  // 에디터 패널 전환
+  document.getElementById('editorText').style.display = 'none';
+  document.getElementById('editorBook').style.display = 'none';
+  document.getElementById('editorQuote').style.display = 'none';
+  document.getElementById('editorMemo').style.display = 'none';
+  var dayList = document.getElementById('editorDayList');
+  if (dayList) dayList.style.display = 'none';
+  document.getElementById('editorExpense').style.display = 'none';
+  var fullDb = document.getElementById('expenseFullDashboard');
+  if (fullDb) fullDb.style.display = 'none';
+  document.getElementById('edToolbar').style.display = 'none';
+  panel.style.display = 'flex';
+
+  // Aa, 더보기 버튼 숨김
+  var moreBtn = document.querySelector('.ed-more-btn');
+  var aaBtn = document.querySelector('.ed-aa-btn');
+  if (moreBtn) moreBtn.style.display = 'none';
+  if (aaBtn) aaBtn.style.display = 'none';
+
+  var meta = ROUTINE_META.find(function(r) { return r.id === routineId; });
+  if (!meta) return;
+
+  var wrap = document.getElementById('routineDetailWrap');
+  var streak = getRoutineStreak(routineId);
+  var now = new Date();
+  var heatmap = getRoutineMonthlyHeatmap(routineId, now.getFullYear(), now.getMonth() + 1);
+  var trend = getRoutineWeeklyTrend(routineId, 8);
+  var stats = getRoutineStats(routineId);
+  var td = today();
+
+  var html = '';
+
+  // ── 헤더: 이름 + 연속 기록 ──
+  html += '<div class="rd-header">';
+  html += '<div class="rd-header-color" style="background:' + meta.color + '"></div>';
+  html += '<div class="rd-header-info">';
+  html += '<div class="rd-header-name">' + meta.name + '</div>';
+  if (streak.current > 0) {
+    html += '<div class="rd-header-streak" style="color:' + meta.color + '">' + streak.current + '일 연속 진행 중</div>';
+  } else {
+    html += '<div class="rd-header-streak rd-header-streak-broken">오늘부터 다시 시작해보세요</div>';
+  }
+  html += '<div class="rd-header-best">최장 기록 ' + streak.best + '일</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // ── 월간 히트맵 ──
+  html += '<div class="rd-section">';
+  html += '<div class="rd-section-title">' + (now.getMonth() + 1) + '월</div>';
+  html += '<div class="rd-heatmap">';
+  html += '<div class="rd-heatmap-dow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>';
+  html += '<div class="rd-heatmap-grid">';
+
+  // 빈 셀 (월 시작 요일)
+  var firstDow = heatmap.length > 0 ? heatmap[0].dow : 0;
+  for (var e = 0; e < firstDow; e++) {
+    html += '<div class="rd-heatmap-cell empty"></div>';
+  }
+
+  heatmap.forEach(function(d) {
+    var cls = 'rd-heatmap-cell';
+    if (d.isFuture) cls += ' future';
+    else if (d.done) cls += ' done';
+    var isToday = d.date === td;
+    if (isToday) cls += ' today';
+    var bg = d.done ? meta.color : '';
+    html += '<div class="' + cls + '"' + (bg ? ' style="background:' + bg + '"' : '') + '>' + d.day + '</div>';
+  });
+  html += '</div>';
+  html += '</div>';
+
+  // ── 주간 추이 차트 ──
+  html += '<div class="rd-section">';
+  html += '<div class="rd-section-title">주간 추이</div>';
+  html += '<div class="rd-trend-chart">';
+  var maxPct = 100;
+  trend.forEach(function(w, idx) {
+    var h = Math.max(w.pct, 4);
+    var isLast = (idx === trend.length - 1);
+    html += '<div class="rd-trend-bar-item' + (isLast ? ' current' : '') + '">';
+    html += '<div class="rd-trend-bar-value">' + w.pct + '%</div>';
+    html += '<div class="rd-trend-bar-fill" style="height:' + h + '%;background:' + (isLast ? meta.color : '') + '"></div>';
+    html += '<div class="rd-trend-bar-label">' + w.label + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '</div>';
+
+  // ── 통계 요약 ──
+  html += '<div class="rd-section">';
+  html += '<div class="rd-section-title">통계</div>';
+  html += '<div class="rd-stats-grid">';
+  html += '<div class="rd-stat"><div class="rd-stat-num" style="color:' + meta.color + '">' + stats.monthPct + '%</div><div class="rd-stat-label">이달 달성률</div></div>';
+  html += '<div class="rd-stat"><div class="rd-stat-num">' + stats.totalPct + '%</div><div class="rd-stat-label">90일 달성률</div></div>';
+  html += '<div class="rd-stat"><div class="rd-stat-num">' + stats.bestDow + '</div><div class="rd-stat-label">가장 잘 지키는 요일</div></div>';
+  html += '<div class="rd-stat"><div class="rd-stat-num">' + stats.worstDow + '</div><div class="rd-stat-label">가장 많이 빠지는 요일</div></div>';
+  html += '</div>';
+
+  // ── 요일별 달성률 ──
+  html += '<div class="rd-section">';
+  html += '<div class="rd-section-title">요일별 달성률</div>';
+  html += '<div class="rd-dow-chart">';
+  stats.dowData.forEach(function(d) {
+    html += '<div class="rd-dow-row">';
+    html += '<span class="rd-dow-name">' + d.name + '</span>';
+    html += '<div class="rd-dow-bar-wrap"><div class="rd-dow-bar" style="width:' + Math.max(d.pct, 2) + '%;background:' + meta.color + '"></div></div>';
+    html += '<span class="rd-dow-pct">' + d.pct + '%</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '</div>';
+
+  wrap.innerHTML = html;
 }
 
 // ═══ 루틴 상세 분석 UI 렌더링 ═══
