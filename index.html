@@ -452,12 +452,6 @@
     <div class="editor-scroll-area">
       <div class="editor-content-wrap">
 
-        <!-- 지출/수입 토글 -->
-        <div class="expense-type-toggle" id="expenseTypeToggle">
-          <button class="expense-type-btn active" data-type="expense" onclick="setExpenseType('expense')">지출</button>
-          <button class="expense-type-btn" data-type="income" onclick="setExpenseType('income')">수입</button>
-        </div>
-
         <!-- 금액 입력 -->
         <div class="expense-amount-field">
           <input type="text" inputmode="numeric" id="expenseAmountInput"
@@ -536,12 +530,6 @@
       <button class="modal-close" onclick="closeExpenseModal()">×</button>
     </div>
     <div class="modal-body" style="padding:20px">
-      <!-- 지출/수입 토글 -->
-      <div class="expense-type-toggle" id="expenseTypeToggleModal">
-        <button class="expense-type-btn active" data-type="expense" onclick="setExpenseType('expense')">지출</button>
-        <button class="expense-type-btn" data-type="income" onclick="setExpenseType('income')">수입</button>
-      </div>
-
       <!-- 금액 입력 -->
       <div class="expense-amount-field">
         <input type="text" inputmode="numeric" id="expenseAmountInputModal"

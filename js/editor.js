@@ -675,19 +675,6 @@ function updateExpenseSaveBtn(mode = 'normal') {
   }
 }
 
-function setExpenseType(type) {
-  // 활성화된 모달이 있으면 모달의 토글만 업데이트, 아니면 일반 토글 업데이트
-  const modal = document.getElementById('expenseModalOverlay');
-  const isModalOpen = modal && modal.style.display !== 'none';
-
-  const selector = isModalOpen ? '#expenseTypeToggleModal' : '#expenseTypeToggle';
-  const container = document.querySelector(selector);
-  if (container) {
-    container.querySelectorAll('.expense-type-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-type') === type);
-    });
-  }
-}
 
 function openExpenseDatePicker() {
   // TODO: 날짜 선택 모달 (현재는 간단히 일반 input date 사용 가능)

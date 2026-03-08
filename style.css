@@ -1984,36 +1984,38 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
 /* ─── 3단 에디터 ─── */
 
-/* 지출/수입 토글 */
-.expense-type-toggle {
-  display: flex; background: var(--bg); border-radius: 10px;
-  padding: 3px; margin-bottom: 32px; width: fit-content;
-}
-.expense-type-btn {
-  padding: 8px 24px; border: none; border-radius: 8px;
-  font-size: 14px; font-weight: 500; cursor: pointer;
-  background: transparent; color: var(--tx-m);
-  font-family: 'Pretendard', sans-serif; transition: .15s;
-}
-.expense-type-btn.active {
-  background: var(--bg-white); color: var(--tx);
-  box-shadow: 0 1px 3px rgba(0,0,0,.08);
-}
-
 /* 금액 입력 */
 .expense-amount-field {
-  display: flex; align-items: baseline; gap: 8px;
-  padding-bottom: 12px; border-bottom: 1.5px solid var(--border-l);
-  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 16px 0;
+  border-bottom: 1.5px solid var(--border-l);
 }
 .expense-amount-input {
-  flex: 1; border: none; background: none; outline: none;
-  font-size: 28px; font-weight: 300; color: var(--tx);
-  font-family: 'Pretendard', sans-serif; letter-spacing: -.5px;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--tx);
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  letter-spacing: -0.5px;
 }
-.expense-amount-input::placeholder { color: var(--border); }
+
+.expense-amount-input::placeholder {
+  color: var(--border);
+  font-weight: 300;
+}
 .expense-amount-unit {
-  font-size: 16px; color: var(--tx-m); font-weight: 400; flex-shrink: 0;
+  flex-shrink: 0;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--tx-m);
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  white-space: nowrap;
 }
 
 /* 지출처 입력 */
