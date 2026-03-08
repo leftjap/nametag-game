@@ -501,11 +501,15 @@ function openExpenseModal(expenseId) {
 
   renderExpenseCategoryGrid('modal');
   modal.style.display = 'flex';
+  modal.classList.add('open');
 }
 
 function closeExpenseModal() {
   const modal = document.getElementById('expenseModalOverlay');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
 }
 
 function onExpenseModalOverlayClick(e) {
