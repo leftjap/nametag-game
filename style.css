@@ -2734,7 +2734,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-tl-date-group {
-  padding: 0 20px;
+  padding: 0;
+  margin: 0 20px;
   margin-bottom: 0;
 }
 
@@ -2746,17 +2747,15 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   font-size: 13px;
   font-weight: 500;
   color: var(--tx-l);
-  padding: 0;
-  margin: 0 0 10px 0;
+  padding: 0 0 8px 0;
+  margin: 0;
   letter-spacing: -0.2px;
-  text-align: left;
 }
 
 .exp-tl-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
+  padding: 8px 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
