@@ -364,3 +364,144 @@ function renderMonthlyCard() {
   html += '</div>';
   container.innerHTML = html;
 }
+
+// ═══ 루틴 개별 상세 통계 ═══
+
+function getRoutineStreak(routineId) {
+  var all = getAllChk();
+  var d = new Date();
+  var current = 0, best = 0, tempStreak = 0;
+
+  // 현재 연속
+  for (var i = 0; i < 365; i++) {
+    var dt = new Date(d); dt.setDate(d.getDate() - i);
+    var key = getLocalYMD(dt);
+    if (all[key] && all[key][routineId]) {
+      current++;
+    } else {
+      if (i === 0) current = 0;
+      break;
+    }
+  }
+
+  // 최장 연속
+  for (var j = 0; j < 365; j++) {
+    var dt2 = new Date(d); dt2.setDate(d.getDate() - j);
+    var key2 = getLocalYMD(dt2);
+    if (all[key2] && all[key2][routineId]) {
+      tempStreak++;
+      if (tempStreak > best) best = tempStreak;
+    } else {
+      tempStreak = 0;
+    }
+  }
+
+  return { current: current, best: best };
+}
+
+function getRoutineMonthlyHeatmap(routineId, year, month) {
+  var all = getAllChk();
+  var daysInMonth = new Date(year, month, 0).getDate();
+  var result = [];
+
+  for (var day = 1; day <= daysInMonth; day++) {
+    var key = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    var done = !!(all[key] && all[key][routineId]);
+    var dateObj = new Date(year, month - 1, day);
+    result.push({
+      day: day,
+      date: key,
+      done: done,
+      dow: dateObj.getDay(),
+      isFuture: dateObj > new Date()
+    });
+  }
+  return result;
+}
+
+function getRoutineWeeklyTrend(routineId, numWeeks) {
+  var all = getAllChk();
+  var now = new Date();
+  var result = [];
+
+  for (var w = numWeeks - 1; w >= 0; w--) {
+    var weekEnd = new Date(now);
+    weekEnd.setDate(now.getDate() - (w * 7));
+    var weekStart = new Date(weekEnd);
+    weekStart.setDate(weekEnd.getDate() - 6);
+
+    var done = 0, total = 7;
+    for (var i = 0; i < 7; i++) {
+      var dt = new Date(weekStart);
+      dt.setDate(weekStart.getDate() + i);
+      if (dt > now) { total = i; break; }
+      var key = getLocalYMD(dt);
+      if (all[key] && all[key][routineId]) done++;
+    }
+
+    var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    var label = (weekStart.getMonth() + 1) + '/' + weekStart.getDate();
+    result.push({ label: label, done: done, total: total, pct: pct });
+  }
+  return result;
+}
+
+function getRoutineStats(routineId) {
+  var all = getAllChk();
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth();
+
+  // 이번 달 달성률
+  var todayDate = now.getDate();
+  var monthDone = 0;
+  for (var d = 1; d <= todayDate; d++) {
+    var key = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    if (all[key] && all[key][routineId]) monthDone++;
+  }
+  var monthPct = todayDate > 0 ? Math.round((monthDone / todayDate) * 100) : 0;
+
+  // 전체 기간 달성률 (최근 90일)
+  var totalDone = 0, totalDays = 0;
+  for (var i = 0; i < 90; i++) {
+    var dt = new Date(now); dt.setDate(now.getDate() - i);
+    var key2 = getLocalYMD(dt);
+    totalDays++;
+    if (all[key2] && all[key2][routineId]) totalDone++;
+  }
+  var totalPct = totalDays > 0 ? Math.round((totalDone / totalDays) * 100) : 0;
+
+  // 요일별 달성률
+  var dowDone = [0, 0, 0, 0, 0, 0, 0];
+  var dowTotal = [0, 0, 0, 0, 0, 0, 0];
+  for (var j = 0; j < 90; j++) {
+    var dt2 = new Date(now); dt2.setDate(now.getDate() - j);
+    var dow = dt2.getDay();
+    var key3 = getLocalYMD(dt2);
+    dowTotal[dow]++;
+    if (all[key3] && all[key3][routineId]) dowDone[dow]++;
+  }
+
+  var dowNames = ['일', '월', '화', '수', '목', '금', '토'];
+  var bestDow = 0, worstDow = 0, bestPct = -1, worstPct = 101;
+  for (var k = 0; k < 7; k++) {
+    var p = dowTotal[k] > 0 ? (dowDone[k] / dowTotal[k]) * 100 : 0;
+    if (p > bestPct) { bestPct = p; bestDow = k; }
+    if (p < worstPct) { worstPct = p; worstDow = k; }
+  }
+
+  return {
+    monthDone: monthDone,
+    monthTotal: todayDate,
+    monthPct: monthPct,
+    totalDone: totalDone,
+    totalDays: totalDays,
+    totalPct: totalPct,
+    bestDow: dowNames[bestDow],
+    bestDowPct: Math.round(bestPct),
+    worstDow: dowNames[worstDow],
+    worstDowPct: Math.round(worstPct),
+    dowData: dowNames.map(function(name, idx) {
+      return { name: name, pct: dowTotal[idx] > 0 ? Math.round((dowDone[idx] / dowTotal[idx]) * 100) : 0 };
+    })
+  };
+}
