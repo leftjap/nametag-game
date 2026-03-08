@@ -992,27 +992,8 @@ function handleNew() {
 }
 
 function handleBackBtn() {
-  // 가계부 탭: 전체 내역(B)이면 대시보드(A)로, 대시보드(A)이면 탭 전환
-  if (activeTab === 'expense') {
-    var detailPane = document.getElementById('expFullDetailPane');
-    if (detailPane && detailPane.style.display !== 'none') {
-      showExpenseDashboardFromDetail();
-      return;
-    }
-    switchTab('navi');
-    return;
-  }
-
-  const w = window.innerWidth;
-  if (w >= 769 && w <= 1400) {
-    const app = document.getElementById('mainApp');
-    if (app.classList.contains('tablet-side-open'))   { app.classList.remove('tablet-side-open');   app.classList.add('tablet-list-closed'); }
-    else if (app.classList.contains('tablet-list-closed')) { app.classList.remove('tablet-list-closed'); app.classList.add('tablet-side-open'); }
-    else app.classList.add('tablet-list-closed');
-    updateBackBtnIcon();
-  } else {
-    setMobileView('list');
-  }
+  // 현재 탭을 유지한 채 에디터 → 리스트 뷰로 전환
+  setMobileView('list');
 }
 
 function handleDone() {
