@@ -4,30 +4,29 @@
 
 // 카테고리 아이콘 매핑
 var CATEGORY_ICONS = {
-  '식비': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 3v18M6 3v7c0 1.1.9 2 2 2h2a2 2 0 002-2V3M10 3v18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  '카페': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 8h1a4 4 0 010 8h-1M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8zM6 2v3M10 2v3M14 2v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  '교통': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="7.5" cy="15" r="1.5" fill="currentColor"/><circle cx="16.5" cy="15" r="1.5" fill="currentColor"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg>',
-  '쇼핑': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  '생활': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  '공과금': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  '대출': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M2 10h20" stroke="currentColor" stroke-width="1.8"/><path d="M6 14h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
-  '의료': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/></svg>',
-  '반려동물': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="7" cy="8" r="2" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="8" r="2" stroke="currentColor" stroke-width="1.8"/><circle cx="4" cy="14" r="1.5" stroke="currentColor" stroke-width="1.8"/><circle cx="20" cy="14" r="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 18c0-2.2 1.8-4 4-4s4 1.8 4 4c0 1.1-1.8 2-4 2s-4-.9-4-2z" stroke="currentColor" stroke-width="1.8"/></svg>',
-  '문화': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  '기타': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+  'food': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14.86l.04-.12.96-1.74h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0020.07 4H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42a.25.25 0 01-.26-.24z"/></svg>',
+  'dining': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M2 19h18v2H2v-2zm2-5a4 4 0 004 4h4a4 4 0 004-4V5H4v9zm14-7h2a3 3 0 010 6h-2V7z"/></svg>',
+  'shopping': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>',
+  'transport': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>',
+  'utility': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>',
+  'medical': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>',
+  'culture': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>',
+  'loan': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>',
+  'pet': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><circle cx="4.5" cy="9.5" r="2.5"/><circle cx="9" cy="5.5" r="2.5"/><circle cx="15" cy="5.5" r="2.5"/><circle cx="19.5" cy="9.5" r="2.5"/><path d="M17.34 14.86c-.87-1.02-1.6-1.89-2.48-2.91-.46-.54-1.17-.88-1.86-.88s-1.4.34-1.86.88c-.87 1.02-1.61 1.89-2.48 2.91-1.31 1.31-2.92 2.76-2.62 4.79.29 1.02 1.02 2.03 2.33 2.32.73.15 3.06-.44 5.54-.44h.18c2.48 0 4.81.59 5.54.44 1.31-.29 2.04-1.31 2.33-2.32.31-2.04-1.3-3.49-2.62-4.79z"/></svg>',
+  'gift': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.1 0-2 .9-2 2v3c0 .55.45 1 1 1h1v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h1c.55 0 1-.45 1-1V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 15H6v-7h5v7zm0-8H3V8h8v3zm2 8v-7h5v7h-5zm5-8h-5V8h5v3z"/></svg>',
+  'etc': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>'
 };
 
-function getCategoryIcon(category) {
-  if (!category) return CATEGORY_ICONS['기타'];
-  if (CATEGORY_ICONS[category]) return CATEGORY_ICONS[category];
-  // 부분 매칭 (예: '식비/외식' → '식비')
-  var keys = Object.keys(CATEGORY_ICONS);
-  for (var i = 0; i < keys.length; i++) {
-    if (category.indexOf(keys[i]) !== -1 || keys[i].indexOf(category) !== -1) {
-      return CATEGORY_ICONS[keys[i]];
-    }
-  }
-  return CATEGORY_ICONS['기타'];
+function getCategoryIcon(item) {
+  var cat = item.category || '';
+  if (CATEGORY_ICONS[cat]) return CATEGORY_ICONS[cat];
+  return CATEGORY_ICONS['etc'];
+}
+
+function getCategoryBg(item) {
+  var cat = item.category || '';
+  var found = EXPENSE_CATEGORIES.find(function(c) { return c.id === cat; });
+  return found ? found.bg : '#B0B0B8';
 }
 
 function updateExpenseCompact() {
@@ -56,19 +55,12 @@ function renderExpenseDashboard(platform) {
   var trend = getMonthlyTrend();
   var catBreakdown = getCategoryBreakdown(thisYM);
   var thisMonthTotal = getMonthTotal(thisYM);
-  var d = new Date(thisYM + '-01');
-  var monthLabel = (d.getMonth() + 1) + '월';
   var totalDisplay = thisMonthTotal > 0 ? formatAmount(thisMonthTotal) + '원' : '0원';
 
-  var html = '';
+  // 월 헤더를 상단 네비에 렌더링
+  renderExpenseMonthNav(thisYM);
 
-  // 1. 월 이동 헤더 — 전체 너비, 가운데 정렬
-  var _isNowMonth = (thisYM === today().slice(0, 7));
-  html += '<div class="exp-month-nav">'
-    + '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)"><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg></button>'
-    + '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + monthLabel + '</span>'
-    + '<button class="exp-month-nav-btn' + (_isNowMonth ? ' exp-nav-disabled' : '') + '"' + (_isNowMonth ? '' : ' onclick="changeExpenseMonth(1)"') + '><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg></button>'
-    + '</div>';
+  var html = '';
 
   var summaryTitle = '오늘까지 ' + totalDisplay + ' 썼어요';
 
@@ -325,12 +317,12 @@ function renderRecentExpenses(yearMonth) {
 
     items.forEach(function(item, idx) {
       html += '<div class="exp-tl-item" onclick="loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');">';
-      html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
+      html += '<div class="exp-tl-item-icon" style="background:' + getCategoryBg(item) + '">' + getCategoryIcon(item) + '</div>';
       html += '<div class="exp-tl-item-left">';
       html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
       html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
-      if (item.payMethod) {
-        html += ' | ' + item.payMethod;
+      if (item.card) {
+        html += ' | ' + item.card;
       }
       html += '</span>';
       html += '</div>';
@@ -423,12 +415,12 @@ function renderExpenseTimeline(yearMonth, useModal) {
         : 'loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');';
 
       html += '<div class="exp-tl-item" onclick="' + clickAction + '">';
-      html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
+      html += '<div class="exp-tl-item-icon" style="background:' + getCategoryBg(item) + '">' + getCategoryIcon(item) + '</div>';
       html += '<div class="exp-tl-item-left">';
       html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
       html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
-      if (item.payMethod) {
-        html += ' | ' + item.payMethod;
+      if (item.card) {
+        html += ' | ' + item.card;
       }
       html += '</span>';
       html += '</div>';
@@ -600,25 +592,16 @@ function renderExpenseFullDetail(yearMonth) {
 
   var d = new Date(yearMonth + '-01');
   var monthNum = d.getMonth() + 1;
-  var monthLabel = monthNum + '월';
   var fullMonthLabel = d.getFullYear() + '년 ' + monthNum + '월';
   var nowYM = today().slice(0, 7);
   var isCurrentMonth = (yearMonth === nowYM);
-  var isFutureDisabled = (yearMonth >= nowYM);
   var monthTotal = getMonthTotal(yearMonth);
   var catBreakdown = getCategoryBreakdown(yearMonth);
 
+  // 월 헤더를 상단 네비에 렌더링
+  renderExpenseMonthNav(yearMonth);
+
   var html = '';
-
-  // 월 이동 헤더
-  var _leftSvg = '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg>';
-  var _rightSvg = '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg>';
-
-  html += '<div class="exp-month-nav">';
-  html += '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)">' + _leftSvg + '</button>';
-  html += '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + monthLabel + '</span>';
-  html += '<button class="exp-month-nav-btn' + (isFutureDisabled ? '' : '') + '" onclick="changeExpenseMonth(1)">' + _rightSvg + '</button>';
-  html += '</div>';
 
   if (!isCurrentMonth) {
     var totalDisplay = monthTotal > 0 ? formatAmount(monthTotal) + '원' : '0원';
@@ -641,12 +624,6 @@ function renderExpenseFullDetail(yearMonth) {
 
     html += renderMonthCalendar(yearMonth);
   }
-
-  // 검색
-  html += '<div class="exp-search-bar">';
-  html += '<input type="text" class="exp-search-input" id="expenseSearchInput" placeholder="검색" ';
-  html += 'onkeyup="filterExpenseDetail(this.value)">';
-  html += '</div>';
 
   // 타임라인
   html += '<div class="exp-full-timeline-wrap">';
@@ -720,12 +697,12 @@ function renderExpenseFullTimeline(yearMonth, query = '') {
         : 'loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');';
 
       html += '<div class="exp-tl-item" onclick="' + clickAction + '">';
-      html += '<div class="exp-tl-item-icon">' + getCategoryIcon(item.category) + '</div>';
+      html += '<div class="exp-tl-item-icon" style="background:' + getCategoryBg(item) + '">' + getCategoryIcon(item) + '</div>';
       html += '<div class="exp-tl-item-left">';
       html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
       html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
-      if (item.payMethod) {
-        html += ' | ' + item.payMethod;
+      if (item.card) {
+        html += ' | ' + item.card;
       }
       html += '</span>';
       html += '</div>';
@@ -774,25 +751,16 @@ function renderExpenseFullDetailMobile(yearMonth) {
 
   var d = new Date(yearMonth + '-01');
   var monthNum = d.getMonth() + 1;
-  var monthLabel = monthNum + '월';
   var fullMonthLabel = d.getFullYear() + '년 ' + monthNum + '월';
   var nowYM = today().slice(0, 7);
   var isCurrentMonth = (yearMonth === nowYM);
-  var isFutureDisabled = (yearMonth >= nowYM);
   var monthTotal = getMonthTotal(yearMonth);
   var catBreakdown = getCategoryBreakdown(yearMonth);
 
+  // 월 헤더를 상단 네비에 렌더링
+  renderExpenseMonthNav(yearMonth);
+
   var html = '';
-
-  // 월 이동 헤더
-  var _leftSvg = '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg>';
-  var _rightSvg = '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg>';
-
-  html += '<div class="exp-month-nav">';
-  html += '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)">' + _leftSvg + '</button>';
-  html += '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + monthLabel + '</span>';
-  html += '<button class="exp-month-nav-btn' + (isFutureDisabled ? ' exp-nav-disabled' : '') + '"' + (isFutureDisabled ? '' : ' onclick="changeExpenseMonth(1)"') + '>' + _rightSvg + '</button>';
-  html += '</div>';
 
   if (!isCurrentMonth) {
     var totalDisplay = monthTotal > 0 ? formatAmount(monthTotal) + '원' : '0원';
@@ -814,11 +782,6 @@ function renderExpenseFullDetailMobile(yearMonth) {
 
     html += renderMonthCalendar(yearMonth);
   }
-
-  // 검색
-  html += '<div class="exp-search-bar">';
-  html += '<input type="text" class="exp-search-input" placeholder="검색" oninput="filterExpenseDetailMobile(this.value, \'' + yearMonth + '\')">';
-  html += '</div>';
 
   // 타임라인
   html += '<div id="expMobileTimeline">';
@@ -922,4 +885,77 @@ function selectMonth(ym) {
       showExpenseFullDetailMobile(ym);
     }
   }
+}
+
+// ═══════════════════════════════════════
+// 월 헤더 렌더링 (상단 네비 바)
+// ═══════════════════════════════════════
+function renderExpenseMonthNav(yearMonth) {
+  var w = window.innerWidth;
+
+  if (w <= 768) {
+    // 모바일: lp-hdr에 삽입
+    var lpHdr = document.querySelector('.lp-hdr');
+    if (!lpHdr) return;
+    var existing = lpHdr.querySelector('.exp-month-nav-inline');
+    if (existing) existing.remove();
+    lpHdr.insertAdjacentHTML('beforeend', _buildMonthNavHtml(yearMonth));
+  } else if (w <= 1400) {
+    // 태블릿: ed-topbar의 위치에 삽입
+    var tabLabel = document.getElementById('edTabLabel');
+    if (tabLabel) tabLabel.style.display = 'none';
+    var topbar = document.querySelector('.ed-topbar');
+    if (!topbar) return;
+    var existing2 = topbar.querySelector('.exp-month-nav-inline');
+    if (existing2) existing2.remove();
+    var leftEl = topbar.querySelector('.ed-topbar-left');
+    if (leftEl) leftEl.insertAdjacentHTML('afterend', _buildMonthNavHtml(yearMonth));
+  } else {
+    // PC: expenseFullDashboard 상단에 삽입
+    var container = document.getElementById('expFullDashboardPane');
+    var container2 = document.getElementById('expFullDetailPane');
+    [container, container2].forEach(function(c) {
+      if (!c) return;
+      var existing3 = c.querySelector('.exp-month-nav-inline');
+      if (existing3) existing3.remove();
+    });
+    var activeContainer = container && container.style.display !== 'none' ? container : container2;
+    if (activeContainer) {
+      activeContainer.insertAdjacentHTML('afterbegin', _buildMonthNavHtml(yearMonth));
+    }
+  }
+}
+
+function _buildMonthNavHtml(yearMonth) {
+  var d = new Date(yearMonth + '-01');
+  var monthLabel = (d.getMonth() + 1) + '월';
+  var nowYM = today().slice(0, 7);
+  var _isNowMonth = (yearMonth === nowYM);
+
+  return '<div class="exp-month-nav-inline">'
+    + '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)">'
+    + '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg>'
+    + '</button>'
+    + '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + monthLabel + '</span>'
+    + '<button class="exp-month-nav-btn' + (_isNowMonth ? ' exp-nav-disabled' : '') + '"'
+    + (_isNowMonth ? '' : ' onclick="changeExpenseMonth(1)"') + '>'
+    + '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg>'
+    + '</button>'
+    + '</div>';
+}
+
+// ═══════════════════════════════════════
+// 카테고리 아이콘 팔레트 (확인용)
+// ═══════════════════════════════════════
+function renderIconPalette() {
+  var html = '<div class="exp-icon-palette">';
+  EXPENSE_CATEGORIES.forEach(function(cat) {
+    var icon = CATEGORY_ICONS[cat.id] || CATEGORY_ICONS['etc'];
+    html += '<div class="exp-icon-palette-item">'
+      + '<div class="exp-icon-palette-circle" style="background:' + cat.bg + '">' + icon + '</div>'
+      + '<span class="exp-icon-palette-name">' + cat.name + '</span>'
+      + '</div>';
+  });
+  html += '</div>';
+  return html;
 }
