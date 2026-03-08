@@ -231,17 +231,17 @@ function injectExpenseMockData() {
 
   // 고정 지출 템플릿 (월별)
   const fixedExpenses = [
-    { name: '아파트 관리비', category: 'utility', amount: 117000, card: 'KB국민계좌', day: 3 },
-    { name: 'SK 통신비', category: 'utility', amount: 65000, card: '신한카드', day: 15 },
-    { name: '서울가스', category: 'utility', amount: 42000, card: '삼성카드', day: 20 },
-    { name: '신한은행 대출이자', category: 'loan', amount: 156000, card: 'KB국민계좌', day: 10 },
-    { name: '삼성화재 보험료', category: 'etc', amount: 98000, card: '신한카드', day: 25 },
-    { name: 'Netflix 구독료', category: 'culture', amount: 17900, card: '삼성카드', day: 1 }
+    { name: '아파트 관리비', category: '공과금', amount: 117000, card: 'KB국민계좌', day: 3 },
+    { name: 'SK 통신비', category: '공과금', amount: 65000, card: '신한카드', day: 15 },
+    { name: '서울가스', category: '공과금', amount: 42000, card: '삼성카드', day: 20 },
+    { name: '신한은행 대출이자', category: '대출', amount: 156000, card: 'KB국민계좌', day: 10 },
+    { name: '삼성화재 보험료', category: '기타', amount: 98000, card: '신한카드', day: 25 },
+    { name: 'Netflix 구독료', category: '문화', amount: 17900, card: '삼성카드', day: 1 }
   ];
 
   // 변동 지출 가맹점 템플릿
   const merchantTemplates = {
-    food: [
+    '식비': [
       { names: ['스타벅스', '투썸 플레이스', '이디야', '컴포즈'], weight: 15, minA: 4000, maxA: 7000 },
       { names: ['GS25', 'CU', '세븐일레븐', '미니스톱'], weight: 12, minA: 5000, maxA: 15000 },
       { names: ['김밥천국', '김치찌개집', '고기마을', '한금네'], weight: 8, minA: 8000, maxA: 18000 },
@@ -249,27 +249,27 @@ function injectExpenseMockData() {
       { names: ['요기요', '배달의민족', '쿠팡이츠'], weight: 7, minA: 15000, maxA: 40000 },
       { names: ['파리바게뜨', '뚜레쥬르', '달콤한 빵'], weight: 5, minA: 3000, maxA: 12000 }
     ],
-    living: [
+    '생활': [
       { names: ['이마트 마포점', '이마트 강남점', '홈플러스'], weight: 6, minA: 50000, maxA: 150000 },
       { names: ['쿠팡', '네이버쇼핑', '무신사'], weight: 3, minA: 30000, maxA: 200000 },
       { names: ['올리브영', '다이소', '몽동닷컴'], weight: 4, minA: 10000, maxA: 50000 }
     ],
-    transport: [
+    '교통': [
       { names: ['카카오T', '타다', '우버'], weight: 8, minA: 5000, maxA: 25000 },
       { names: ['GS칼텍스', 'SK에너지', 'S-OIL'], weight: 2, minA: 50000, maxA: 80000 },
       { names: ['코레일', 'KTX 승차권'], weight: 1, minA: 20000, maxA: 80000 }
     ],
-    medical: [
+    '의료': [
       { names: ['서울의료센터', 'A병원', '365의원', '약국'], weight: 2, minA: 15000, maxA: 200000 }
     ],
-    pet: [
+    '반려동물': [
       { names: ['반려동물병원', '펫샵', '펫음식 마켓'], weight: 1, minA: 20000, maxA: 150000 }
     ],
-    culture: [
+    '문화': [
       { names: ['CGV', '메가박스', '스팟'], weight: 2, minA: 15000, maxA: 30000 },
       { names: ['교보문고', '영풍문고', '알라딘'], weight: 2, minA: 10000, maxA: 40000 }
     ],
-    etc: [
+    '기타': [
       { names: ['기타가맹점', '기타상점'], weight: 3, minA: 5000, maxA: 30000 }
     ]
   };
@@ -316,16 +316,16 @@ function injectExpenseMockData() {
       const txCount = Math.random() < 0.3 ? 2 : (Math.random() < 0.2 ? 3 : 1);
       for (let t = 0; t < txCount; t++) {
         // 카테고리 선택 (가중치)
-        const weights = { food: 40, living: 20, transport: 15, medical: 3, pet: 2, culture: 8, etc: 12 };
+        const weights = { '식비': 40, '생활': 20, '교통': 15, '의료': 3, '반려동물': 2, '문화': 8, '기타': 12 };
         let rand = Math.random() * 100;
-        let category = 'food';
+        let category = '식비';
         for (const [cat, w] of Object.entries(weights)) {
           rand -= w;
           if (rand <= 0) { category = cat; break; }
         }
 
         // 가맹점 선택
-        const templates = merchantTemplates[category] || merchantTemplates.etc;
+        const templates = merchantTemplates[category] || merchantTemplates['기타'];
         let tmpl = templates[0];
         let wrand = Math.random() * templates.reduce((s, t) => s + t.weight, 0);
         for (const t of templates) {
