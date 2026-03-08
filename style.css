@@ -2593,3 +2593,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   cursor: default !important;
   pointer-events: none !important;
 }
+
+.pane-expense-dashboard .exp-month-nav,
+.pane-expense-detail .exp-month-nav {
+  padding-top: 0;
+}
