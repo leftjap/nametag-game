@@ -545,7 +545,11 @@ function setupAutoSave() {
     }
   });
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') { clearTimeout(_at); saveLocalOnly(); SYNC.syncAll(); }
+    if (document.visibilityState === 'hidden') {
+      clearTimeout(_at); saveLocalOnly(); SYNC.syncAll();
+    } else if (document.visibilityState === 'visible') {
+      SYNC.mergeServerExpenses();
+    }
   });
 }
 

@@ -533,6 +533,7 @@ index.html        — 마크업
 - `saveDatabase()`, `scheduleDatabaseSave()` — DB 저장 (3초 디바운스)
 - `uploadImage(base64, filename, mime)` — 이미지 → 구글 드라이브
 - `saveDocToGDrive(id, type)`, `scheduleDocSave(type)` — 문서 → 드라이브 (5초 디바운스)
+- `mergeServerExpenses()` — 서버에서 expenses를 가져와 LocalStorage와 ID 기준 병합 (SMS 자동 반영)
 - `saveChecksToSheet(dateStr, checkData)` — 루틴 → 스프레드시트
 - `scheduleBookSave(book)`, `saveBooksToSheet(book)` — 책 → 드라이브
 - `scheduleQuoteSave(text, by, id)`, `saveQuotesToSheet(text, by)` — 어구 → 스프레드시트
@@ -662,6 +663,9 @@ index.html        — 마크업
 
 ### 가계부 흐름 (현재 패턴)
 사이드바 클릭 → `switchTab('expense')` → PC/태블릿: `expenseFullDashboard` 표시 + `renderExpenseDashboard('pc')` / 모바일: `pane-expense-dashboard` 표시 + `renderExpenseDashboard('mobile')` → "내역 더 보기" 클릭 → 전체 내역 표시
+
+### SMS 가계부 자동 반영 흐름
+iOS 단축어가 카드 문자 수신 → GAS `saveExpenseFromSMS` 호출 → `app_database.json`에 expense 추가 → 앱이 포그라운드 복귀 시 `visibilitychange` → `SYNC.mergeServerExpenses()` → 서버 expenses를 ID 기준으로 LocalStorage와 병합 → 가계부 탭이면 대시보드 리렌더
 
 ---
 
@@ -824,6 +828,7 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 - 수동저장 (togglePin 등): `SYNC.scheduleDatabaseSave()`
 - 루틴: 1.2초 디바운스 → `SYNC.saveChecksToSheet()` + `scheduleDatabaseSave()`
 - 가계부: `saveExpenseForm` 내부에서 `SYNC.scheduleDatabaseSave()`
+- SMS 자동 반영: `visibilitychange(visible)` → `SYNC.mergeServerExpenses()` → 서버 expenses를 LocalStorage에 병합
 
 ---
 

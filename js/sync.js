@@ -255,6 +255,41 @@ const SYNC = {
     await this._post({ action: 'save_quote', text: text || '', by: by || '' });
   },
 
+  // ═══ 서버 expenses 병합 (SMS 자동 반영) ═══
+  async mergeServerExpenses() {
+    if (!this.isDbLoaded) return;
+    try {
+      const res = await this._post({ action: 'load_db' });
+      if (!res || !res.dbData) return;
+      const serverExpenses = res.dbData[K.expenses];
+      if (!serverExpenses || !Array.isArray(serverExpenses)) return;
+      const localExpenses = getExpenses();
+      const localIds = new Set(localExpenses.map(e => e.id));
+      let added = 0;
+      for (let i = 0; i < serverExpenses.length; i++) {
+        if (!localIds.has(serverExpenses[i].id)) {
+          localExpenses.unshift(serverExpenses[i]);
+          added++;
+        }
+      }
+      if (added > 0) {
+        localExpenses.sort((a, b) => {
+          const da = (b.date || '') + (b.time || '');
+          const db = (a.date || '') + (a.time || '');
+          return da.localeCompare(db);
+        });
+        saveExpenses(localExpenses);
+        updateExpenseCompact();
+        if (activeTab === 'expense') {
+          var platform = window.innerWidth > 768 ? 'pc' : 'mobile';
+          renderExpenseDashboard(platform);
+        }
+      }
+    } catch (e) {
+      console.warn('mergeServerExpenses 실패:', e.message);
+    }
+  },
+
   // ═══ 전체 동기화 ═══
   async syncAll() {
     if (!this.isDbLoaded) return;
