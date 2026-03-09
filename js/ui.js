@@ -160,6 +160,11 @@ function switchTab(t, keepLayout) {
 
   clearSearch();
   hideRoutineCard();
+  // 루틴 캘린더 뷰 정리
+  var _rcPanel = document.getElementById('editorRoutineDetail');
+  if (_rcPanel && _rcPanel.style.display !== 'none') {
+    if (typeof hideRoutineCalView === 'function') hideRoutineCalView();
+  }
 
   if (t === 'expense') {
     const w = window.innerWidth;
