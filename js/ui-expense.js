@@ -151,33 +151,35 @@ function renderCumulativeChart(yearMonth) {
     prevMonthCumulative[i] = prevSum;
   }
 
-  // maxY: 현재 시점까지의 이번달/지난달 누적값 중 큰 값 기준
-  // → 토스처럼 "지금까지의 데이터"에 맞춰 차트가 꽉 차게 됨
-  var relevantVals = [1]; // 최소값 1 (0 나누기 방지)
+  // ── maxY: 현재까지 데이터 + 전월 전체 중 최대값 ──
+  var relevantVals = [1];
   for (var rv = 1; rv <= lastDataDay; rv++) {
     relevantVals.push(thisMonthCumulative[rv]);
     relevantVals.push(prevMonthCumulative[rv]);
   }
-  // 지난달은 전체 표시하므로 전체 값도 포함
   for (var rv2 = lastDataDay + 1; rv2 <= daysInMonth; rv2++) {
     relevantVals.push(prevMonthCumulative[rv2]);
   }
   var maxY = Math.max.apply(null, relevantVals);
 
-  var width = 260, height = 170, paddingX = 0, paddingY = 2;
-  var graphWidth = width - paddingX * 2;
-  var graphHeight = height - paddingY * 2 - 14;
-  var bottom = paddingY + graphHeight;
+  // ── SVG 좌표계: viewBox 전체를 그래프에 사용 ──
+  var width = 260, height = 150;
+  var padTop = 6, padBottom = 20; // 상단 약간 여유, 하단 라벨 영역
+  var graphLeft = 0, graphRight = width; // 좌우 끝까지
+  var graphWidth = graphRight - graphLeft;
+  var graphTop = padTop;
+  var graphBottom = height - padBottom;
+  var graphHeight = graphBottom - graphTop;
 
   var thisPoints = '', prevPoints = '';
-  var thisFill = paddingX + ',' + bottom + ' ';
-  var prevFill = paddingX + ',' + bottom + ' ';
+  var thisFill = graphLeft + ',' + graphBottom + ' ';
+  var prevFill = graphLeft + ',' + graphBottom + ' ';
   var dotX = 0, dotY = 0;
 
   for (var j = 1; j <= daysInMonth; j++) {
-    var x = paddingX + (j - 1) / (daysInMonth - 1) * graphWidth;
-    var thisY = paddingY + graphHeight - (thisMonthCumulative[j] / maxY) * graphHeight;
-    var prevY = paddingY + graphHeight - (prevMonthCumulative[j] / maxY) * graphHeight;
+    var x = graphLeft + (j - 1) / (daysInMonth - 1) * graphWidth;
+    var thisY = graphTop + graphHeight - (thisMonthCumulative[j] / maxY) * graphHeight;
+    var prevY = graphTop + graphHeight - (prevMonthCumulative[j] / maxY) * graphHeight;
 
     if (j <= lastDataDay) {
       thisPoints += x + ',' + thisY + ' ';
@@ -190,21 +192,21 @@ function renderCumulativeChart(yearMonth) {
     prevFill += x + ',' + prevY + ' ';
   }
 
-  var lastThisX = paddingX + (lastDataDay - 1) / (daysInMonth - 1) * graphWidth;
-  thisFill += lastThisX + ',' + bottom;
-  var lastPrevX = paddingX + graphWidth;
-  prevFill += lastPrevX + ',' + bottom;
+  var lastThisX = graphLeft + (lastDataDay - 1) / (daysInMonth - 1) * graphWidth;
+  thisFill += lastThisX + ',' + graphBottom;
+  var lastPrevX = graphRight;
+  prevFill += lastPrevX + ',' + graphBottom;
 
-  var labelY = bottom + 16;
+  var labelY = height - 4; // 라벨을 SVG 하단에 배치
   var startLabel = monthNum + '.1';
   var endLabel = monthNum + '.' + daysInMonth;
   var todayLabel = monthNum + '.' + lastDataDay;
   var todayLabelX = dotX;
-  var startX = paddingX;
-  var endX = paddingX + graphWidth;
+  var startX = graphLeft;
+  var endX = graphRight;
 
   return '<div class="exp-chart-wrap">'
-    + '<svg class="exp-chart-svg" viewBox="0 0 ' + width + ' ' + height + '">'
+    + '<svg class="exp-chart-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">'
     + '<defs>'
     + '<linearGradient id="thisMonthGrad" x1="0" y1="0" x2="0" y2="1">'
     + '<stop offset="0%" stop-color="#E55643" stop-opacity="0.25"/>'

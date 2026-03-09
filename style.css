@@ -1848,10 +1848,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
 /* 누적 곡선 차트 */
 .exp-chart-wrap {
-  padding: 0 0 8px; border-bottom: 1px solid var(--border-l);
-  border: 2px dashed #007aff; border-radius: 12px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border-l);
 }
-.exp-chart-svg { width: 100%; height: 160px; }
+.exp-chart-svg { width: 100%; height: auto; aspect-ratio: 260 / 150; }
 .exp-chart-legend {
   display: flex; align-items: center; justify-content: center;
   gap: 16px; margin-top: 8px; font-size: 11px; color: var(--tx-hint);
@@ -2890,7 +2890,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
 .exp-chart-wrap svg.exp-chart-svg {
   width: 100% !important;
-  height: 140px !important;
+  height: auto !important;
+  aspect-ratio: 260 / 150;
   display: block;
 }
 
