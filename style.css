@@ -627,6 +627,24 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   background:#7a9968;
 }
 
+/* 동기화 상태별 구름 아이콘 피드백 */
+.sync-cloud-btn.syncing{
+  animation:syncSpin 1s linear infinite;
+}
+.sync-cloud-btn.syncing svg{
+  color:var(--yellow) !important;
+}
+.sync-cloud-btn.sync-ok svg{
+  color:#7a9968 !important;
+}
+.sync-cloud-btn.sync-error svg{
+  color:var(--red) !important;
+}
+@keyframes syncSpin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+
 /* ═══════════════════════════════════════
    루틴 컴팩트 스타일
    ═══════════════════════════════════════ */
