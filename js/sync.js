@@ -29,17 +29,12 @@ const SYNC = {
       clearTimeout(this._labelTimer);
       label.classList.remove('error');
       if (type === 'syncing') {
-        label.innerHTML = '동기화 중<span class="sync-dots"></span>';
-        label.classList.add('show');
+        label.textContent = '동기화 진행 중';
       } else if (type === 'error') {
-        label.textContent = text;
-        label.classList.add('show', 'error');
+        label.textContent = text || '오류';
+        label.classList.add('error');
       } else {
-        label.textContent = '완료됨!';
-        label.classList.add('show');
-        this._labelTimer = setTimeout(() => {
-          label.classList.remove('show');
-        }, 2000);
+        label.textContent = '완료됨';
       }
     }
   },
