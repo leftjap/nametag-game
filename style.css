@@ -2238,7 +2238,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-category-amount {
-  font-size: 13px; font-weight: 600; color: var(--tx-d); text-align: right;
+  font-size: 16px; font-weight: 500; color: var(--tx-d); text-align: right;
 }
 
 /* ═══ 카테고리 차트 카드 통일 ═══ */
@@ -2281,7 +2281,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-category-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--tx-d) !important;
   white-space: nowrap;
@@ -2529,11 +2529,12 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
 
   .exp-category-name {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .exp-category-amount {
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 500;
   }
 
   .exp-bar-chart {
