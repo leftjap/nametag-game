@@ -153,20 +153,20 @@ function renderCumulativeChart(yearMonth) {
 
   var allVals = Object.values(thisMonthCumulative).concat(Object.values(prevMonthCumulative)).concat([1]);
   var maxY = Math.max.apply(null, allVals);
-  var width = 260, height = 170, padding = 20;
-  var graphWidth = width - padding * 2;
-  var graphHeight = height - padding * 2 - 18;
-  var bottom = padding + graphHeight;
+  var width = 260, height = 170, paddingX = 0, paddingY = 20;
+  var graphWidth = width - paddingX * 2;
+  var graphHeight = height - paddingY * 2 - 18;
+  var bottom = paddingY + graphHeight;
 
   var thisPoints = '', prevPoints = '';
-  var thisFill = padding + ',' + bottom + ' ';
-  var prevFill = padding + ',' + bottom + ' ';
+  var thisFill = paddingX + ',' + bottom + ' ';
+  var prevFill = paddingX + ',' + bottom + ' ';
   var dotX = 0, dotY = 0;
 
   for (var j = 1; j <= daysInMonth; j++) {
-    var x = padding + (j - 1) / (daysInMonth - 1) * graphWidth;
-    var thisY = padding + graphHeight - (thisMonthCumulative[j] / maxY) * graphHeight;
-    var prevY = padding + graphHeight - (prevMonthCumulative[j] / maxY) * graphHeight;
+    var x = paddingX + (j - 1) / (daysInMonth - 1) * graphWidth;
+    var thisY = paddingY + graphHeight - (thisMonthCumulative[j] / maxY) * graphHeight;
+    var prevY = paddingY + graphHeight - (prevMonthCumulative[j] / maxY) * graphHeight;
 
     if (j <= lastDataDay) {
       thisPoints += x + ',' + thisY + ' ';
@@ -179,9 +179,9 @@ function renderCumulativeChart(yearMonth) {
     prevFill += x + ',' + prevY + ' ';
   }
 
-  var lastThisX = padding + (lastDataDay - 1) / (daysInMonth - 1) * graphWidth;
+  var lastThisX = paddingX + (lastDataDay - 1) / (daysInMonth - 1) * graphWidth;
   thisFill += lastThisX + ',' + bottom;
-  var lastPrevX = padding + graphWidth;
+  var lastPrevX = paddingX + graphWidth;
   prevFill += lastPrevX + ',' + bottom;
 
   var labelY = bottom + 16;
@@ -189,8 +189,8 @@ function renderCumulativeChart(yearMonth) {
   var endLabel = monthNum + '.' + daysInMonth;
   var todayLabel = monthNum + '.' + lastDataDay;
   var todayLabelX = dotX;
-  var startX = padding;
-  var endX = padding + graphWidth;
+  var startX = paddingX;
+  var endX = paddingX + graphWidth;
 
   return '<div class="exp-chart-wrap">'
     + '<svg class="exp-chart-svg" viewBox="0 0 ' + width + ' ' + height + '">'
