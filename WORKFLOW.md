@@ -330,6 +330,7 @@ index.html        — 마크업
 **리스트 렌더링:**
 - `renderListPanel()` — **핵심 함수**. 현재 탭/검색/뷰모드에 따라 리스트 전체 렌더. `renderWritingGrid()` 호출
 - `generateItemHtml(item, t, showDate)` — 단일 아이템 HTML 생성
+- `_patchRoutineOnclick(itemHtml, item)` — 루틴 모드에서 아이템 onclick을 switchTab 포함으로 패치
 - 헬퍼: `getThumb()`, `getThumbs()`, `getRelativeTime()`, `escapeHtml()`, `hl()`, `getPreviewText()`
 
 **사진 뷰:** `renderPhotoView(items, t)`, `selectPhoto(id, e)`

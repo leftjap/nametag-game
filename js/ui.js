@@ -672,6 +672,41 @@ function hideDayList() {
   document.getElementById('edToolbar').style.display   = ['book','quote'].includes(activeTab) ? 'none' : 'flex';
 }
 
+// 루틴 모드에서 리스트 아이템 onclick을 switchTab 포함으로 패치
+function _patchRoutineOnclick(itemHtml, item) {
+  const itemType = item._type || item.type;
+  if (!itemType) return itemHtml;
+  // loadDoc('type','id') 패턴
+  if (textTypes.includes(itemType)) {
+    itemHtml = itemHtml.replace(
+      /onclick="loadDoc\('([^']+)','([^']+)'\);\s*setMobileView\('editor'\);"/,
+      'onclick="switchTab(\'' + itemType + '\', true); loadDoc(\'' + itemType + '\',\'' + item.id + '\'); setMobileView(\'editor\');"'
+    );
+  }
+  // loadBook('id') 패턴
+  else if (itemType === 'book') {
+    itemHtml = itemHtml.replace(
+      /onclick="loadBook\('([^']+)'\);\s*setMobileView\('editor'\);"/,
+      'onclick="switchTab(\'book\', true); loadBook(\'' + item.id + '\'); setMobileView(\'editor\');"'
+    );
+  }
+  // loadQuote('id') 패턴
+  else if (itemType === 'quote') {
+    itemHtml = itemHtml.replace(
+      /onclick="loadQuote\('([^']+)'\);\s*setMobileView\('editor'\);"/,
+      'onclick="switchTab(\'quote\', true); loadQuote(\'' + item.id + '\'); setMobileView(\'editor\');"'
+    );
+  }
+  // loadMemo('id') 패턴
+  else if (itemType === 'memo') {
+    itemHtml = itemHtml.replace(
+      /onclick="loadMemo\('([^']+)'\);\s*setMobileView\('editor'\);"/,
+      'onclick="switchTab(\'memo\', true); loadMemo(\'' + item.id + '\'); setMobileView(\'editor\');"'
+    );
+  }
+  return itemHtml;
+}
+
 // ═══ 리스트 패널 메인 렌더링 ═══
 function renderListPanel() {
   renderWritingGrid();
@@ -721,7 +756,9 @@ function renderListPanel() {
       const dateKey  = getLocalYMD(new Date(item.created || item.date || Date.now()));
       const showDate = (dateKey !== pinLastDate);
       pinLastDate    = dateKey;
-      html += generateItemHtml(item, item._type || t, showDate).replace('class="lp-item', 'class="lp-item pinned-item');
+      let itemHtml = generateItemHtml(item, item._type || t, showDate).replace('class="lp-item', 'class="lp-item pinned-item');
+      if (isRoutineMode) itemHtml = _patchRoutineOnclick(itemHtml, item);
+      html += itemHtml;
     });
   }
 
@@ -733,7 +770,9 @@ function renderListPanel() {
     const dateKey  = getLocalYMD(dt);
     const showDate = (dateKey !== lastDateStr);
     lastDateStr    = dateKey;
-    html += generateItemHtml(item, item._type || t, showDate);
+    let itemHtml = generateItemHtml(item, item._type || t, showDate);
+    if (isRoutineMode) itemHtml = _patchRoutineOnclick(itemHtml, item);
+    html += itemHtml;
   });
   el.innerHTML = html;
 }
