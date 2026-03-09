@@ -717,6 +717,10 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 - CSS (다크 사이드바, 각 미디어쿼리): `.side .side-arrow { display: block; stroke: rgba(255,255,255, .25); }`
 - 개별 화살표 클래스는 완전히 제거한다.
 
+**정렬 기준점 주의:** `.side-arrow`는 `position: absolute; right: 14px`으로 부모 기준 배치된다. 글쓰기 메뉴(`.side-menu`)는 `.side-nav` 안에 있고, `.side-nav`에 인라인 `padding: 8px 12px 12px`이 있어 실제 사이드바 우측 끝에서 `14px + 12px = 26px` 위치에 화살표가 표시된다. 반면 루틴(`.routine-compact`)과 가계부(`.expense-compact`)는 좌우 패딩 0인 `.sec` 안에 있어 `right: 14px`이 곧 사이드바 끝에서 14px이다. 이 차이를 보정하기 위해 `.routine-compact .side-arrow, .expense-compact .side-arrow { right: 26px }`이 적용되어 있다.
+
+**사이드바 항목 수정 시 반드시 확인:** `.side-nav`의 패딩을 변경하거나, 루틴/가계부의 부모 `.sec`의 패딩을 변경하거나, `.side-arrow`의 `right` 값을 변경할 때는 **8개 화살표 전체의 수평 정렬**이 유지되는지 확인해야 한다. 새로운 사이드바 항목에 `.side-arrow`를 추가할 때도 부모의 패딩 구조에 따라 `right` 값 보정이 필요할 수 있다.
+
 ---
 
 ## 11. 코드 비대화 방지 규칙
