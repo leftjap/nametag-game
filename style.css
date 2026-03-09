@@ -59,7 +59,7 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
 }
 .side-rubber{position:absolute;top:0;bottom:0;left:0;width:0;background:#2c2c2e;z-index:50;pointer-events:none}
 .editor-rubber{position:absolute;top:0;bottom:0;right:0;width:0;background:var(--bg-white);z-index:50;pointer-events:none}
-.side-hdr{display:flex;align-items:center;padding:0 14px;height:60px;min-height:60px;border-bottom:1px solid var(--border);gap:8px;position:relative}
+.side-hdr{display:flex;align-items:center;padding:0 14px;height:60px;min-height:60px;border-bottom:1px solid var(--border);gap:8px;position:relative;overflow:visible}
 .brand-wrap{display:flex;align-items:center;gap:10px}
 .brand{display:none}
 .cat-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#e0e0e0,#c0c0c0);box-shadow:0 2px 8px rgba(0,0,0,.06);flex-shrink:0}
@@ -620,6 +620,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* ═══════════════════════════════════════
    클라우드 동기화 버튼 스타일
    ═══════════════════════════════════════ */
+.sync-cloud-btn{position:relative;overflow:visible}
 .sync-cloud-btn svg{width:22px;height:22px}
 .sync-cloud-dot{
   position:absolute;top:6px;right:6px;
@@ -630,23 +631,23 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* 동기화 상태 텍스트 (구름 아이콘 아래) */
 .sync-cloud-label{
   position:absolute;
-  right:14px;
+  left:50%;
   top:100%;
-  margin-top:4px;
-  font-size:11px;
+  margin-top:2px;
+  font-size:9px;
   font-family:'Pretendard',-apple-system,sans-serif;
   font-weight:400;
   color:rgba(255,255,255,.5);
   white-space:nowrap;
   opacity:0;
-  transform:translateY(-4px);
+  transform:translateX(-50%) translateY(-4px);
   transition:opacity .25s ease, transform .25s ease;
   pointer-events:none;
   z-index:51;
 }
 .sync-cloud-label.show{
   opacity:1;
-  transform:translateY(0);
+  transform:translateX(-50%) translateY(0);
 }
 .sync-cloud-label.error{
   color:rgba(255,100,90,.7);
@@ -888,7 +889,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu.on{padding:14px 20px !important}
 
   /* 사이드바 다크 */
-  .side .side-hdr{background:transparent;border-bottom:none;position:relative;height:90px;min-height:90px;padding:0 20px}
+  .side .side-hdr{background:transparent;border-bottom:none;position:relative;height:90px;min-height:90px;padding:0 20px;overflow:visible}
   .side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}
   .side .sync-status{display:none}
   .side .sync-btn{display:none}
@@ -980,7 +981,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .app.view-list.view-editor .editor{visibility:visible}
 
   /* 사이드바 다크 테마 */
-  .side .side-hdr{background:transparent;border-bottom:none;position:relative;padding:0 16px;height:56px}.side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}
+  .side .side-hdr{background:transparent;border-bottom:none;position:relative;padding:0 16px;height:56px;overflow:visible}.side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}
   .side .cat-avatar{width:32px;height:32px;border:2px solid rgba(255,255,255,.15)}
   .side .brand{display:none}
   .side .sync-status{display:none}
@@ -1565,6 +1566,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     background:transparent !important;
     border-bottom:none !important;
     position:relative !important;
+    overflow:visible !important;
   }
   .side .side-hdr::after{
     content:'' !important;
