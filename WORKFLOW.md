@@ -594,7 +594,7 @@ index.html        — 마크업
 1. `:root` 변수, 리셋
 2. 로그인/로딩 화면
 3. PC 레이아웃 (.app, .side, .list-panel, .editor)
-4. 사이드바 (어구, 글쓰기 메뉴, 루틴, 기록 통계)
+4. 사이드바 (어구, 글쓰기 메뉴, **`.side-arrow` 통합 화살표**, 루틴, 기록 통계)
 5. 리스트 패널 (lp-hdr, lp-item, 사진 그리드, 캘린더)
 6. 에디터 (topbar, 툴바, ed-body, 서식, 플로팅 툴바)
 7. 이미지 컨텍스트/리사이즈, 모달
@@ -709,6 +709,13 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 - 차트가 컨테이너를 꽉 채워야 하면 `preserveAspectRatio="none"`을 사용하고, CSS에서 `height: auto; aspect-ratio: [viewBox 비율]`로 맞춘다.
 - CSS에서 `height`를 px로 강제(`!important` 포함)하면 viewBox 비율과 충돌할 수 있다. 높이 고정이 필요하면 viewBox 비율도 그에 맞춰야 한다.
 - `maxY` 계산 시, 아직 데이터가 없는 미래 날짜의 값을 포함하면 그래프가 바닥에 깔린다. 현재 시점까지의 데이터만으로 스케일을 잡는다.
+
+### 사이드바 화살표(›) 규칙
+사이드바의 모든 화살표(글쓰기 메뉴, 루틴, 가계부)는 **`.side-arrow` SVG 클래스**를 통일해서 사용한다. 개별 클래스(`wi-arrow`, `routine-compact-arrow`, `expense-compact-arrow` 등)는 사용하지 않는다.
+- HTML: `<svg class="side-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`
+- CSS (style.css 기본): `.side-arrow { width: 20px; height: 20px; flex-shrink: 0; stroke: var(--tx-hint); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }`
+- CSS (다크 사이드바, 각 미디어쿼리): `.side .side-arrow { display: block; stroke: rgba(255,255,255, .25); }`
+- 개별 화살표 클래스는 완전히 제거한다.
 
 ---
 

@@ -124,7 +124,7 @@ function renderWritingGrid() {
     <div class="side-menu ${activeTab === t.id ? 'on' : ''}" data-tab="${t.id}"
          onclick="switchTab('${t.id}'); setMobileView('list');">
       <div class="side-menu-l">${t.label}</div>
-      <div class="wi-arrow">›</div>
+      <svg class="side-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
 }
 
