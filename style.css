@@ -123,7 +123,7 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
 .side-menu.on .badge-pill{color:var(--tx-m)}
 .side-menu.on .tab-color-dot{box-shadow:none !important;border:1px solid rgba(0,0,0,0.15) !important}
 
-.side-menu-l{font-weight:inherit;font-size:14px}
+.side-menu-l{font-weight:inherit;font-size:16px}
 .badge-pill{font-size:11px;color:var(--tx-hint);font-family:'Pretendard',sans-serif;font-weight:400}
 .wi-arrow{display:none}
 .side-menu::before{display:none}
@@ -641,10 +641,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .routine-compact-label{font-size:15px;font-weight:400}
 .routine-compact-sub{font-size:11px;font-weight:400}
 .routine-compact-arrow{
-  width:18px;height:18px;stroke-width:2;fill:none;
+  width:20px;height:20px;stroke-width:2;fill:none;
   stroke-linecap:round;stroke-linejoin:round;
 }
 .routine-compact.on{background:rgba(0,0,0,.06);border-radius:10px;}
+.routine-compact.on .routine-compact-label{font-weight:500}
 
 /* ═══════════════════════════════════════
    태블릿 (769px ~ 1024px) — 3단, 사이드바 다크
@@ -880,7 +881,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu.on{background:rgba(255,255,255,.1);color:#ffffff;font-weight:500}
   .side .side-menu .tab-color-dot{display:none}
   .side .badge-pill{display:none}
-  .side .wi-arrow{display:block!important;font-size:17px;color:rgba(255,255,255,.3);font-weight:300;margin-left:auto}
+  .side .wi-arrow{display:block!important;font-size:20px;color:rgba(255,255,255,.3);font-weight:300;margin-left:auto;line-height:1}
   .side .side-menu.on .wi-arrow{color:rgba(255,255,255,.45)}
 
   /* 태블릿 스와이프 액션 */
@@ -970,7 +971,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu .tab-color-dot{width:14px;height:14px;border-radius:4px;margin-right:12px;border:1px solid rgba(255,255,255,.1)!important}
   .side .side-menu.on .tab-color-dot{border:1px solid rgba(255,255,255,.2)!important}
   .side .badge-pill{display:none}
-  .side .wi-arrow{display:block!important;font-size:17px;color:rgba(255,255,255,.3);font-weight:300;margin-left:auto}
+  .side .wi-arrow{display:block!important;font-size:20px;color:rgba(255,255,255,.3);font-weight:300;margin-left:auto;line-height:1}
   .side .side-menu.on .wi-arrow{color:rgba(255,255,255,.45)}
   .side .side-menu-l{display:flex;align-items:center;font-size:16px}
 
@@ -1599,9 +1600,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu .tab-color-dot{display:none !important}
   .side .badge-pill{display:none !important}
   .side .wi-arrow{
-    display:block !important;font-size:17px !important;
+    display:block !important;font-size:20px !important;
     color:rgba(255,255,255,.3) !important;font-weight:300 !important;
-    margin-left:auto !important;
+    margin-left:auto !important;line-height:1 !important;
   }
   .side .side-menu.on .wi-arrow{color:rgba(255,255,255,.45) !important}
 }
@@ -1778,7 +1779,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   color: var(--tx-hint); font-weight: 400;
 }
 .expense-compact-arrow {
-  width: 18px; height: 18px; stroke: var(--tx-hint);
+  width: 20px; height: 20px; stroke: var(--tx-hint);
   stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round;
 }
 .expense-compact.on { background: rgba(0,0,0,.04); }
