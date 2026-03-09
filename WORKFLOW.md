@@ -48,6 +48,9 @@
 ### 영향 범위
 - [영향 받는 전역 변수, 함수, 플랫폼별 차이]
 
+### 관련 기존 규칙
+- [이 문서에서 참조해야 할 규칙 번호와 항목명. 없으면 "없음"]
+
 ### 대안 (있을 경우)
 - [다른 접근법이 있으면 장단점과 함께 제시]
 ```
@@ -465,6 +468,12 @@ index.html        — 마크업
 - `_deleteExpenseFromPopup(expenseId)` — 팝업에서 삭제 실행 + 화면 리렌더
 - `setupExpenseContextMenu()` — document 레벨 이벤트 위임 등록 (우클릭 + 꾹누르기 600ms)
 
+**주요 렌더 함수 출력 구조:**
+- `renderWeeklyCalendar()` → `.exp-week-cal > .exp-week-grid > (.exp-week-dow-row > .exp-week-dow×7) + .exp-week-day×7` + `#expWeekDaySlot`
+- `renderMonthCalendar()` → `.exp-month-cal > .exp-month-grid > (.exp-month-dow-row > .exp-month-dow×7) + .exp-month-day×N` + `#expMonthDaySlot`
+- `renderExpenseDashboard('pc')` → `.exp-two-col > (차트카드 + 카테고리카드)` + `.exp-projection` + 주간캘린더 + 타임라인 + 더보기
+- `renderExpenseDashboard('mobile')` → `.exp-summary` + 차트 + 카테고리 + `.exp-projection` + 주간캘린더 + 타임라인 + 더보기
+
 **이 파일을 업로드해야 할 때:** 가계부 UI 변경, 차트 스타일, 타임라인 수정, 월 이동 로직, 카테고리 표시
 
 ---
@@ -553,6 +562,9 @@ index.html        — 마크업
 - `removeRoutineMonthNav()` — 월 네비 제거
 - `openRoutineMonthPicker()`, `closeRoutineMonthPicker()`, `pickRoutineMonth(ym)`
 - `buildRCChart(...)` — 누적 곡선 SVG 생성
+
+**주요 렌더 함수 출력 구조:**
+- `renderRoutineCalView()` → `.rc-view > .rc-summary` + 차트 + `.rc-gap` + `.rc-cal > .rc-cal-grid > (.rc-dow-row > .rc-dow×7) + .rc-day×N` + `.rc-report`
 
 **이 파일을 업로드해야 할 때:** 루틴 캘린더 UI 변경, 루틴 통계 차트 수정
 
@@ -647,6 +659,15 @@ index.html        — 마크업
 14. 루틴 캘린더 뷰 (.rc-*)
 15. 가로 모드 차단
 16. PC/태블릿 캘린더 폰트/선택 효과 강화
+
+**선택자 위치 참조:**
+- `.exp-week-*`, `.exp-month-*`, `.exp-bar-*`, `.exp-tl-*`, `.exp-cat-*` → 12번 가계부
+- `.exp-day-selected`, `.exp-day-detail` → 13번 가계부 캘린더 선택
+- `.rc-*` → 14번 루틴 캘린더 뷰
+- `.chk-*`, `.streak-*`, `.routine-*`, `.monthly-*`, `.rhythm-*` → 4번 사이드바 루틴~기록
+- `.lp-*`, `.photo-*`, `.cal-*` → 5번 리스트 패널
+- `.ed-*`, `.tb-*`, `.ft-*` → 6번 에디터
+- `.side-menu`, `.side-arrow`, `.tab-color-dot` → 4번 사이드바 글쓰기 메뉴
 
 **이 파일을 업로드할 때:** 0번의 "style.css 업로드 전략"을 따른다.
 
@@ -949,7 +970,20 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 
 ---
 
-## 19. 이 문서 자체의 관리
+## 19. 자주 겪는 실수 체크리스트
+
+작업지시서 작성 전 해당 항목을 확인한다.
+
+- [ ] switchTab의 else 블록에서 패널/UI 복원을 빠뜨리지 않았는가? (10번 "에디터 서브 패널 복원 규칙")
+- [ ] gesture.js가 인라인 스타일로 덮어쓰는 요소를 CSS !important 없이 제어하려 하지 않았는가? (10번 "가계부 탭 뷰 스위처 숨김 규칙")
+- [ ] .side-arrow의 right 값이 부모 패딩 구조와 맞는가? (10번 "사이드바 화살표 규칙")
+- [ ] 그리드 gap으로 인해 border가 끊어지는 곳은 없는가? (래퍼로 감싸서 해결)
+- [ ] SVG viewBox 비율과 CSS 렌더링 영역 비율이 일치하는가? (10번 "SVG 차트 작성 시 주의")
+- [ ] 미디어쿼리 3곳(모바일/태블릿/PC) 모두 확인했는가?
+
+---
+
+## 20. 이 문서 자체의 관리
 
 이 문서는 프로젝트의 네비게이션 맵이다. 코드와 문서가 어긋나면 AI가 잘못된 판단을 한다.
 
@@ -961,4 +995,12 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 - 데이터 스키마가 변경되면 → 15번
 - 주요 흐름이 바뀌면 → 9번, 14번
 - 새 파일이 추가되면 → 7번, 8번
+
+---
+
+## 변경 로그
+
+| 날짜 | 변경 내용 |
+|---|---|
+| 2026-03-09 | 19번 자주 겪는 실수 체크리스트 추가, 방향 확인서에 관련 기존 규칙 항목 추가, 렌더 함수 HTML 구조(8번) 추가, CSS 선택자 인덱스(8번) 추가, 변경 로그 추가 |
 ```
