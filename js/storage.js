@@ -5,12 +5,13 @@
 // ═══ 앱 상수 ═══
 const APP_TOKEN = 'nametag2026';
 const K = {
-  docs:      'gb_docs',
-  checks:    'gb_chk',
-  books:     'gb_books',
-  quotes:    'gb_quotes',
-  memos:     'gb_memos',
-  expenses:  'gb_expenses'
+  docs:           'gb_docs',
+  checks:         'gb_chk',
+  books:          'gb_books',
+  quotes:         'gb_quotes',
+  memos:          'gb_memos',
+  expenses:       'gb_expenses',
+  merchantIcons:  'gb_merchant_icons'
 };
 
 // ═══ LocalStorage 읽기/쓰기 ═══

@@ -2,71 +2,20 @@
 // ui-expense.js — 가계부 UI 렌더링
 // ═══════════════════════════════════════
 
-// 카테고리 아이콘 매핑
-var CATEGORY_ICONS = {
-  'food': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.16 14.86l.04-.12.96-1.74h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0020.07 4H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42a.25.25 0 01-.26-.24z"/></svg>',
-  'dining': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M2 19h18v2H2v-2zm2-5a4 4 0 004 4h4a4 4 0 004-4V5H4v9zm14-7h2a3 3 0 010 6h-2V7z"/></svg>',
-  'shopping': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg>',
-  'transport': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>',
-  'utility': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>',
-  'medical': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>',
-  'culture': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>',
-  'loan': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>',
-  'pet': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><circle cx="4.5" cy="9.5" r="2.5"/><circle cx="9" cy="5.5" r="2.5"/><circle cx="15" cy="5.5" r="2.5"/><circle cx="19.5" cy="9.5" r="2.5"/><path d="M17.34 14.86c-.87-1.02-1.6-1.89-2.48-2.91-.46-.54-1.17-.88-1.86-.88s-1.4.34-1.86.88c-.87 1.02-1.61 1.89-2.48 2.91-1.31 1.31-2.92 2.76-2.62 4.79.29 1.02 1.02 2.03 2.33 2.32.73.15 3.06-.44 5.54-.44h.18c2.48 0 4.81.59 5.54.44 1.31-.29 2.04-1.31 2.33-2.32.31-2.04-1.3-3.49-2.62-4.79z"/></svg>',
-  'gift': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.1 0-2 .9-2 2v3c0 .55.45 1 1 1h1v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h1c.55 0 1-.45 1-1V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 15H6v-7h5v7zm0-8H3V8h8v3zm2 8v-7h5v7h-5zm5-8h-5V8h5v3z"/></svg>',
-  'etc': '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>'
-};
-
-function getCategoryIcon(item) {
-  var cat = item.category || '';
-  if (CATEGORY_ICONS[cat]) return CATEGORY_ICONS[cat];
-  return CATEGORY_ICONS['etc'];
-}
-
-function getCategoryBg(item) {
-  var cat = item.category || '';
-  var found = EXPENSE_CATEGORIES.find(function(c) { return c.id === cat; });
-  return found ? found.bg : '#B0B0B8';
-}
-
-// ═══ 매출처 로고 (MERCHANT_LOGOS 매핑 + Google 파비콘) ═══
-
-function _findMerchantDomain(merchant) {
-  // MERCHANT_LOGOS 키워드와 부분 매칭 (긴 키워드 우선)
-  var keys = Object.keys(MERCHANT_LOGOS).sort(function(a, b) { return b.length - a.length; });
-  for (var i = 0; i < keys.length; i++) {
-    if (merchant.indexOf(keys[i]) !== -1) return MERCHANT_LOGOS[keys[i]];
-  }
-  return null;
-}
+// ═══ 기본 아이콘 (고양이) ═══
+var DEFAULT_ICON_URL = 'https://www.genspark.ai/api/files/s/ERJTmkMG';
 
 function getMerchantIconHtml(item) {
   var merchant = (item.merchant || '').trim();
-  if (!merchant) {
-    return '<div class="exp-tl-item-icon" style="background:' + getCategoryBg(item) + '">' + getCategoryIcon(item) + '</div>';
-  }
-  var domain = _findMerchantDomain(merchant);
-  if (domain) {
-    var faviconUrl = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
-    return '<div class="exp-tl-item-icon exp-tl-item-icon-img">'
-      + '<img src="' + faviconUrl + '" width="40" height="40" onerror="_logoFallback(this,\'' + (item.category || 'etc') + '\')">'
-      + '</div>';
-  }
-  return '<div class="exp-tl-item-icon" style="background:' + getCategoryBg(item) + '">' + getCategoryIcon(item) + '</div>';
-}
-
-function _logoFallback(el, category) {
-  el.onerror = null;
-  var cat = category || 'etc';
-  var found = EXPENSE_CATEGORIES.find(function(c) { return c.id === cat; });
-  var bg = found ? found.bg : '#B0B0B8';
-  var icon = CATEGORY_ICONS[cat] || CATEGORY_ICONS['etc'];
-  var parent = el.parentElement;
-  if (parent) {
-    parent.classList.remove('exp-tl-item-icon-img');
-    parent.style.background = bg;
-    parent.innerHTML = icon;
-  }
+  // 1. 사용자 지정 아이콘 매핑 확인
+  var iconUrl = findMerchantIcon(merchant);
+  // 2. 항목 자체에 icon 필드가 있으면 우선
+  if (item.icon) iconUrl = item.icon;
+  // 3. 아이콘 URL이 있으면 해당 이미지, 없으면 고양이
+  var src = iconUrl || DEFAULT_ICON_URL;
+  return '<div class="exp-tl-item-icon exp-tl-item-icon-img">'
+    + '<img src="' + src + '" width="40" height="40" onerror="this.onerror=null;this.src=\'' + DEFAULT_ICON_URL + '\';">'
+    + '</div>';
 }
 
 function updateExpenseCompact() {
@@ -1006,22 +955,6 @@ function renderExpenseMonthNav(yearMonth) {
   }
 }
 
-// ═══════════════════════════════════════
-// 카테고리 아이콘 팔레트 (확인용)
-// ═══════════════════════════════════════
-function renderIconPalette() {
-  var html = '<div class="exp-icon-palette">';
-  EXPENSE_CATEGORIES.forEach(function(cat) {
-    var icon = CATEGORY_ICONS[cat.id] || CATEGORY_ICONS['etc'];
-    html += '<div class="exp-icon-palette-item">'
-      + '<div class="exp-icon-palette-circle" style="background:' + cat.bg + '">' + icon + '</div>'
-      + '<span class="exp-icon-palette-name">' + cat.name + '</span>'
-      + '</div>';
-  });
-  html += '</div>';
-  return html;
-}
-
 function renderSelectedDayExpenses(dateStr) {
   var expenses = getDayExpenses(dateStr).sort(function(a, b) {
     return (b.time || '').localeCompare(a.time || '');
@@ -1095,6 +1028,8 @@ function newExpenseForm(mode = 'normal') {
   document.getElementById('expenseMerchantInput' + suffix).value = '';
   document.getElementById('expenseCardInput' + suffix).value = '';
   document.getElementById('expenseMemoInput' + suffix).value = '';
+  document.getElementById('expenseIconKeyword' + suffix).value = '';
+  document.getElementById('expenseIconUrl' + suffix).value = '';
   const now = new Date();
   document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(now);
   clearCategorySelection(mode);
@@ -1113,6 +1048,24 @@ function loadExpense(id, mode = 'normal') {
   const d = new Date(e.date + 'T' + (e.time || '00:00'));
   document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(d);
   selectCategory(e.category, mode);
+
+  // 아이콘 매핑 자동 채우기
+  var existingIcon = findMerchantIcon(e.merchant);
+  if (existingIcon) {
+    var icons = getMerchantIcons();
+    icons.sort(function(a, b) { return b.keyword.length - a.keyword.length; });
+    for (var mi = 0; mi < icons.length; mi++) {
+      if (e.merchant.indexOf(icons[mi].keyword) !== -1) {
+        document.getElementById('expenseIconKeyword' + suffix).value = icons[mi].keyword;
+        document.getElementById('expenseIconUrl' + suffix).value = icons[mi].icon;
+        break;
+      }
+    }
+  } else {
+    document.getElementById('expenseIconKeyword' + suffix).value = '';
+    document.getElementById('expenseIconUrl' + suffix).value = '';
+  }
+
   updateExpenseSaveBtn(mode);
 }
 
@@ -1249,6 +1202,14 @@ function saveExpenseForm(mode = 'normal') {
     updateExpense(curExpenseId, { amount, category, merchant, card, memo, date, time });
   } else {
     newExpense({ amount, category, merchant, card, memo, date, time, source: 'manual' });
+  }
+
+  // 매출처 아이콘 매핑 저장
+  var iconKeyword = document.getElementById('expenseIconKeyword' + suffix).value.trim();
+  var iconUrl = document.getElementById('expenseIconUrl' + suffix).value.trim();
+  if (iconKeyword && iconUrl) {
+    saveMerchantIcon(iconKeyword, iconUrl);
+    SYNC.scheduleDatabaseSave();
   }
 
   // UI 업데이트 및 정리
