@@ -151,11 +151,22 @@ function renderCumulativeChart(yearMonth) {
     prevMonthCumulative[i] = prevSum;
   }
 
-  var allVals = Object.values(thisMonthCumulative).concat(Object.values(prevMonthCumulative)).concat([1]);
-  var maxY = Math.max.apply(null, allVals);
-  var width = 260, height = 170, paddingX = 0, paddingY = 4;
+  // maxY: 현재 시점까지의 이번달/지난달 누적값 중 큰 값 기준
+  // → 토스처럼 "지금까지의 데이터"에 맞춰 차트가 꽉 차게 됨
+  var relevantVals = [1]; // 최소값 1 (0 나누기 방지)
+  for (var rv = 1; rv <= lastDataDay; rv++) {
+    relevantVals.push(thisMonthCumulative[rv]);
+    relevantVals.push(prevMonthCumulative[rv]);
+  }
+  // 지난달은 전체 표시하므로 전체 값도 포함
+  for (var rv2 = lastDataDay + 1; rv2 <= daysInMonth; rv2++) {
+    relevantVals.push(prevMonthCumulative[rv2]);
+  }
+  var maxY = Math.max.apply(null, relevantVals);
+
+  var width = 260, height = 170, paddingX = 0, paddingY = 2;
   var graphWidth = width - paddingX * 2;
-  var graphHeight = height - paddingY * 2 - 12;
+  var graphHeight = height - paddingY * 2 - 14;
   var bottom = paddingY + graphHeight;
 
   var thisPoints = '', prevPoints = '';
