@@ -64,6 +64,15 @@ function showRoutineCalendarView(keepListPanel) {
   var rc2 = document.getElementById('editorRoutineCal');
   if (rc2) rc2.style.display = 'none';
   document.getElementById('edToolbar').style.display = 'none';
+  // 가계부 관련 요소 정리
+  var fullDb = document.getElementById('expenseFullDashboard');
+  if (fullDb) fullDb.style.display = 'none';
+  var paneExpDash = document.getElementById('pane-expense-dashboard');
+  if (paneExpDash) paneExpDash.style.display = 'none';
+  var paneExpDetail = document.getElementById('pane-expense-detail');
+  if (paneExpDetail) paneExpDetail.style.display = 'none';
+  // 가계부 월 네비 제거
+  document.querySelectorAll('.exp-month-nav-inline').forEach(function(el) { el.remove(); });
   var mb = document.querySelector('.ed-more-btn');
   var ab = document.querySelector('.ed-aa-btn');
   var nb = document.querySelector('.ed-new-btn');
@@ -79,6 +88,13 @@ function showRoutineCalendarView(keepListPanel) {
   if (window.innerWidth <= 768) setMobileView('editor');
   var app = document.getElementById('mainApp');
   var w = window.innerWidth;
+  // 가계부에서 전환 시 list-panel 복원
+  var appEl = document.getElementById('mainApp');
+  if (w > 1400) {
+    appEl.classList.remove('list-closed');
+  } else if (w >= 769 && w <= 1400) {
+    appEl.classList.remove('tablet-list-closed');
+  }
   if (w >= 769 && w <= 1400) {
     app.classList.remove('tablet-side-open');
     if (!keepListPanel) {
