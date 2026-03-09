@@ -747,14 +747,17 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 
 ### 가계부 탭 뷰 스위처 숨김 규칙
 
-가계부 탭(`expense`)에서는 `lp-hdr`의 뷰 스위처(리스트/사진/캘린더 아이콘)가 표시되면 안 된다. 가계부는 자체 대시보드/상세 뷰를 사용하며, 일반 탭의 리스트/사진/캘린더 전환과 무관하다.
+가계부 탭(`expense`)에서는 `lp-hdr`의 뷰 스위처(리스트/사진/캘린더 아이콘)와 검색 버튼이 표시되면 안 된다. 가계부는 자체 대시보드/상세 뷰를 사용하며, 일반 탭의 리스트/사진/캘린더 전환과 무관하다.
 
-**재발 조건:** 가계부 폼(editorExpense)에서 뒤로가기 → 모바일 `setMobileView('list')` → `renderListPanel()` 경로에서 뷰 스위처 표시 상태가 복원될 때, 가계부 탭 여부를 체크하지 않으면 뷰 스위처가 노출된다.
+**근본 원인:** gesture.js(수정 금지)의 모바일 스와이프 touchend 핸들러가 에디터→리스트 전환 성공 시, 탭 종류를 확인하지 않고 `viewSwitcher.style.display = 'flex'`를 설정한다. `switchTab('expense')`에서 `display: none`으로 숨겨도 gesture.js의 `setTimeout` 콜백이 이후에 실행되면서 다시 노출한다.
 
-**체크리스트 — switchTab/setMobileView/renderListPanel을 수정할 때:**
-1. 가계부 탭 진입 시 뷰 스위처를 숨기는 코드가 유지되는가?
-2. 가계부 폼에서 빠져나올 때(handleBackBtn 등) 뷰 스위처가 다시 표시되지 않는가?
-3. 가계부 탭이 아닌 다른 탭으로 전환 시 뷰 스위처가 정상 복원되는가?
+**해결 방식:** `.list-panel.expense-active .view-switcher { display: none !important; }`로 gesture.js의 인라인 스타일을 CSS `!important`로 덮어쓴다. `switchTab()`에서 가계부 진입 시 `.list-panel`에 `expense-active` 클래스를 추가하고, 다른 탭 전환 시 제거한다.
+
+**체크리스트 — switchTab/setMobileView/renderListPanel/gesture.js 관련 코드를 수정할 때:**
+1. `.list-panel`의 `expense-active` 클래스 추가/제거가 유지되는가?
+2. CSS의 `!important` 규칙이 삭제되거나 덮어쓰여지지 않았는가?
+3. 가계부 탭이 아닌 다른 탭으로 전환 시 `expense-active` 클래스가 정상 제거되는가?
+4. 새로운 탭이 추가될 때 `switchTab()`의 else 블록에서 `expense-active` 제거가 실행되는가?
 
 ### 사이드바 화살표(›) 규칙
 사이드바의 모든 화살표(글쓰기 메뉴, 루틴, 가계부)는 **`.side-arrow` SVG 클래스**를 통일해서 사용한다. 개별 클래스(`wi-arrow`, `routine-compact-arrow`, `expense-compact-arrow` 등)는 사용하지 않는다.

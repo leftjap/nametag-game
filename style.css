@@ -3454,3 +3454,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .editor.expense-edit-active .ed-more-btn { display: none !important; }
 .editor.expense-edit-active .ed-aa-btn { display: none !important; }
 .editor.expense-edit-active .ed-new-btn { display: none !important; }
+
+/* 가계부 탭 활성 시 뷰 스위처/검색 강제 숨김 (gesture.js 인라인 스타일 덮어쓰기) */
+.list-panel.expense-active .view-switcher {
+  display: none !important;
+}
+.list-panel.expense-active .lp-search-btn {
+  display: none !important;
+}

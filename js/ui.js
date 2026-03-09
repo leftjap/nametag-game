@@ -175,6 +175,9 @@ function switchTab(t, keepLayout) {
   }
 
   if (t === 'expense') {
+    // 가계부 탭: list-panel에 expense-active 클래스 추가 (CSS로 뷰 스위처 강제 숨김)
+    document.querySelector('.list-panel').classList.add('expense-active');
+
     const w = window.innerWidth;
 
     // 일반 pane 숨기기
@@ -265,6 +268,9 @@ function switchTab(t, keepLayout) {
       mApp.classList.add('view-list');
     }
   } else {
+    // 가계부 탭 해제: list-panel에서 expense-active 클래스 제거
+    document.querySelector('.list-panel').classList.remove('expense-active');
+
     // ── 가계부에서 나올 때 복원 ──
     // 가계부에서 나올 때 list-panel 복원
     var appEl = document.getElementById('mainApp');
