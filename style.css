@@ -2230,7 +2230,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-category-bar-wrap {
-  height: 20px; background: rgba(0,0,0,.05); border-radius: 6px; overflow: hidden;
+  height: 15px; background: rgba(0,0,0,.05); border-radius: 6px; overflow: hidden;
 }
 
 .exp-category-bar {
@@ -2290,7 +2290,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-category-bar-wrap {
-  height: 24px;
+  height: 15px;
   background: rgba(0,0,0,.04);
   border-radius: 6px;
   overflow: hidden;
