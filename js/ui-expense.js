@@ -480,8 +480,8 @@ function renderCategoryChart(catBreakdown) {
   });
 
   if (hasMore) {
-    html += '<div style="text-align:center;padding:12px 0 4px;">';
-    html += '<button class="exp-more-btn" style="margin:0;padding:8px 20px;font-size:13px;" onclick="toggleCategoryMore(this)">더보기</button>';
+    html += '<div class="exp-cat-more-wrap">';
+    html += '<button class="exp-cat-more-btn" onclick="toggleCategoryMore(this)">더보기</button>';
     html += '</div>';
     html += '<div class="exp-category-more" style="display:none;">';
     catBreakdown.slice(showCount).forEach(function(cat, i) {

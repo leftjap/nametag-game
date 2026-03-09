@@ -2075,6 +2075,84 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   font-size: 13px; font-weight: 600; color: var(--tx-d); text-align: right;
 }
 
+/* ═══ 카테고리 차트 카드 통일 ═══ */
+.exp-category-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exp-category-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tx);
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+}
+
+.exp-category-row {
+  display: grid;
+  grid-template-columns: 72px 1fr 60px;
+  gap: 10px;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.exp-category-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tx-d) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exp-category-bar-wrap {
+  height: 16px;
+  background: rgba(0,0,0,.04);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.exp-category-bar {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.exp-category-amount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tx-d);
+  text-align: right;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  white-space: nowrap;
+}
+
+.exp-cat-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 0;
+}
+
+.exp-cat-more-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--tx-m);
+  padding: 7px 20px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  transition: .15s;
+  line-height: 1;
+}
+
+.exp-cat-more-btn:hover {
+  border-color: var(--tx-hint);
+  color: var(--tx-d);
+}
+
 /* 모달 (PC/태블릿 입력 폼) */
 #expenseModalOverlay {
   display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -2173,7 +2251,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
 
   .exp-category-row {
-    grid-template-columns: 60px 1fr 80px;
+    grid-template-columns: 64px 1fr 56px;
   }
 
   .exp-category-name {
