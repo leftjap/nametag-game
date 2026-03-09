@@ -1392,16 +1392,21 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* ═══ 선택 항목: Bear 스타일 (웹/태블릿 전용) ═══ */
 @media(min-width:769px){
   .lp-item.on{
-    background:#e9e9ea !important;
-    border-radius:12px !important;
-    margin:2px 8px !important;
-    width:calc(100% - 16px) !important;
+    background:#f0f0f2 !important;
+    border-radius:0 !important;
+    margin:0 !important;
+    width:100% !important;
     border-left:3.5px solid #E55643 !important;
     padding-left:12.5px !important;
     box-shadow:none !important;
+    position:relative !important;
+    z-index:1 !important;
   }
   .lp-item.on::after{
-    display:none !important;
+    left:0 !important;
+    right:0 !important;
+    background:var(--border-l) !important;
+    display:block !important;
   }
 }
 
