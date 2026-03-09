@@ -76,9 +76,9 @@ function showRoutineCalendarView(keepListPanel) {
   var mb = document.querySelector('.ed-more-btn');
   var ab = document.querySelector('.ed-aa-btn');
   var nb = document.querySelector('.ed-new-btn');
-  if (mb) mb.style.display = 'none';
-  if (ab) ab.style.display = 'none';
-  if (nb) nb.style.display = 'none';
+  if (mb) mb.style.setProperty('display', 'none', 'important');
+  if (ab) ab.style.setProperty('display', 'none', 'important');
+  if (nb) nb.style.setProperty('display', 'none', 'important');
   var tl = document.getElementById('edTabLabel');
   if (tl) tl.style.display = 'none';
   document.querySelector('.editor').classList.add('routine-cal-active');
@@ -115,9 +115,9 @@ function hideRoutineCalView() {
   var mb = document.querySelector('.ed-more-btn');
   var ab = document.querySelector('.ed-aa-btn');
   var nb = document.querySelector('.ed-new-btn');
-  if (mb) mb.style.display = '';
-  if (ab) ab.style.display = '';
-  if (nb) nb.style.display = '';
+  if (mb) mb.style.removeProperty('display');
+  if (ab) ab.style.removeProperty('display');
+  if (nb) nb.style.removeProperty('display');
   document.querySelector('.editor').classList.remove('routine-view-active');
   var tl = document.getElementById('edTabLabel');
   if (tl) tl.style.display = '';
@@ -327,7 +327,7 @@ function renderRoutineCalView(yearMonth) {
 
   // 루틴 캘린더 뷰에서 글쓰기 버튼 숨기기 (렌더링 후 확실히 숨김)
   var nb = document.querySelector('.ed-new-btn');
-  if (nb) nb.style.display = 'none';
+  if (nb) nb.style.setProperty('display', 'none', 'important');
 }
 
 function buildRCChart(dim, lastDay, thisCum, prevCum, pDim, mNum, pNum) {
