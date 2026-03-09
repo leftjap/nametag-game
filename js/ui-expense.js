@@ -1036,6 +1036,11 @@ let curExpenseId = null;
 
 function newExpenseForm(mode = 'normal') {
   curExpenseId = null;
+  // 모바일 에디터: 가계부 폼 활성 클래스 추가
+  if (mode === 'normal') {
+    var editorEl = document.querySelector('.editor');
+    if (editorEl) editorEl.classList.add('expense-edit-active');
+  }
   const suffix = mode === 'modal' ? 'Modal' : '';
   document.getElementById('expenseAmountInput' + suffix).value = '';
   document.getElementById('expenseMerchantInput' + suffix).value = '';
@@ -1053,6 +1058,11 @@ function newExpenseForm(mode = 'normal') {
 }
 
 function loadExpense(id, mode = 'normal') {
+  // 모바일 에디터: 가계부 폼 활성 클래스 추가
+  if (mode === 'normal') {
+    var editorEl = document.querySelector('.editor');
+    if (editorEl) editorEl.classList.add('expense-edit-active');
+  }
   const e = getExpenses().find(x => x.id === id);
   if (!e) return;
   curExpenseId = id;
@@ -1110,6 +1120,8 @@ function deleteExpenseFromForm(mode = 'normal') {
     }
   } else {
     // 모바일: 대시보드 갱신 후 리스트 뷰로
+    var editorEl = document.querySelector('.editor');
+    if (editorEl) editorEl.classList.remove('expense-edit-active');
     renderExpenseDashboard('mobile');
     setMobileView('list');
   }
@@ -1276,6 +1288,8 @@ function saveExpenseForm(mode = 'normal') {
     return;
   } else if (window.innerWidth <= 768) {
     // 모바일: 대시보드 화면으로 전환
+    var editorEl = document.querySelector('.editor');
+    if (editorEl) editorEl.classList.remove('expense-edit-active');
     renderExpenseDashboard('mobile');
     setMobileView('list');
   } else {

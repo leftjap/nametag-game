@@ -164,6 +164,10 @@ function switchTab(t, keepLayout) {
 
   clearSearch();
   hideRoutineCard();
+  // 가계부 폼 활성 클래스 정리 (다른 탭으로 전환 시)
+  if (t !== 'expense') {
+    document.querySelector('.editor').classList.remove('expense-edit-active');
+  }
   // 루틴 캘린더 뷰 정리
   var _rcPanel = document.getElementById('editorRoutineDetail');
   if (_rcPanel && _rcPanel.style.display !== 'none') {
