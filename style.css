@@ -631,7 +631,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* 동기화 상태 텍스트 (구름 아이콘 아래) */
 .sync-cloud-label{
   position:absolute;
-  bottom:4px;
+  bottom:2px;
   left:50%;
   transform:translateX(-50%);
   text-align:center;
@@ -875,7 +875,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-hdr::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:rgba(255,255,255,.08);pointer-events:none}
   .side .sync-status{display:none}
   .side .sync-btn{display:none}
-  .sync-cloud-btn{display:flex;width:36px;height:46px;align-items:flex-start;justify-content:center;padding-top:4px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);border-radius:8px;position:relative;flex-shrink:0;overflow:visible;flex-direction:column}
+  .sync-cloud-btn{display:flex;width:36px;height:46px;align-items:center;justify-content:center;padding-top:0;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);border-radius:8px;position:relative;flex-shrink:0;overflow:visible;flex-direction:column}
   .sync-cloud-label{bottom:2px;font-size:9px}
   .side .cat-avatar{border:2px solid rgba(255,255,255,.15);width:52px;height:52px}
   .side .sec-t{color:rgba(255,255,255,.35);font-size:11px;padding:0 16px;margin-bottom:4px}
@@ -969,7 +969,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .brand{display:none}
   .side .sync-status{display:none}
   .side .sync-btn{display:none}
-  .sync-cloud-btn{display:flex;width:44px;height:48px;align-items:flex-start;justify-content:center;padding-top:4px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);border-radius:8px;position:relative;flex-shrink:0;overflow:visible;flex-direction:column}
+  .sync-cloud-btn{display:flex;width:44px;height:48px;align-items:center;justify-content:center;padding-top:0;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);border-radius:8px;position:relative;flex-shrink:0;overflow:visible;flex-direction:column}
   .sync-cloud-btn svg{width:22px;height:22px;flex-shrink:0}
   .sync-cloud-label{bottom:2px;font-size:8px}
   .side .side-scroll{padding-bottom:env(safe-area-inset-bottom, 20px)}
@@ -1567,8 +1567,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .sync-btn{display:none !important}
   .sync-cloud-btn{
     display:flex !important;width:36px !important;height:46px !important;
-    align-items:flex-start !important;justify-content:center !important;
-    padding-top:3px !important;
+    align-items:center !important;justify-content:center !important;
+    padding-top:0 !important;
     background:none !important;border:none !important;cursor:pointer !important;
     color:rgba(255,255,255,.5) !important;border-radius:8px !important;
     position:relative !important;flex-shrink:0 !important;
