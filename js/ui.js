@@ -227,9 +227,6 @@ function switchTab(t, keepLayout) {
       var fullDb = document.getElementById('expenseFullDashboard');
       if (fullDb) fullDb.style.display = 'flex';
 
-      var trashBtnTop = document.getElementById('expenseTrashBtn');
-      if (trashBtnTop) trashBtnTop.style.display = 'none';
-
       if (fab) fab.style.display = 'none';
 
       // 원페이지 대시보드 렌더
@@ -305,10 +302,6 @@ function switchTab(t, keepLayout) {
     var aaBtn = document.querySelector('.ed-aa-btn');
     if (moreBtn) moreBtn.style.display = '';
     if (aaBtn) aaBtn.style.display = '';
-
-    // 휴지통 버튼 복원
-    var trashBtnRestore = document.getElementById('expenseTrashBtn');
-    if (trashBtnRestore) trashBtnRestore.style.display = '';
 
     // FAB 복원
     var fab = document.querySelector('.fab-btn');
