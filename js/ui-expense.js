@@ -66,15 +66,6 @@ function renderExpenseDashboard(platform) {
 
   var html = '';
 
-  // 모바일: topbar에 안 들어가면 콘텐츠 내부에 삽입
-  if (!topbarNav) {
-    html += '<div class="exp-month-nav">';
-    html += '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)"><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg></button>';
-    html += '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + mo + '월</span>';
-    html += '<button class="exp-month-nav-btn' + (isNow ? ' exp-nav-disabled' : '') + '"' + (isNow ? '' : ' onclick="changeExpenseMonth(1)"') + '><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg></button>';
-    html += '</div>';
-  }
-
   var summaryTitle = '오늘까지 ' + totalDisplay + ' 썼어요';
 
   var paceHtml = '';
@@ -697,15 +688,6 @@ function renderExpenseFullDetail(yearMonth) {
 
   var html = '';
 
-  // 모바일: topbar에 안 들어가면 콘텐츠 내부에 삽입
-  if (!detailTopbarNav) {
-    html += '<div class="exp-month-nav">';
-    html += '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)"><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg></button>';
-    html += '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + detailMo + '월</span>';
-    html += '<button class="exp-month-nav-btn' + (detailIsNow ? ' exp-nav-disabled' : '') + '"' + (detailIsNow ? '' : ' onclick="changeExpenseMonth(1)"') + '><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg></button>';
-    html += '</div>';
-  }
-
   var monthTotal = getMonthTotal(yearMonth);
   var d = new Date(yearMonth + '-01');
   var monthNum = d.getMonth() + 1;
@@ -963,8 +945,14 @@ function renderExpenseMonthNav(yearMonth) {
 
   var w = window.innerWidth;
   if (w <= 768) {
-    // 모바일: topbar에 넣지 않음 (대시보드 내부에서 처리)
-    return false;
+    // 모바일: lp-hdr 센터에 삽입
+    var tabLabel = document.getElementById('edTabLabel');
+    if (tabLabel) tabLabel.style.display = 'none';
+    var lpHdr = document.querySelector('.lp-hdr');
+    if (lpHdr) {
+      lpHdr.insertAdjacentHTML('beforeend', navHtml);
+    }
+    return true;
   } else {
     // PC/태블릿: ed-topbar 센터에 삽입
     var tabLabel = document.getElementById('edTabLabel');

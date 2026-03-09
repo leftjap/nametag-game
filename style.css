@@ -2727,13 +2727,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   pointer-events: none !important;
 }
 
-.pane-expense-dashboard .exp-month-nav,
-.pane-expense-detail .exp-month-nav {
-  height: calc(56px + env(safe-area-inset-top, 0px));
-  min-height: calc(56px + env(safe-area-inset-top, 0px));
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
 .pane-expense-dashboard .exp-summary,
 #expFullDashboardPane .exp-summary {
   padding-top: 8px;
@@ -3023,6 +3016,19 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   color: #ddd !important;
   cursor: default !important;
   pointer-events: none !important;
+}
+
+/* 모바일: lp-hdr 내부 월 네비 */
+@media (max-width: 768px) {
+  .lp-hdr .exp-month-nav-inline {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+  .lp-hdr .exp-month-nav-inline .exp-month-nav-label {
+    font-size: 16px;
+  }
 }
 
 /* ═══════════════════════════════════════
