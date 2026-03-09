@@ -227,6 +227,9 @@ function switchTab(t, keepLayout) {
       var fullDb = document.getElementById('expenseFullDashboard');
       if (fullDb) fullDb.style.display = 'flex';
 
+      var trashBtnTop = document.getElementById('expenseTrashBtn');
+      if (trashBtnTop) trashBtnTop.style.display = 'none';
+
       if (fab) fab.style.display = 'none';
 
       // 원페이지 대시보드 렌더
