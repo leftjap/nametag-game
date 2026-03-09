@@ -1104,7 +1104,6 @@ function deleteExpenseFromForm(mode = 'normal') {
     alert('삭제할 항목이 없습니다.');
     return;
   }
-  if (!confirm('정말 삭제하시겠습니까?')) return;
   delExpense(curExpenseId);
   curExpenseId = null;
 
@@ -1346,7 +1345,6 @@ function showExpensePopup(expenseId, x, y) {
 
 function _deleteExpenseFromPopup(expenseId) {
   closeLpPopup();
-  if (!confirm('정말 삭제하시겠습니까?')) return;
   delExpense(expenseId);
   updateExpenseCompact();
   SYNC.scheduleDatabaseSave();
