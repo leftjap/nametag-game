@@ -2546,8 +2546,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   justify-content: center;
   gap: 0;
   padding: 0;
-  height: 56px;
-  min-height: 56px;
+  height: 48px;
+  min-height: 48px;
   position: sticky;
   top: 0;
   background: var(--bg-white);
@@ -2831,10 +2831,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     padding: 0 20px;
   }
   .pane-expense-dashboard .exp-summary {
-    padding: 20px 0 16px;
+    padding: 8px 0 10px;
   }
   .pane-expense-dashboard .exp-chart-wrap {
-    padding: 12px 0 16px;
+    padding: 4px 0 12px;
   }
   .pane-expense-dashboard .exp-projection {
     padding: 20px 0 16px;
