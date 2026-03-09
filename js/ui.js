@@ -279,6 +279,17 @@ function switchTab(t, keepLayout) {
     var fullDb = document.getElementById('expenseFullDashboard');
     if (fullDb) fullDb.style.display = 'none';
 
+    // 가계부 에디터 폼 숨기고 현재 탭에 맞는 에디터 패널 복원
+    var edExpense = document.getElementById('editorExpense');
+    if (edExpense) edExpense.style.display = 'none';
+    document.getElementById('editorText').style.display  = textTypes.includes(t) ? 'flex' : 'none';
+    document.getElementById('editorBook').style.display  = t === 'book'  ? 'flex' : 'none';
+    document.getElementById('editorQuote').style.display = t === 'quote' ? 'flex' : 'none';
+    document.getElementById('editorMemo').style.display  = t === 'memo'  ? 'flex' : 'none';
+    var edDayList = document.getElementById('editorDayList');
+    if (edDayList) edDayList.style.display = 'none';
+    document.getElementById('edToolbar').style.display = ['book','quote'].includes(t) ? 'none' : 'flex';
+
     // 모달 닫기
     if (typeof closeExpenseModal === 'function') closeExpenseModal();
 
