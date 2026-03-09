@@ -240,7 +240,7 @@ function renderMonthlyBarChart(trend) {
   trend.forEach(function(t) {
     var pct = (t.total / maxTotal) * 100;
     var isCurrentClass = t.isCurrent ? 'current' : '';
-    html += '<div class="exp-bar-item ' + isCurrentClass + '">'
+    html += '<div class="exp-bar-item ' + isCurrentClass + '" onclick="_expenseViewYM=\'' + t.ym + '\';showExpenseFullDetail(\'' + t.ym + '\')" style="cursor:pointer;">'
       + (t.isCurrent && t.ym === today().slice(0, 7) ? '<div class="exp-bar-projected">예상</div>' : '')
       + '<div class="exp-bar-value">' + Math.round(t.total / 10000) + '</div>'
       + '<div class="exp-bar-fill" style="height:' + Math.max(pct, 4) + '%"></div>'
