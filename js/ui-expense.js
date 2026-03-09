@@ -641,6 +641,8 @@ function showExpenseFullDetail(yearMonth) {
     if (dashPane) dashPane.style.display = 'none';
     if (detailPane) detailPane.style.display = 'block';
     renderExpenseFullDetail(yearMonth);
+    var scrollWrap = document.querySelector('.expense-full-scroll');
+    if (scrollWrap) scrollWrap.scrollTop = 0;
   } else {
     var dashboard = document.getElementById('pane-expense-dashboard');
     var detail = document.getElementById('pane-expense-detail');
