@@ -82,7 +82,7 @@ function renderExpenseDashboard(platform) {
     if (pace.isLess) {
       paceHtml = '<div class="exp-summary-sub">지난달보다 <span style="color:#E55643;font-weight:600;">' + diffAmount + ' 덜</span> 쓰는 중</div>';
     } else {
-      paceHtml = '<div class="exp-summary-sub over">지난달보다 <span style="font-weight:600;">' + diffAmount + ' 더</span> 쓰는 중</div>';
+      paceHtml = '<div class="exp-summary-sub">지난달보다 <span style="color:#E55643;font-weight:600;">' + diffAmount + ' 더</span> 쓰는 중</div>';
     }
   }
 
