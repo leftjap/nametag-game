@@ -293,7 +293,7 @@ function renderWeeklyCalendar(thisYM) {
 
 // 지출 항목 하나를 HTML로 생성
 function renderExpenseItem(item, clickAction) {
-  var html = '<div class="exp-tl-item" onclick="' + clickAction + '">';
+  var html = '<div class="exp-tl-item" data-expense-id="' + item.id + '" onclick="' + clickAction + '">';
   html += getMerchantIconHtml(item);
   html += '<div class="exp-tl-item-left">';
   html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
@@ -1291,4 +1291,125 @@ function saveExpenseForm(mode = 'normal') {
     // PC 에디터: 폼 초기화
     newExpenseForm();
   }
+}
+
+// ═══════════════════════════════════════
+// 가계부 타임라인 꾹누르기/우클릭 팝업
+// ═══════════════════════════════════════
+var _expLpTimer = null;
+var _expLpItem = null;
+var _expLpMoved = false;
+var _expLpX = 0;
+var _expLpY = 0;
+
+function showExpensePopup(expenseId, x, y) {
+  var expense = getExpenses().find(function(e) { return e.id === expenseId; });
+  if (!expense) return;
+
+  var isPC = window.innerWidth > 768;
+  var editAction = isPC
+    ? 'openExpenseModal(\'' + expenseId + '\')'
+    : 'loadExpense(\'' + expenseId + '\'); setMobileView(\'editor\');';
+
+  var menuEl = document.getElementById('lpPopupMenu');
+  menuEl.innerHTML = ''
+    + '<div class="lp-popup-menu-item" onclick="closeLpPopup(); ' + editAction + '"><span>수정</span>'
+    + '<svg viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M15 5l4 4"/></svg></div>'
+    + '<div class="lp-popup-sep"></div>'
+    + '<div class="lp-popup-menu-item danger" onclick="_deleteExpenseFromPopup(\'' + expenseId + '\')"><span>삭제</span>'
+    + '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>';
+
+  var overlay = document.getElementById('lpPopupOverlay');
+  var card = document.getElementById('lpPopupCard');
+
+  var isMobile = window.innerWidth <= 768;
+  var cardW = isMobile ? Math.min(220, window.innerWidth - 40) : Math.min(240, window.innerWidth - 32);
+  var left = x - cardW / 2;
+  if (left < 16) left = 16;
+  if (left + cardW > window.innerWidth - 16) left = window.innerWidth - cardW - 16;
+  var top = y + 8;
+  if (top + 120 > window.innerHeight - 16) top = y - 120 - 8;
+  if (top < 16) top = 16;
+
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+  card.style.width = cardW + 'px';
+
+  window._liftedOriginal = null;
+  window._liftedClone = null;
+  contextItemId = null;
+  contextItemType = null;
+
+  overlay.classList.add('open');
+  requestAnimationFrame(function() { card.classList.add('open'); });
+}
+
+function _deleteExpenseFromPopup(expenseId) {
+  closeLpPopup();
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  delExpense(expenseId);
+  updateExpenseCompact();
+  SYNC.scheduleDatabaseSave();
+  // 현재 화면 리렌더
+  if (window.innerWidth > 768) {
+    var detailPane = document.getElementById('expFullDetailPane');
+    if (detailPane && detailPane.style.display !== 'none') {
+      renderExpenseFullDetail(getExpenseViewYM());
+    } else {
+      renderExpenseDashboard('pc');
+    }
+  } else {
+    var mDetail = document.getElementById('pane-expense-detail');
+    if (mDetail && mDetail.style.display !== 'none') {
+      renderExpenseFullDetailMobile(getExpenseViewYM());
+    } else {
+      renderExpenseDashboard('mobile');
+    }
+  }
+}
+
+function setupExpenseContextMenu() {
+  // 우클릭
+  document.addEventListener('contextmenu', function(e) {
+    var item = e.target.closest('.exp-tl-item');
+    if (!item) return;
+    var id = item.getAttribute('data-expense-id');
+    if (!id) return;
+    e.preventDefault();
+    showExpensePopup(id, e.clientX, e.clientY);
+  });
+
+  // 꾹누르기 (모바일)
+  document.addEventListener('touchstart', function(e) {
+    var item = e.target.closest('.exp-tl-item');
+    if (!item) return;
+    var id = item.getAttribute('data-expense-id');
+    if (!id) return;
+    _expLpItem = item;
+    _expLpMoved = false;
+    _expLpX = e.touches[0].clientX;
+    _expLpY = e.touches[0].clientY;
+    clearTimeout(_expLpTimer);
+    _expLpTimer = setTimeout(function() {
+      if (!_expLpMoved && _expLpItem) {
+        if (navigator.vibrate) navigator.vibrate(20);
+        showExpensePopup(id, _expLpX, _expLpY);
+        _expLpItem = null;
+      }
+    }, 600);
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (!_expLpItem) return;
+    if (Math.abs(e.touches[0].clientX - _expLpX) > 15 || Math.abs(e.touches[0].clientY - _expLpY) > 15) {
+      _expLpMoved = true;
+      clearTimeout(_expLpTimer);
+      _expLpItem = null;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function() {
+    clearTimeout(_expLpTimer);
+    _expLpItem = null;
+  }, { passive: true });
 }

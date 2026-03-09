@@ -162,6 +162,7 @@ function init() {
     setupEditorImageSelection();
     setupGesturesAndUI();       // 모바일 제스처
     setupListContextMenu();
+    setupExpenseContextMenu();
 
     // 초기 문서 로드
     const naviDocs = getDocs('navi');

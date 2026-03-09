@@ -460,6 +460,11 @@ index.html        — 마크업
 - `handleSmsPaste()` — textarea 내용 파싱 → 폼 반영
 - `deleteExpenseFromForm(mode)` — 기존 항목 삭제 (확인 대화 포함, 모바일|모달 모드 지원)
 
+**타임라인 컨텍스트 메뉴:**
+- `showExpensePopup(expenseId, x, y)` — 타임라인 항목 우클릭/꾹누르기 팝업 (수정/삭제)
+- `_deleteExpenseFromPopup(expenseId)` — 팝업에서 삭제 실행 + 화면 리렌더
+- `setupExpenseContextMenu()` — document 레벨 이벤트 위임 등록 (우클릭 + 꾹누르기 600ms)
+
 **이 파일을 업로드해야 할 때:** 가계부 UI 변경, 차트 스타일, 타임라인 수정, 월 이동 로직, 카테고리 표시
 
 ---
