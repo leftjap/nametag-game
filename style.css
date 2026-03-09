@@ -627,22 +627,39 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   background:#7a9968;
 }
 
-/* 동기화 상태별 구름 아이콘 피드백 */
-.sync-cloud-btn.syncing{
-  animation:syncSpin 1s linear infinite;
+/* 동기화 상태 텍스트 (구름 버튼 옆) */
+.sync-cloud-label{
+  font-size:12px;
+  font-family:'Pretendard',-apple-system,sans-serif;
+  color:rgba(255,255,255,.5);
+  white-space:nowrap;
+  overflow:hidden;
+  max-width:0;
+  opacity:0;
+  transition:max-width .3s ease, opacity .3s ease, margin .3s ease;
+  margin-left:0;
+  pointer-events:none;
+  line-height:1;
 }
-.sync-cloud-btn.syncing svg{
-  color:var(--yellow) !important;
+.sync-cloud-label.show{
+  max-width:120px;
+  opacity:1;
+  margin-left:6px;
 }
-.sync-cloud-btn.sync-ok svg{
-  color:#7a9968 !important;
+.sync-cloud-label.error{
+  color:rgba(255,100,90,.7);
 }
-.sync-cloud-btn.sync-error svg{
-  color:var(--red) !important;
+
+/* 동기화 중 점 애니메이션 */
+.sync-dots::after{
+  content:'';
+  animation:syncDots 1.2s steps(4,end) infinite;
 }
-@keyframes syncSpin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
+@keyframes syncDots{
+  0%{content:''}
+  25%{content:'.'}
+  50%{content:'..'}
+  75%{content:'...'}
 }
 
 /* ═══════════════════════════════════════

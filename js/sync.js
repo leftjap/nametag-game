@@ -24,12 +24,23 @@ const SYNC = {
       dot.style.background = type === 'error' ? 'var(--red)' : type === 'syncing' ? 'var(--yellow)' : '#7a9968';
       dot.style.animation  = type === 'syncing' ? 'pulse 1s infinite' : 'none';
     }
-    const cloudBtn = document.getElementById('syncCloudBtn');
-    if (cloudBtn) {
-      cloudBtn.classList.remove('syncing', 'sync-ok', 'sync-error');
-      if (type === 'syncing') cloudBtn.classList.add('syncing');
-      else if (type === 'error') cloudBtn.classList.add('sync-error');
-      else cloudBtn.classList.add('sync-ok');
+    const label = document.getElementById('syncCloudLabel');
+    if (label) {
+      clearTimeout(this._labelTimer);
+      label.classList.remove('error');
+      if (type === 'syncing') {
+        label.innerHTML = '동기화 중<span class="sync-dots"></span>';
+        label.classList.add('show');
+      } else if (type === 'error') {
+        label.textContent = text;
+        label.classList.add('show', 'error');
+      } else {
+        label.textContent = '완료됨!';
+        label.classList.add('show');
+        this._labelTimer = setTimeout(() => {
+          label.classList.remove('show');
+        }, 2000);
+      }
     }
   },
 
