@@ -57,10 +57,22 @@ function renderExpenseDashboard(platform) {
   var thisMonthTotal = getMonthTotal(thisYM);
   var totalDisplay = thisMonthTotal > 0 ? formatAmount(thisMonthTotal) + '원' : '0원';
 
-  // 월 헤더를 상단 네비에 렌더링
-  renderExpenseMonthNav(thisYM);
+  // 월 헤더를 상단 네비에 렌더링 (PC/태블릿은 topbar, 모바일은 false 반환)
+  var ymParts = thisYM.split('-');
+  var mo = parseInt(ymParts[1]);
+  var isNow = (thisYM === today().slice(0, 7));
+  var topbarNav = renderExpenseMonthNav(thisYM);
 
   var html = '';
+
+  // 모바일: topbar에 안 들어가면 콘텐츠 내부에 삽입
+  if (!topbarNav) {
+    html += '<div class="exp-month-nav">';
+    html += '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)"><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg></button>';
+    html += '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + mo + '월</span>';
+    html += '<button class="exp-month-nav-btn' + (isNow ? ' exp-nav-disabled' : '') + '"' + (isNow ? '' : ' onclick="changeExpenseMonth(1)"') + '><svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg></button>';
+    html += '</div>';
+  }
 
   var summaryTitle = '오늘까지 ' + totalDisplay + ' 썼어요';
 
@@ -833,57 +845,40 @@ function selectMonth(ym) {
 // 월 헤더 렌더링 (상단 네비 바)
 // ═══════════════════════════════════════
 function renderExpenseMonthNav(yearMonth) {
-  var w = window.innerWidth;
-
-  if (w <= 768) {
-    // 모바일: lp-hdr에 삽입
-    var lpHdr = document.querySelector('.lp-hdr');
-    if (!lpHdr) return;
-    var existing = lpHdr.querySelector('.exp-month-nav-inline');
-    if (existing) existing.remove();
-    lpHdr.insertAdjacentHTML('beforeend', _buildMonthNavHtml(yearMonth));
-  } else if (w <= 1400) {
-    // 태블릿: ed-topbar의 위치에 삽입
-    var tabLabel = document.getElementById('edTabLabel');
-    if (tabLabel) tabLabel.style.display = 'none';
-    var topbar = document.querySelector('.ed-topbar');
-    if (!topbar) return;
-    var existing2 = topbar.querySelector('.exp-month-nav-inline');
-    if (existing2) existing2.remove();
-    var leftEl = topbar.querySelector('.ed-topbar-left');
-    if (leftEl) leftEl.insertAdjacentHTML('afterend', _buildMonthNavHtml(yearMonth));
-  } else {
-    // PC: expenseFullDashboard 상단에 삽입
-    var container = document.getElementById('expFullDashboardPane');
-    var container2 = document.getElementById('expFullDetailPane');
-    [container, container2].forEach(function(c) {
-      if (!c) return;
-      var existing3 = c.querySelector('.exp-month-nav-inline');
-      if (existing3) existing3.remove();
-    });
-    var activeContainer = container && container.style.display !== 'none' ? container : container2;
-    if (activeContainer) {
-      activeContainer.insertAdjacentHTML('afterbegin', _buildMonthNavHtml(yearMonth));
-    }
-  }
-}
-
-function _buildMonthNavHtml(yearMonth) {
-  var d = new Date(yearMonth + '-01');
-  var monthLabel = (d.getMonth() + 1) + '월';
+  var parts = yearMonth.split('-');
+  var mo = parseInt(parts[1]);
   var nowYM = today().slice(0, 7);
-  var _isNowMonth = (yearMonth === nowYM);
+  var isNow = (yearMonth === nowYM);
 
-  return '<div class="exp-month-nav-inline">'
+  var navHtml = '<div class="exp-month-nav-inline" id="expenseMonthNavInline">'
     + '<button class="exp-month-nav-btn" onclick="changeExpenseMonth(-1)">'
     + '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0.5 1,7 7,13.5" fill="currentColor"/></svg>'
     + '</button>'
-    + '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + monthLabel + '</span>'
-    + '<button class="exp-month-nav-btn' + (_isNowMonth ? ' exp-nav-disabled' : '') + '"'
-    + (_isNowMonth ? '' : ' onclick="changeExpenseMonth(1)"') + '>'
+    + '<span class="exp-month-nav-label" onclick="openMonthPicker()" style="cursor:pointer;">' + mo + '월</span>'
+    + '<button class="exp-month-nav-btn' + (isNow ? ' exp-nav-disabled' : '') + '"'
+    + (isNow ? '' : ' onclick="changeExpenseMonth(1)"') + '>'
     + '<svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0.5 7,7 1,13.5" fill="currentColor"/></svg>'
     + '</button>'
     + '</div>';
+
+  // 기존 네비 제거
+  document.querySelectorAll('#expenseMonthNavInline').forEach(function(el) { el.remove(); });
+
+  var w = window.innerWidth;
+  if (w <= 768) {
+    // 모바일: topbar에 넣지 않음 (대시보드 내부에서 처리)
+    return false;
+  } else {
+    // PC/태블릿: ed-topbar 센터에 삽입
+    var tabLabel = document.getElementById('edTabLabel');
+    if (tabLabel) tabLabel.style.display = 'none';
+    var topbar = document.querySelector('.ed-topbar');
+    if (topbar) {
+      var leftEl = topbar.querySelector('.ed-topbar-left');
+      if (leftEl) leftEl.insertAdjacentHTML('afterend', navHtml);
+    }
+    return true;
+  }
 }
 
 // ═══════════════════════════════════════
