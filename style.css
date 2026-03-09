@@ -2113,7 +2113,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   grid-template-columns: 72px 1fr 48px;
   gap: 12px;
   align-items: center;
-  padding: 5px 0;
+  padding: 8px 0;
   cursor: pointer;
   transition: background .1s;
   border-radius: 6px;
@@ -2133,15 +2133,15 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-category-bar-wrap {
-  height: 18px;
+  height: 24px;
   background: rgba(0,0,0,.04);
-  border-radius: 5px;
+  border-radius: 6px;
   overflow: hidden;
 }
 
 .exp-category-bar {
   height: 100%;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 .exp-category-amount {
@@ -2235,7 +2235,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
 .exp-two-col-card .exp-category-sub {
   flex-shrink: 0;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .exp-two-col-card .exp-cat-more-wrap {
