@@ -58,6 +58,15 @@ function toggleDayCard(id, dateStr) {
 
 // ═══ 루틴 루틴 상세 열기/닫기 ═══
 function openRoutineDetail() {
+  // 사이드바 글쓰기 메뉴 활성 해제
+  document.querySelectorAll('.side-menu').forEach(function(m) { m.classList.remove('on'); });
+  // 가계부 compact 활성 해제
+  var expCompact = document.querySelector('.expense-compact');
+  if (expCompact) expCompact.classList.remove('on');
+  // 루틴 compact 활성 표시
+  var routineCompact = document.querySelector('.routine-compact');
+  if (routineCompact) routineCompact.classList.add('on');
+
   showRoutineCard();
   if (window.innerWidth > 768 && typeof showRoutineCalendarView === 'function') {
     showRoutineCalendarView(true);

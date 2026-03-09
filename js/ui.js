@@ -158,6 +158,10 @@ function switchTab(t, keepLayout) {
     expCompact.classList.toggle('on', t === 'expense');
   }
 
+  // 루틴 compact 활성 해제
+  var routineCompact = document.querySelector('.routine-compact');
+  if (routineCompact) routineCompact.classList.remove('on');
+
   clearSearch();
   hideRoutineCard();
   // 루틴 캘린더 뷰 정리
