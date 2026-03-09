@@ -799,6 +799,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .ed-new-btn:hover{opacity:.85;transform:scale(1.05)}
   .ed-new-btn svg{width:19px;height:19px;stroke:white;stroke-width:2.2;fill:none}
+  .editor.routine-cal-active .ed-new-btn{display:none !important}
+  .editor.routine-view-active .ed-new-btn{display:none !important}
 
   .list-panel{touch-action:manipulation}
   .pane-list{touch-action:manipulation}
@@ -1510,6 +1512,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .ed-new-btn:hover{opacity:.85;transform:scale(1.05)}
   .ed-new-btn svg{width:17px;height:17px;stroke:white;stroke-width:2.2;fill:none}
+  .editor.routine-cal-active .ed-new-btn{display:none !important}
+  .editor.routine-view-active .ed-new-btn{display:none !important}
   .ed-topbar{overflow:visible!important;position:relative!important;z-index:20!important;width:100%!important}
   .ed-topbar-right{flex-shrink:0!important;position:relative!important;z-index:20!important;overflow:visible!important}
 
