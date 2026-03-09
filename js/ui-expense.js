@@ -352,7 +352,9 @@ function renderRecentExpenses(yearMonth) {
 
   dateOrder.forEach(function(dateStr) {
     html += renderExpenseDateGroup(dateStr, grouped[dateStr], function(item) {
-      return 'loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');';
+      return window.innerWidth > 768
+        ? 'openExpenseModal(\'' + item.id + '\')'
+        : 'loadExpense(\'' + item.id + '\'); setMobileView(\'editor\');';
     });
   });
 
@@ -602,8 +604,6 @@ function showExpenseDashboardFromDetail() {
     renderExpenseDashboard('mobile');
   }
 }
-// gesture.js 호환 래퍼
-function showExpenseDashboardFromDetail() { showExpenseDashboardFromDetail(); }
 
 // ═══════════════════════════════════════
 // B. 전체 내역 렌더 (전체 내역 페이지)

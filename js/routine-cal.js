@@ -81,6 +81,7 @@ function showRoutineCalendarView(keepListPanel) {
   if (nb) nb.style.display = 'none';
   var tl = document.getElementById('edTabLabel');
   if (tl) tl.style.display = 'none';
+  document.querySelector('.editor').classList.add('routine-cal-active');
   panel.style.display = 'flex';
   _routineViewYM = today().slice(0, 7);
   _selectedRoutineDate = today();
@@ -105,6 +106,7 @@ function showRoutineCalendarView(keepListPanel) {
 
 function hideRoutineCalView() {
   var panel = document.getElementById('editorRoutineDetail');
+  document.querySelector('.editor').classList.remove('routine-cal-active');
   if (panel) panel.style.display = 'none';
   removeRoutineMonthNav();
   _routineViewYM = null;
@@ -320,6 +322,10 @@ function renderRoutineCalView(yearMonth) {
 
   h += '</div>';
   panel.querySelector('.editor-scroll-area').innerHTML = h;
+
+  // 루틴 캘린더 뷰에서 글쓰기 버튼 숨기기 (렌더링 후 확실히 숨김)
+  var nb = document.querySelector('.ed-new-btn');
+  if (nb) nb.style.display = 'none';
 }
 
 function buildRCChart(dim, lastDay, thisCum, prevCum, pDim, mNum, pNum) {
