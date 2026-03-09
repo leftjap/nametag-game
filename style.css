@@ -63,7 +63,7 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
 .brand-wrap{display:flex;align-items:center;gap:10px}
 .brand{display:none}
 .cat-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#e0e0e0,#c0c0c0);box-shadow:0 2px 8px rgba(0,0,0,.06);flex-shrink:0}
-.sync-row{margin-left:auto;display:flex;align-items:center;gap:5px;padding-right:2px}
+.sync-row{margin-left:auto;display:flex;align-items:center;gap:5px;padding-right:2px;position:relative;right:5px}
 .sync-status{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--tab-color);cursor:pointer;padding:2px 6px;border-radius:10px;transition:.2s;display:flex;align-items:center;gap:5px}
 .sync-status:hover{background:color-mix(in srgb, var(--tab-color) 5%, transparent)}
 #syncDot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--tab-color)}
