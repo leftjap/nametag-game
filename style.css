@@ -2080,6 +2080,16 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .expense-save-btn:hover { opacity: .9; }
 .expense-save-btn:disabled { opacity: .4; cursor: default; }
 
+/* 삭제 버튼 */
+.expense-delete-btn {
+  display: block; width: 100%; padding: 16px; margin-top: 8px;
+  background: #ff3b30; border: none; border-radius: 12px;
+  font-size: 16px; color: #fff; font-weight: 600; cursor: pointer;
+  font-family: 'Pretendard', sans-serif; transition: .15s;
+}
+.expense-delete-btn:hover { opacity: .9; }
+.expense-delete-btn:active { opacity: .8; }
+
 /* ═══ 가계부 풀 대시보드 (PC/태블릿) ═══ */
 .expense-dashboard-wrap {
   max-width: 960px; margin: 0 auto; padding: 32px 40px 100px;

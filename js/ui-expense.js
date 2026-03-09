@@ -1030,6 +1030,8 @@ function newExpenseForm(mode = 'normal') {
   document.getElementById('expenseMemoInput' + suffix).value = '';
   document.getElementById('expenseIconKeyword' + suffix).value = '';
   document.getElementById('expenseIconUrl' + suffix).value = '';
+  var delBtn = document.getElementById('expenseDeleteBtn' + suffix);
+  if (delBtn) delBtn.style.display = 'none';
   const now = new Date();
   document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(now);
   clearCategorySelection(mode);
@@ -1066,7 +1068,27 @@ function loadExpense(id, mode = 'normal') {
     document.getElementById('expenseIconUrl' + suffix).value = '';
   }
 
+  // 기존 항목이므로 삭제 버튼 표시
+  var delBtn = document.getElementById('expenseDeleteBtn' + suffix);
+  if (delBtn) delBtn.style.display = 'block';
+
   updateExpenseSaveBtn(mode);
+}
+
+function deleteExpenseFromForm(mode = 'normal') {
+  if (!curExpenseId) {
+    alert('삭제할 항목이 없습니다.');
+    return;
+  }
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  delExpense(curExpenseId);
+  curExpenseId = null;
+  newExpenseForm(mode);
+  if (mode === 'modal') {
+    closeExpenseModal();
+  } else {
+    setMobileView('list');
+  }
 }
 
 function formatExpenseAmount(input) {

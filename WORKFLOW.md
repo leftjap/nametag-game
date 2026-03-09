@@ -417,6 +417,9 @@ index.html        — 마크업
 **모달:**
 - `openExpenseModal(expenseId)`, `closeExpenseModal()`, `onExpenseModalOverlayClick(e)`
 
+**폼 관리:**
+- `deleteExpenseFromForm(mode)` — 기존 항목 삭제 (확인 대화 포함, 모바일|모달 모드 지원)
+
 **이 파일을 업로드해야 할 때:** 가계부 UI 변경, 차트 스타일, 타임라인 수정, 월 이동 로직, 카테고리 표시
 
 ---
