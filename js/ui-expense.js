@@ -460,17 +460,16 @@ function renderCategoryChart(catBreakdown) {
   if (!catBreakdown || catBreakdown.length === 0) return '';
   var maxAmount = catBreakdown[0].amount;
   var showCount = 4;
-  var visibleCats = catBreakdown.slice(0, showCount);
   var hasMore = catBreakdown.length > showCount;
 
   var html = '<div class="exp-category-chart">';
   html += '<div class="exp-category-title">카테고리별 지출</div>';
 
-  visibleCats.forEach(function(cat, i) {
+  // 항상 보이는 항목들
+  catBreakdown.slice(0, showCount).forEach(function(cat, i) {
     var pct = (cat.amount / maxAmount) * 100;
     var opacity = Math.max(0.2, 1 - i * 0.12);
-
-    html += '<div class="exp-category-row" style="cursor:pointer;" onclick="openCategoryDetail(\'' + cat.id + '\',\'' + cat.name + '\')">'
+    html += '<div class="exp-category-row" onclick="openCategoryDetail(\'' + cat.id + '\',\'' + cat.name + '\')">'
       + '<div class="exp-category-name">' + cat.name + '</div>'
       + '<div class="exp-category-bar-wrap">'
       + '<div class="exp-category-bar" style="width:' + Math.max(pct, 3) + '%;background:#E55643;opacity:' + opacity + '"></div>'
@@ -479,16 +478,13 @@ function renderCategoryChart(catBreakdown) {
       + '</div>';
   });
 
+  // 더보기 항목들 (숨겨진 상태)
   if (hasMore) {
-    html += '<div class="exp-cat-more-wrap">';
-    html += '<button class="exp-cat-more-btn" onclick="toggleCategoryMore(this)">더보기</button>';
-    html += '</div>';
     html += '<div class="exp-category-more" style="display:none;">';
     catBreakdown.slice(showCount).forEach(function(cat, i) {
       var pct = (cat.amount / maxAmount) * 100;
       var opacity = Math.max(0.2, 1 - (i + showCount) * 0.12);
-
-      html += '<div class="exp-category-row" style="cursor:pointer;" onclick="openCategoryDetail(\'' + cat.id + '\',\'' + cat.name + '\')">'
+      html += '<div class="exp-category-row" onclick="openCategoryDetail(\'' + cat.id + '\',\'' + cat.name + '\')">'
         + '<div class="exp-category-name">' + cat.name + '</div>'
         + '<div class="exp-category-bar-wrap">'
         + '<div class="exp-category-bar" style="width:' + Math.max(pct, 3) + '%;background:#E55643;opacity:' + opacity + '"></div>'
@@ -497,6 +493,10 @@ function renderCategoryChart(catBreakdown) {
         + '</div>';
     });
     html += '</div>';
+    // 더보기/접기 버튼 — 항상 맨 아래
+    html += '<div class="exp-cat-more-wrap">';
+    html += '<button class="exp-cat-more-btn" onclick="toggleCategoryMore(this)">더보기</button>';
+    html += '</div>';
   }
 
   html += '</div>';
@@ -504,8 +504,8 @@ function renderCategoryChart(catBreakdown) {
 }
 
 function toggleCategoryMore(btn) {
-  var moreDiv = btn.parentElement.nextElementSibling;
-  if (!moreDiv) return;
+  var moreDiv = btn.parentElement.previousElementSibling;
+  if (!moreDiv || !moreDiv.classList.contains('exp-category-more')) return;
   if (moreDiv.style.display === 'none') {
     moreDiv.style.display = 'block';
     btn.textContent = '접기';

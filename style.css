@@ -2090,9 +2090,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   font-size: 20px;
   font-weight: 700;
   color: var(--tx);
-  margin-bottom: 0;
   letter-spacing: -0.3px;
   line-height: 1.4;
+  margin: 0;
 }
 
 .exp-category-row {
@@ -2100,7 +2100,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   grid-template-columns: 72px 1fr 48px;
   gap: 12px;
   align-items: center;
-  padding: 6px 0;
+  padding: 5px 0;
   cursor: pointer;
   transition: background .1s;
   border-radius: 6px;
@@ -2120,7 +2120,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-category-bar-wrap {
-  height: 20px;
+  height: 18px;
   background: rgba(0,0,0,.04);
   border-radius: 5px;
   overflow: hidden;
@@ -2143,7 +2143,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-cat-more-wrap {
   display: flex;
   justify-content: center;
-  padding: 12px 0 4px;
+  padding: 10px 0 0;
 }
 
 .exp-cat-more-btn {
@@ -2169,37 +2169,44 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-two-col-card {
   display: flex;
   flex-direction: column;
+  padding: 20px;
+  overflow: hidden;
 }
 
 .exp-two-col-card .exp-summary {
-  padding: 0 0 8px;
+  padding: 0 0 4px;
 }
 
 .exp-two-col-card .exp-chart-wrap {
   padding: 0;
   border-bottom: none;
   margin: 0;
-  flex: 1;
+}
+
+.exp-two-col-card .exp-chart-wrap svg.exp-chart-svg {
+  height: 180px !important;
+}
+
+.exp-two-col-card .exp-chart-legend {
+  margin-top: 4px;
 }
 
 .exp-two-col-card .exp-category-chart {
-  padding-top: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .exp-two-col-card .exp-category-title {
-  padding-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.exp-two-col-card .exp-category-chart .exp-category-row:first-of-type {
+.exp-two-col-card .exp-category-row:first-of-type {
   margin-top: auto;
 }
 
-.exp-two-col-card .exp-chart-legend {
-  margin-top: auto;
-  padding-top: 8px;
+.exp-two-col-card .exp-cat-more-wrap {
+  padding: 8px 0 0;
 }
 
 /* 모달 (PC/태블릿 입력 폼) */
