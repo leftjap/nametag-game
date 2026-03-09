@@ -2832,10 +2832,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     padding: 0 20px;
   }
   .pane-expense-dashboard .exp-summary {
-    padding: 8px 0 10px;
+    padding: 8px 0 15px;
   }
   .pane-expense-dashboard .exp-chart-wrap {
-    padding: 4px 0 12px;
+    padding: 0 0 12px;
   }
   .pane-expense-dashboard .exp-projection {
     padding: 20px 0 16px;
