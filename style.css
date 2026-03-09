@@ -2120,6 +2120,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 #expenseModalOverlay .expense-form-footer {
   padding: 12px 20px 20px;
 }
+#expenseModalOverlay .expense-form-footer .expense-paste-btn {
+  margin: 0 0 8px;
+}
 
 /* ═══ 가계부 풀 대시보드 (PC/태블릿) ═══ */
 .expense-dashboard-wrap {
