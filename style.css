@@ -693,6 +693,12 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   display: none;
 }
 
+/* 루틴/가계부 화살표 — .side-nav의 좌우 12px 패딩 보정 */
+.routine-compact .side-arrow,
+.expense-compact .side-arrow {
+  right: 26px;
+}
+
 /* ═══════════════════════════════════════
    태블릿 (769px ~ 1024px) — 3단, 사이드바 다크
    ═══════════════════════════════════════ */
