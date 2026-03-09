@@ -693,6 +693,12 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 ### 코드 블록 포함
 각 Step의 작업 내용에 Haiku가 그대로 적용할 수 있는 구체적인 코드 블록을 포함한다. 설명만 있고 코드가 없는 Step은 Haiku가 잘못 해석할 수 있다.
 
+### SVG 차트 작성 시 주의
+- SVG의 viewBox 비율과 CSS가 결정하는 실제 렌더링 영역 비율이 일치해야 한다. 불일치하면 `preserveAspectRatio` 기본값(meet)이 좌우 또는 상하에 여백을 만든다.
+- 차트가 컨테이너를 꽉 채워야 하면 `preserveAspectRatio="none"`을 사용하고, CSS에서 `height: auto; aspect-ratio: [viewBox 비율]`로 맞춘다.
+- CSS에서 `height`를 px로 강제(`!important` 포함)하면 viewBox 비율과 충돌할 수 있다. 높이 고정이 필요하면 viewBox 비율도 그에 맞춰야 한다.
+- `maxY` 계산 시, 아직 데이터가 없는 미래 날짜의 값을 포함하면 그래프가 바닥에 깔린다. 현재 시점까지의 데이터만으로 스케일을 잡는다.
+
 ---
 
 ## 11. 코드 비대화 방지 규칙
