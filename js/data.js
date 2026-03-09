@@ -509,10 +509,11 @@ function getTopCategoryChange(ym) {
   return best && best.diff !== 0 ? best : null;
 }
 
-function getMonthlyTrend() {
+function getMonthlyTrend(count) {
+  if (!count) count = 6;
   const now = new Date();
   const result = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = count - 1; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const label = (d.getMonth() + 1) + '월';

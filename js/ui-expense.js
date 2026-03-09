@@ -52,7 +52,8 @@ function renderExpenseDashboard(platform) {
   var thisYM = getExpenseViewYM();
   var pace = getExpensePace();
   var projected = getProjectedMonthTotal();
-  var trend = getMonthlyTrend();
+  var trendCount = window.innerWidth > 1400 ? 10 : window.innerWidth > 768 ? 8 : 6;
+  var trend = getMonthlyTrend(trendCount);
   var catBreakdown = getCategoryBreakdown(thisYM);
   var thisMonthTotal = getMonthTotal(thisYM);
   var totalDisplay = thisMonthTotal > 0 ? formatAmount(thisMonthTotal) + '원' : '0원';

@@ -277,7 +277,8 @@ index.html        — 마크업
 - `getMonthlyAverage()` — 6개월 월 평균
 - `getCategoryBreakdown(ym)` — 카테고리별 지출 내역
 - `getTopCategoryChange(ym)` — 전월 대비 가장 변화폭이 큰 카테고리 {name, diff}
-- `getMonthlyTrend()`, `getMonthlyTrendAround(centerYM)` — 월별 추이
+- `getMonthlyTrend(count)` — 월별 추이 (count: 개월수, 기본값 6)
+- `getMonthlyTrendAround(centerYM)` — 중심 월 기준 월별 추이
 
 **기타:** `getTabCount(t)`, `updateWritingStats()`, `updateBookStats()`, `showRandomQuote()`, `togglePin(type, id, e)`
 

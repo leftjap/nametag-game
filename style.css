@@ -2252,9 +2252,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   margin-top: 20px;
   padding-bottom: 20px;
   position: relative;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .exp-bar-fill {
@@ -2865,7 +2862,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 .exp-bar-fill {
-  max-width: 32px;
+  max-width: 48px;
   margin: 0 auto;
   border-radius: 4px 4px 0 0;
 }
