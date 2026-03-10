@@ -1645,14 +1645,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     overflow:visible !important;
   }
   .side .side-hdr::after{
-    content:'' !important;
-    position:absolute !important;
-    bottom:0 !important;
-    left:16px !important;
-    right:16px !important;
-    height:1px !important;
-    background:rgba(255,255,255,.08) !important;
-    pointer-events:none !important;
+    display:none !important;
   }
   .side .cat-avatar{border:2px solid rgba(255,255,255,.15) !important}
   .side .sync-status{display:none !important}
@@ -1672,8 +1665,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .sec{padding:8px 0 !important}
   .side .sec-t{color:rgba(255,255,255,.35) !important;font-size:11px !important;padding:0 16px !important;margin-bottom:4px !important}
   .sec-border::after{
-    left:16px !important;right:16px !important;
-    background:rgba(255,255,255,.08) !important;
+    display:none !important;
   }
 
   /* 루틴 컴팩트 */
@@ -1712,6 +1704,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     font-weight:500 !important;
   }
   .side .side-menu .tab-color-dot{display:none !important}
+  .side .side-nav {
+    border-bottom: none !important;
+  }
   .side .badge-pill{display:none !important}
   /* 어구 표시 (PC) */
   .side .quote-section {
