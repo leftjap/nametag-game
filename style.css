@@ -4188,43 +4188,71 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
    ═══════════════════════════════════════ */
 /* ═══ 캘린더 날짜 선택 + 일별 내역 ═══ */
 .exp-month-day.exp-day-selected {
-  background: var(--bg-white) !important;
-  border-radius: 14px;
-  transform: scale(1.2) translate(-1px, -3px);
+  z-index: 2;
+  position: relative;
+  overflow: visible;
+  background: transparent !important;
+  transform: translate(-1px, -3px);
+  transition: transform 0.2s ease;
+}
+.exp-month-day.exp-day-selected::before {
+  content: '';
+  position: absolute;
+  inset: -8px -10px;
+  background: var(--bg-white);
+  border-radius: 16px;
   box-shadow:
     2px 6px 10px rgba(0,0,0,.10),
     4px 12px 28px rgba(0,0,0,.16),
     6px 20px 40px rgba(0,0,0,.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 2;
-  position: relative;
+  z-index: -1;
 }
 .exp-month-day.exp-day-selected .exp-month-day-num {
   color: var(--tx) !important;
   font-weight: 700;
+  font-size: 18px;
+  position: relative;
+  z-index: 1;
 }
 .exp-month-day.exp-day-selected .exp-month-day-amount {
   font-weight: 600;
-  font-size: 11px;
+  font-size: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .exp-week-day.exp-day-selected {
-  background: var(--bg-white) !important;
-  border-radius: 14px;
-  transform: scale(1.2) translate(-1px, -3px) !important;
-  box-shadow: 2px 6px 10px rgba(0,0,0,.10), 4px 12px 28px rgba(0,0,0,.16), 6px 20px 40px rgba(0,0,0,.12) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 2;
   position: relative;
+  overflow: visible;
+  background: transparent !important;
+  transform: translate(-1px, -3px) !important;
+  transition: transform 0.2s ease;
+}
+.exp-week-day.exp-day-selected::before {
+  content: '';
+  position: absolute;
+  inset: -6px -8px;
+  background: var(--bg-white);
+  border-radius: 16px;
+  box-shadow:
+    2px 6px 10px rgba(0,0,0,.10),
+    4px 12px 28px rgba(0,0,0,.16),
+    6px 20px 40px rgba(0,0,0,.12) !important;
+  z-index: -1;
 }
 .exp-week-day.exp-day-selected .exp-week-day-num {
   color: var(--tx) !important;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
+  position: relative;
+  z-index: 1;
 }
 .exp-week-day.exp-day-selected .exp-week-day-amount {
   font-weight: 600;
   font-size: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .exp-day-detail {
@@ -4289,22 +4317,37 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .rc-day.today{box-shadow:0 2px 8px rgba(0,0,0,.08);transform:translateY(-2px);z-index:2;background:var(--bg-white)}
 /* ═══ 루틴 캘린더 선택 효과 ═══ */
 .rc-day.sel{
-  background:var(--bg-white) !important;
+  position:relative;
+  overflow:visible;
+  background:transparent !important;
   border-radius:14px;
-  transform:scale(1.2) translate(-1px, -3px);
+  transform:translate(-1px, -3px);
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+  z-index:2;
+}
+.rc-day.sel::before{
+  content:'';
+  position:absolute;
+  inset:-8px -10px;
+  background:var(--bg-white);
+  border-radius:14px;
   box-shadow:
     2px 6px 10px rgba(0,0,0,.10),
     4px 12px 28px rgba(0,0,0,.16),
     6px 20px 40px rgba(0,0,0,.12);
-  transition:transform 0.2s ease, box-shadow 0.2s ease;
-  z-index:2;
-  position:relative;
+  z-index:-1;
 }
 .rc-day.sel .rc-day-n{
+  position:relative;
+  z-index:1;
   color:var(--tx) !important;
+  font-size:18px;
   font-weight:700;
 }
 .rc-day.sel .rc-day-p{
+  position:relative;
+  z-index:1;
+  font-size:12px;
   font-weight:600;
 }
 .rc-day.future{opacity:.3;cursor:default}
@@ -4315,10 +4358,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .rc-day.p100 .rc-day-n{color:var(--tx);font-weight:600}
 .rc-day.p100 .rc-day-p{color:#E55643}
 .rc-day.sel.today{
-  background:#fff;
+  background:transparent !important;
 }
 .rc-day.sel.p100{
-  background:#fff;
+  background:transparent !important;
 }
 .rc-day.sel.p100 .rc-day-p{
   color:#E55643;
