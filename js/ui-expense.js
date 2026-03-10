@@ -109,47 +109,65 @@ function renderExpenseDashboard(platform) {
     container.innerHTML = html;
 
   } else {
-    // ═══ 모바일: 기존 유지 ═══
+    // ═══ 모바일: PC와 동일 구성 ═══
     var html = '';
-    var pace = getExpensePace();
-    var projected = getProjectedMonthTotal();
-    var trendCount = 6;
-    var trend = getMonthlyTrend(trendCount);
-    var catBreakdown = getCategoryBreakdown(thisYM);
-    var summaryTitle = '오늘까지 ' + totalDisplay + ' 썼어요';
+    var ymDate = new Date(thisYM + '-01');
+    var monthNum = ymDate.getMonth() + 1;
+    var daysInMonth = new Date(ymDate.getFullYear(), ymDate.getMonth() + 1, 0).getDate();
 
-    var paceHtml = '';
-    if (pace) {
-      var diffAmount = formatAmount(Math.abs(pace.diff)) + '원';
-      if (pace.isLess) {
-        paceHtml = '<div class="exp-summary-sub">지난달보다 <span style="color:#E55643;font-weight:600;">' + diffAmount + ' 덜</span> 쓰는 중</div>';
-      } else {
-        paceHtml = '<div class="exp-summary-sub">지난달보다 <span style="color:#E55643;font-weight:600;">' + diffAmount + ' 더</span> 쓰는 중</div>';
-      }
+    // 하루 평균 계산
+    var dailyAvg = 0;
+    if (isCurrentMonth) {
+      var todayDay = new Date().getDate();
+      dailyAvg = todayDay > 0 ? Math.round(thisMonthTotal / todayDay) : 0;
+    } else {
+      dailyAvg = daysInMonth > 0 ? Math.round(thisMonthTotal / daysInMonth) : 0;
     }
 
+    // ── 섹션 1: 요약 텍스트 ──
     html += '<div class="exp-summary">';
-    html += '<div class="exp-summary-title">' + summaryTitle + '</div>';
-    html += paceHtml;
+    if (isCurrentMonth) {
+      html += '<div class="exp-summary-title">' + monthNum + '월에는 <span style="color:#E55643;">' + totalDisplay + '</span> 쓰고 있어요</div>';
+      html += '<div class="exp-summary-sub">하루 평균 <span style="color:#E55643;">' + dailyAvg.toLocaleString() + '원</span> 쓰고 있어요</div>';
+    } else {
+      html += '<div class="exp-summary-title">' + monthNum + '월에는 <span style="color:#E55643;">' + totalDisplay + '</span> 썼어요</div>';
+      html += '<div class="exp-summary-sub">하루 평균 <span style="color:#E55643;">' + dailyAvg.toLocaleString() + '원</span> 썼어요</div>';
+    }
     html += '</div>';
-    html += renderCumulativeChart(thisYM);
-    html += '<div class="exp-section-gap"></div>';
-    html += renderCategoryChart(catBreakdown);
 
+    // ── 섹션 2: 월간 캘린더 ──
+    html += '<div class="exp-pc-calendar-wrap">';
+    html += renderMonthCalendar(thisYM);
+    html += '</div>';
+
+    // ── 섹션 3: 월간 상호별 랭킹 ──
+    var merchantBreakdown = getMerchantBreakdown(thisYM);
+    if (merchantBreakdown.length > 0) {
+      html += '<div class="exp-section-gap"></div>';
+      html += renderMonthlyMerchantHero(merchantBreakdown, thisYM, isCurrentMonth, monthNum);
+    }
+
+    // ── 섹션 4: 월별 막대 차트 ──
+    var trend = isCurrentMonth ? getMonthlyTrend(6) : getMonthlyTrendAround(thisYM);
     html += '<div class="exp-section-gap"></div>';
     html += '<div class="exp-projection">';
-    html += '<div class="exp-projection-title">이번 달엔 ' + formatAmount(projected) + '원 쓸 것 같아요</div>';
-    html += '<div class="exp-projection-sub">한 달에 평균 ' + formatAmount(getMonthlyAverage()) + '원 정도 써요</div>';
     html += renderMonthlyBarChart(trend);
     html += '</div>';
 
-    html += '<div class="exp-section-gap"></div>';
-    html += renderWeeklyCalendar(thisYM);
+    // ── 섹션 5: 연간 누적 ──
+    var currentYear = ymDate.getFullYear();
+    var yearlyHtml = renderYearlySection(currentYear);
+    if (yearlyHtml) {
+      html += '<div class="exp-section-gap"></div>';
+      html += '<div style="padding:0 20px;">';
+      html += yearlyHtml;
+      html += '</div>';
+    }
 
-    html += '<div class="exp-section-gap"></div>';
-    html += renderRecentExpenses(thisYM);
-
+    // ── 내역 더 보기 버튼 ──
+    html += '<div style="padding:20px 0;text-align:center;">';
     html += '<button class="exp-more-btn" onclick="showExpenseFullDetail(\'' + thisYM + '\')">내역 더 보기 →</button>';
+    html += '</div>';
 
     container.innerHTML = html;
   }

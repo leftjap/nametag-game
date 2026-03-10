@@ -3960,6 +3960,44 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     width: 64px;
     min-width: 64px;
   }
+
+  .pane-expense-dashboard .exp-pc-calendar-wrap {
+    padding: 0;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-cal {
+    padding: 4px 0 8px;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-grid {
+    gap: 4px 8px;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-day {
+    aspect-ratio: auto;
+    min-height: 44px;
+    padding: 4px 0;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-day.empty {
+    min-height: 44px;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-day-num {
+    font-size: 14px;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-day-amount {
+    font-size: 9px;
+  }
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-dow {
+    font-size: 11px;
+    padding: 4px 0 6px;
+  }
+
+  .pane-expense-dashboard .exp-yearly-section {
+    padding: 20px 0 16px;
+  }
+  .pane-expense-dashboard .exp-projection {
+    padding: 20px;
+  }
+  .pane-expense-dashboard .exp-section-gap {
+    margin: 0 -20px;
+  }
 }
 
 /* ═══ 전체 보기 팝업 내부 ═══ */
