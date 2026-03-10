@@ -4190,11 +4190,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-month-day.exp-day-selected {
   background: var(--bg-white) !important;
   border-radius: 14px;
-  transform: scale(1.08) translate(-1px, -3px);
+  transform: scale(1.2) translate(-1px, -3px);
   box-shadow:
-    2px 6px 10px rgba(0,0,0,.08),
-    4px 12px 28px rgba(0,0,0,.14),
-    6px 16px 36px rgba(0,0,0,.08);
+    2px 6px 10px rgba(0,0,0,.10),
+    4px 12px 28px rgba(0,0,0,.16),
+    6px 20px 40px rgba(0,0,0,.12);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 2;
   position: relative;
@@ -4211,8 +4211,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-week-day.exp-day-selected {
   background: var(--bg-white) !important;
   border-radius: 14px;
-  transform: scale(1.08) translate(-1px, -3px) !important;
-  box-shadow: 2px 6px 10px rgba(0,0,0,.08), 4px 12px 28px rgba(0,0,0,.14), 6px 16px 36px rgba(0,0,0,.08) !important;
+  transform: scale(1.2) translate(-1px, -3px) !important;
+  box-shadow: 2px 6px 10px rgba(0,0,0,.10), 4px 12px 28px rgba(0,0,0,.16), 6px 20px 40px rgba(0,0,0,.12) !important;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 2;
   position: relative;
@@ -4291,11 +4291,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .rc-day.sel{
   background:var(--bg-white) !important;
   border-radius:14px;
-  transform:scale(1.08) translate(-1px, -3px);
+  transform:scale(1.2) translate(-1px, -3px);
   box-shadow:
-    2px 6px 10px rgba(0,0,0,.08),
-    4px 12px 28px rgba(0,0,0,.14),
-    6px 16px 36px rgba(0,0,0,.08);
+    2px 6px 10px rgba(0,0,0,.10),
+    4px 12px 28px rgba(0,0,0,.16),
+    6px 20px 40px rgba(0,0,0,.12);
   transition:transform 0.2s ease, box-shadow 0.2s ease;
   z-index:2;
   position:relative;
