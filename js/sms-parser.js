@@ -2,101 +2,98 @@
 // sms-parser.js — 카드 문자 파싱
 // ═══════════════════════════════════════
 
+// 카드번호 → 풀네임 매핑
+const CARD_NAME_MAP = {
+  '삼성1337': '삼성카드 & MILEAGE PLATINUM'
+};
+
 function parseSMS(text) {
-  if (!text || typeof text !== 'string') return null;
+  if (!text) return null;
+
+  // 거절/취소 문자는 무시
+  if (/거절|취소/.test(text)) return null;
 
   const result = {
-    amount: 0,
-    merchant: '',
-    card: '',
-    date: '',
-    time: '',
-    category: 'etc',
-    isExpense: true
+    amount: 0, merchant: '', card: '',
+    date: '', time: '', category: 'etc'
   };
 
-  // 누적 금액 줄 제거 (먼저 처리하여 금액 추출에 간섭 방지)
-  var cleanText = text.replace(/누적[\d,]+원/g, '');
-
-  // 금액 추출
-  var amountMatch = cleanText.match(/([\d,]+)\s*원/);
+  // 금액 추출 (첫 번째 매치)
+  const amountMatch = text.match(/([\d,]+)\s*원/);
   if (!amountMatch) return null;
   result.amount = parseInt(amountMatch[1].replace(/,/g, ''));
   if (result.amount <= 0) return null;
 
-  // 카드사 매칭 (짧은 키워드 → 풀네임)
-  var CARD_MAP = {
-    '삼성': '삼성카드 & Mileage Platinum',
-    '신한': '신한카드',
-    'KB': 'KB국민카드',
-    '국민': 'KB국민카드',
-    '현대': '현대카드',
-    '롯데': '롯데카드',
-    '하나': '하나카드',
-    'NH': 'NH농협카드',
-    '농협': 'NH농협카드',
-    '우리': '우리카드',
-    'BC': 'BC카드',
-    '씨티': '씨티카드',
-    '카카오페이': '카카오페이',
-    '네이버페이': '네이버페이',
-    '토스페이': '토스페이',
-    '토스': '토스',
-    '카카오뱅크': '카카오뱅크',
-    '케이뱅크': '케이뱅크'
-  };
-
-  // 긴 키워드 우선 매칭
-  var cardKeys = Object.keys(CARD_MAP).sort(function(a, b) { return b.length - a.length; });
-  for (var ci = 0; ci < cardKeys.length; ci++) {
-    if (text.indexOf(cardKeys[ci]) !== -1) {
-      result.card = CARD_MAP[cardKeys[ci]];
-      break;
+  // 카드사 + 번호 매핑 (예: "삼성1337승인" → "삼성카드 & MILEAGE PLATINUM")
+  const cardNumMatch = text.match(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)(\d{4})/);
+  if (cardNumMatch) {
+    const shortKey = cardNumMatch[1] + cardNumMatch[2];
+    if (CARD_NAME_MAP[shortKey]) {
+      result.card = CARD_NAME_MAP[shortKey];
+    } else {
+      const defaultCardNames = {
+        '삼성': '삼성카드', '신한': '신한카드', '국민': 'KB국민카드',
+        '현대': '현대카드', '롯데': '롯데카드', '하나': '하나카드',
+        '우리': '우리카드', 'BC': 'BC카드', 'NH': 'NH농협카드', 'KB': 'KB국민카드'
+      };
+      result.card = defaultCardNames[cardNumMatch[1]] || cardNumMatch[1] + '카드';
+    }
+  } else {
+    const cardPatterns = [
+      '신한카드','삼성카드','국민카드','KB국민','KB카드',
+      '현대카드','롯데카드','하나카드','NH카드','NH농협',
+      '우리카드','BC카드','씨티카드','카카오페이','네이버페이',
+      '토스페이','토스','카카오뱅크','케이뱅크'
+    ];
+    for (let i = 0; i < cardPatterns.length; i++) {
+      if (text.indexOf(cardPatterns[i]) !== -1) {
+        result.card = cardPatterns[i];
+        break;
+      }
     }
   }
 
   // 날짜 추출
-  var dateMatch = text.match(/(\d{1,2})[\/\.\-](\d{1,2})/);
+  const dateMatch = text.match(/(\d{1,2})[\/\.\-](\d{1,2})/);
   if (dateMatch) {
-    var m = dateMatch[1].padStart(2, '0');
-    var d = dateMatch[2].padStart(2, '0');
-    result.date = new Date().getFullYear() + '-' + m + '-' + d;
+    const m = ('0' + dateMatch[1]).slice(-2);
+    const d = ('0' + dateMatch[2]).slice(-2);
+    const now = new Date();
+    const y = now.getFullYear();
+    result.date = y + '-' + m + '-' + d;
   } else {
     result.date = today();
   }
 
   // 시간 추출
-  var timeMatch = text.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  const timeMatch = text.match(/(\d{1,2}):(\d{2})/);
   if (timeMatch) {
-    result.time = timeMatch[1].padStart(2, '0') + ':' + timeMatch[2];
+    result.time = ('0' + timeMatch[1]).slice(-2) + ':' + timeMatch[2];
   }
 
-  // 가맹점 추출
-  var mt = text;
-  // [Web발신] 제거
+  // 가맹점 추출 (불필요한 정보 모두 제거)
+  let mt = text;
   mt = mt.replace(/\[Web발신\]/g, '').replace(/\[웹발신\]/g, '');
-  // "삼성1337승인 고*진" 같은 카드+승인+이름 줄 제거
-  mt = mt.replace(/[가-힣A-Za-z]+\d{2,4}승인\s*[가-힣]+\*[가-힣]+/g, '');
-  // 마스킹 이름 패턴 제거 (홍*동, 고*진 등)
-  mt = mt.replace(/[가-힣]+\*[가-힣]+/g, '');
-  // 금액 제거
   mt = mt.replace(/([\d,]+)\s*원/g, '');
-  // 누적 줄 제거
-  mt = mt.replace(/누적[\d,]*/g, '');
-  // 카드사 키워드+숫자 제거 (삼성1337, 신한4521 등)
-  mt = mt.replace(/[가-힣A-Za-z]+\d{2,4}/g, '');
-  // 날짜, 시간 제거
+  mt = mt.replace(/누적[\d,]*원?/g, '');
+  mt = mt.replace(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)\d{4}/g, '');
+  mt = mt.replace(/\w*카드[^()\s]*/g, '');
+  mt = mt.replace(/[가-힣]{1,3}\*[가-힣]{1,3}/g, '');
   mt = mt.replace(/\d{1,2}[\/\.\-]\d{1,2}/g, '');
   mt = mt.replace(/\d{1,2}:\d{2}(:\d{2})?/g, '');
-  // 불필요한 키워드 제거
-  mt = mt.replace(/(승인|일시불|취소|해외|결제|체크|신용|할부|\d+회차|잔액)/gi, '');
-  // 구분 기호 정리
-  mt = mt.replace(/[|\-\/·,_]/g, ' ').replace(/\s+/g, ' ').trim();
-  // 1글자 토큰 제거
-  var tokens = mt.split(' ').filter(function(t) { return t.length >= 2; });
-  result.merchant = tokens.join(' ').slice(0, 30);
+  mt = mt.replace(/(승인|일시불|취소|해외|결제|체크|신용|할부|\d+회차|누적|잔액|거절)/gi, '');
+  mt = mt.replace(/&[^)\s]*/g, '');
+  mt = mt.replace(/(MILEAGE|PLATINUM|SKYPASS)/gi, '');
+  mt = mt.replace(/\([^)]*\)/g, '');
+  mt = mt.replace(/[|\-\/·,]/g, ' ').replace(/\s+/g, ' ').trim();
 
-  // 카테고리 자동 매칭
+  const tokens = mt.split(' ');
+  const filtered = [];
+  for (let j = 0; j < tokens.length; j++) {
+    if (tokens[j].length >= 2) filtered.push(tokens[j]);
+  }
+  result.merchant = filtered.join(' ').substring(0, 30);
+
   result.category = autoMatchCategory(result.merchant);
 
   return result;
