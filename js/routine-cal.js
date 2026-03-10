@@ -347,9 +347,9 @@ function renderRoutineCalView(yearMonth) {
   var avgPct = (checkDays * ROUTINE_META.length) > 0 ? Math.round((thisAtPoint / (checkDays * ROUTINE_META.length)) * 100) : 0;
   h += '<div class="rc-summary">';
   if (isNow) {
-    h += '<div class="rc-summary-title">루틴 달성률 ' + avgPct + '%를 유지하고 있어요</div>';
+    h += '<div class="rc-summary-title">루틴 달성률 <span style="color:#E55643;">' + avgPct + '%</span>를 유지하고 있어요</div>';
   } else {
-    h += '<div class="rc-summary-title">' + mo + '월 루틴 달성률은 ' + avgPct + '%였어요</div>';
+    h += '<div class="rc-summary-title">' + mo + '월 루틴 달성률은 <span style="color:#E55643;">' + avgPct + '%</span>였어요</div>';
   }
   if (diff > 0) {
     h += '<div class="rc-summary-sub">' + prevMo + '월보다 <span class="rc-up">' + diff + '회 더</span> 체크' + (isNow ? '했' : '하') + '어요</div>';
