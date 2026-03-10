@@ -137,7 +137,7 @@ function renderExpenseDashboard(platform) {
 
     // ── 섹션 2: 월간 캘린더 ──
     html += '<div class="exp-pc-calendar-wrap">';
-    html += renderMonthCalendar(thisYM, 'reRenderDashboardA');
+    html += renderMonthCalendar(thisYM);
     html += '</div>';
 
     // ── 섹션 3: 월간 상호별 랭킹 ──
@@ -453,14 +453,12 @@ function renderRecentExpenses(yearMonth) {
   return html;
 }
 
-function renderMonthCalendar(yearMonth, rerenderFnName) {
-  if (!rerenderFnName) rerenderFnName = 'reRenderDetail';
+function renderMonthCalendar(yearMonth) {
   const d = new Date(yearMonth + '-01');
   const year = d.getFullYear();
   const month = d.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  var isPC = window.innerWidth > 768;
 
   let html = '<div class="exp-month-cal"><div class="exp-month-grid">';
   html += '<div class="exp-month-dow-row">';
@@ -484,33 +482,13 @@ function renderMonthCalendar(yearMonth, rerenderFnName) {
     const isToday = dateStr === todayStr ? 'today' : '';
     const amountClass = total > avgDaily * 1.5 ? 'high' : '';
 
-    if (isPC) {
-      // PC/태블릿: 플로팅 팝업 방식
-      html += `<div class="exp-month-day ${isToday}" onclick="onExpCalDayClick(event, '${dateStr}')">
-        <div class="exp-month-day-num">${i}</div>
-        ${total > 0 ? `<div class="exp-month-day-amount ${amountClass}">${total.toLocaleString()}</div>` : ''}
-      </div>`;
-    } else {
-      // 모바일: 기존 하단 펼침 방식
-      var selectedClass = (_selectedExpenseDate === dateStr) ? ' exp-day-selected' : '';
-      html += `<div class="exp-month-day ${isToday}${selectedClass}" onclick="toggleExpenseDaySelect('${dateStr}', ${rerenderFnName})">
-        <div class="exp-month-day-num">${i}</div>
-        ${total > 0 ? `<div class="exp-month-day-amount ${amountClass}">${total.toLocaleString()}</div>` : ''}
-      </div>`;
-    }
+    html += `<div class="exp-month-day ${isToday}" onclick="onExpCalDayClick(event, '${dateStr}')">
+      <div class="exp-month-day-num">${i}</div>
+      ${total > 0 ? `<div class="exp-month-day-amount ${amountClass}">${total.toLocaleString()}</div>` : ''}
+    </div>`;
   }
 
   html += '</div></div>';
-
-  // 모바일만 하단 슬롯 유지
-  if (!isPC) {
-    html += '<div id="expMonthDaySlot">';
-    if (_selectedExpenseDate && _selectedExpenseDate.startsWith(yearMonth)) {
-      html += renderSelectedDayExpenses(_selectedExpenseDate);
-      html += '<div class="exp-section-gap"></div>';
-    }
-    html += '</div>';
-  }
 
   return html;
 }
