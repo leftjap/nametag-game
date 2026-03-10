@@ -3741,6 +3741,14 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   font-family: 'Pretendard', -apple-system, sans-serif;
 }
 
+.exp-yearly-rank-pct {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--tx-hint);
+  font-family: 'JetBrains Mono', monospace;
+  margin-left: 4px;
+}
+
 .exp-yearly-hero-icon .exp-tl-item-icon {
   width: 44px;
   height: 44px;
