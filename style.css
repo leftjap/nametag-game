@@ -1711,7 +1711,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   /* 어구 표시 (PC) */
   .side .quote-section {
     display: block !important;
-    padding: 12px 16px !important;
+    padding: 12px 0 !important;
+  }
+  .side .quote-section .q-card {
+    padding: 0 16px !important;
   }
   .side .q-card {
     background: none !important;
