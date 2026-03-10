@@ -66,7 +66,7 @@ function renderExpenseDashboard(platform) {
       dailyAvg = daysInMonth > 0 ? Math.round(thisMonthTotal / daysInMonth) : 0;
     }
 
-    // ── 섹션 1: 캘린더 요약 + 월간 캘린더 ──
+    // ── 섹션 1: 요약 텍스트 (1열) ──
     html += '<div class="exp-summary">';
     if (isCurrentMonth) {
       html += '<div class="exp-summary-title">' + monthNum + '월에는 ' + totalDisplay + ' 쓰고 있어요</div>';
@@ -77,11 +77,29 @@ function renderExpenseDashboard(platform) {
     }
     html += '</div>';
 
-    // 월간 캘린더
-    html += renderMonthCalendar(thisYM);
+    // ── 섹션 2: 캘린더(좌) + 타임라인(우) 2열 ──
+    html += '<div class="exp-two-col exp-cal-timeline-row">';
 
-    // ── 섹션 2: 누적 곡선(좌) + 상호별 랭킹(우) 2열 ──
-    var merchantBreakdown = getMerchantBreakdown(thisYM);
+    // 좌: 월간 캘린더
+    html += '<div class="exp-two-col-card exp-cal-card">';
+    html += renderMonthCalendar(thisYM);
+    html += '</div>';
+
+    // 우: 타임라인 (캘린더 높이에 맞춰 스크롤)
+    html += '<div class="exp-two-col-card exp-timeline-card">';
+    html += '<div id="expPcTimelineSlot">';
+    if (_selectedExpenseDate && _selectedExpenseDate.startsWith(thisYM)) {
+      html += renderSelectedDayExpenses(_selectedExpenseDate);
+    } else {
+      html += renderRecentExpenses(thisYM);
+    }
+    html += '</div>';
+    html += '</div>';
+
+    html += '</div>'; // .exp-two-col 닫기
+
+    // ── 섹션 3: 누적 곡선(좌) + 카테고리(우) 2열 ──
+    var catBreakdown = getCategoryBreakdown(thisYM);
 
     html += '<div class="exp-section-gap"></div>';
     html += '<div class="exp-two-col">';
@@ -105,28 +123,31 @@ function renderExpenseDashboard(platform) {
     html += renderCumulativeChart(thisYM);
     html += '</div>';
 
-    // 우: 상호별 랭킹
+    // 우: 카테고리 차트
     html += '<div class="exp-two-col-card">';
-    if (merchantBreakdown.length > 0) {
-      var topMerchant = merchantBreakdown[0].merchant;
-      if (isCurrentMonth) {
-        html += '<div class="exp-summary" style="padding:0 0 12px;">';
-        html += '<div class="exp-summary-title" style="font-size:17px;">' + monthNum + '월에는 ' + topMerchant + '에 많이 쓰고 있어요</div>';
-        html += '</div>';
-      } else {
-        html += '<div class="exp-summary" style="padding:0 0 12px;">';
-        html += '<div class="exp-summary-title" style="font-size:17px;">' + monthNum + '월에는 ' + topMerchant + '에 많이 썼어요</div>';
-        html += '</div>';
-      }
-      html += renderMerchantRanking(merchantBreakdown, 5, {});
-    } else {
-      html += '<div class="exp-mr-empty">이달 지출 내역이 없습니다</div>';
-    }
+    html += renderCategoryChart(catBreakdown);
     html += '</div>';
 
     html += '</div>'; // .exp-two-col 닫기
 
-    // ── 섹션 3: 월별 막대 차트 ──
+    // ── 섹션 4: 상호별 랭킹 (1열) ──
+    var merchantBreakdown = getMerchantBreakdown(thisYM);
+    if (merchantBreakdown.length > 0) {
+      html += '<div class="exp-section-gap"></div>';
+      html += '<div style="padding:0;">';
+      var topMerchant = merchantBreakdown[0].merchant;
+      html += '<div class="exp-summary" style="padding:20px 0 12px;">';
+      if (isCurrentMonth) {
+        html += '<div class="exp-summary-title" style="font-size:17px;">' + monthNum + '월에는 ' + topMerchant + '에 많이 쓰고 있어요</div>';
+      } else {
+        html += '<div class="exp-summary-title" style="font-size:17px;">' + monthNum + '월에는 ' + topMerchant + '에 많이 썼어요</div>';
+      }
+      html += '</div>';
+      html += renderMerchantRanking(merchantBreakdown, 5, {});
+      html += '</div>';
+    }
+
+    // ── 섹션 5: 월별 막대 차트 (1열) ──
     var trendCount = window.innerWidth > 1400 ? 10 : 8;
     var trend = isCurrentMonth ? getMonthlyTrend(trendCount) : getMonthlyTrendAround(thisYM);
     html += '<div class="exp-section-gap"></div>';
@@ -134,7 +155,7 @@ function renderExpenseDashboard(platform) {
     html += renderMonthlyBarChart(trend);
     html += '</div>';
 
-    // ── 섹션 4: 연간 누적 ──
+    // ── 섹션 6: 연간 누적 (1열) ──
     var currentYear = ymDate.getFullYear();
     var yearlyHtml = renderYearlySection(currentYear);
     if (yearlyHtml) {
@@ -1766,6 +1787,41 @@ function onExpCalDayClick(event, dateStr) {
   var expenses = getDayExpenses(dateStr).sort(function(a, b) {
     return (b.time || '').localeCompare(a.time || '');
   });
+
+  // PC 대시보드 내 타임라인 슬롯이 있으면 인라인 업데이트
+  var pcSlot = document.getElementById('expPcTimelineSlot');
+  if (pcSlot) {
+    // 같은 날짜 재클릭 시 선택 해제 → 최근 내역으로 복귀
+    if (_selectedExpenseDate === dateStr) {
+      _selectedExpenseDate = null;
+      // 캘린더 선택 스타일 제거
+      document.querySelectorAll('.exp-month-day.exp-day-selected').forEach(function(el) {
+        el.classList.remove('exp-day-selected');
+      });
+      pcSlot.innerHTML = renderRecentExpenses(getExpenseViewYM());
+      return;
+    }
+
+    _selectedExpenseDate = dateStr;
+
+    // 캘린더 선택 스타일 업데이트
+    document.querySelectorAll('.exp-month-day.exp-day-selected').forEach(function(el) {
+      el.classList.remove('exp-day-selected');
+    });
+    event.currentTarget.classList.add('exp-day-selected');
+
+    if (expenses.length === 0) {
+      pcSlot.innerHTML = '<div class="exp-tl-empty">내역이 없습니다</div>';
+    } else {
+      pcSlot.innerHTML = renderSelectedDayExpenses(dateStr);
+    }
+    // 타임라인 카드를 맨 위로 스크롤
+    var timelineCard = pcSlot.closest('.exp-timeline-card');
+    if (timelineCard) timelineCard.scrollTop = 0;
+    return;
+  }
+
+  // PC 슬롯이 없으면 (모바일 등 폴백) 기존 플로팅 팝업
   if (expenses.length === 0) return;
 
   var dateObj = new Date(dateStr + 'T00:00:00');
@@ -1783,13 +1839,11 @@ function onExpCalDayClick(event, dateStr) {
     contentHtml += renderExpenseItem(item, clickAction);
   });
 
-  // 하단 합계
   contentHtml += '<div class="exp-fp-footer">';
   contentHtml += '<span class="exp-fp-footer-label">' + expenses.length + '건</span>';
   contentHtml += '<span class="exp-fp-footer-amount">' + dayTotal.toLocaleString() + '원</span>';
   contentHtml += '</div>';
 
-  // 클릭한 셀 위치 근처에서 열기
   var rect = event.currentTarget.getBoundingClientRect();
   var anchorX = rect.left + rect.width / 2;
   var anchorY = rect.bottom;
