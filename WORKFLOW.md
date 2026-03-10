@@ -519,10 +519,12 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `_escMerchant(str)` — onclick에서 상호명 안전하게 이스케이프
 - `openMerchantDetail(merchant)` — 상호 클릭 → 월간 내역을 플로팅 팝업으로 표시
 
-**연간 누적 섹션:**
-- `renderYearlySection(year)` — 연간 누적 섹션 (히어로 1위 + 그리드 2~7위, "더보기"로 6개씩 추가) HTML 생성
-- `_renderYearlyGridItem(m, rank)` — 연간 그리드 아이템 HTML 생성 (공용)
-- `_loadMoreYearly()` — 연간 "더보기" 클릭 핸들러 (6개씩 그리드에 추가)
+**연간 누적 섹션 (버블 차트 + 랭킹):**
+- `renderYearlySection(year)` — 연간 누적 섹션 (버블 차트 + 랭킹 리스트 10개 + "전체 순위 보기") HTML 생성
+- `_packCircles(items, containerW, containerH)` — circle packing 알고리즘 (force-based, 금액 비례 반지름)
+- `_renderYearlyBubbles(merchants, containerW, containerH)` — 버블 차트 HTML 생성 (상위 10개 + 기타, 파비콘 표시, 카테고리 배경색)
+- `_renderYearlyRankList(merchants, limit)` — 랭킹 리스트 HTML 생성 (뉴트럴 그라데이션 배경, 순위+파비콘+상호명+금액)
+- `_renderYearlyGridItem(m, rank)` — 연간 그리드 아이템 HTML 생성 (월간 히어로 그리드에서 사용)
 - `openYearlyFullPopup(year)` — 연간 전체 상호 리스트 팝업 (순위+파비콘+상호명+금액 리스트)
 
 **주요 렌더 함수 출력 구조:**
@@ -788,7 +790,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `.exp-week-*`, `.exp-month-*`, `.exp-bar-*`, `.exp-tl-*`, `.exp-cat-*` → 12번 가계부
 - `.exp-fp-*` (`.exp-fp-overlay`, `.exp-fp-card`, `.exp-fp-header`, `.exp-fp-body`, `.exp-fp-footer`) → 12번 가계부 플로팅 팝업
 - `.exp-mr-*` (`.exp-mr-list`, `.exp-mr-row`, `.exp-mr-info`, `.exp-mr-bar-wrap`, `.exp-mr-amount` 등) → 12번 상호별 랭킹 카드
-- `.exp-yearly-*` (`.exp-yearly-section`, `.exp-yearly-hero`, `.exp-yearly-grid`, `.exp-yearly-grid-item` 등) → 12번 연간 누적 섹션
+- `.exp-yearly-*` (`.exp-yearly-section`, `.exp-yearly-bubble-wrap`, `.exp-yearly-bubble`, `.exp-yearly-rank-list`, `.exp-yearly-rank-row`, `.exp-yearly-rank-num`, `.exp-yearly-rank-icon`, `.exp-yearly-rank-name`, `.exp-yearly-rank-amount`, `.exp-yearly-grid`, `.exp-yearly-grid-item`, `.exp-yearly-header`, `.exp-yearly-title` 등) → 12번 연간 누적 섹션
 - `.exp-fp-yearly-*` (`.exp-fp-yearly-list`, `.exp-fp-yearly-row`, `.exp-fp-yearly-rank`, `.exp-fp-yearly-amount` 등) → 12번 연간 전체 보기 팝업 내부
 - `.exp-day-selected`, `.exp-day-detail` → 13번 가계부 캘린더 선택
 - `.rc-*` → 14번 루틴 캘린더 뷰
@@ -971,7 +973,6 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 | _expenseCategoryFilter | ui-expense.js | 가계부 카테고리 필터 ID |
 | _expenseCategoryFilterName | ui-expense.js | 가계부 카테고리 필터 이름 |
 | _expenseDetailSearchQuery | ui-expense.js | 가계부 전체 내역 검색어 |
-| _yearlyLoadedCount | ui-expense.js | 연간 더보기 로드 카운터 |
 | _routineViewYM | routine-cal.js | 루틴 캘린더 보고 있는 월 |
 | _selectedRoutineDate | routine-cal.js | 루틴 캘린더 선택 날짜 |
 | contextItemId | ui.js | 꾹누르기 팝업 대상 항목 ID |
@@ -1142,4 +1143,5 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-09 | 19번 자주 겪는 실수 체크리스트 추가, 방향 확인서에 관련 기존 규칙 항목 추가, 렌더 함수 HTML 구조(8번) 추가, CSS 선택자 인덱스(8번) 추가, 변경 로그 추가 |
 | 2026-03-10 | GAS 배포 규칙 추가: 7번 파일 구조에 gas-nametag 추가, 8번 상세 맵에 Code.gs 추가, 0번 업로드 기준에 GAS 행 추가, 2번에 GAS 배포 규칙/템플릿 추가, 10번에 GAS 수정 주의사항 추가 |
 | 2026-03-10 | 가계부 PC/태블릿 대시보드 레이아웃 개편: renderExpenseDashboard 재구성(요약/캘린더/2열+막대+연간), renderMerchantRanking 개선(1위빨강/태그회색/태그팝업), renderMonthlyBarChart 예상금액추가, renderYearlySection 재구성(순위/같은행/더보기), openCategoryExpensePopup/_renderYearlyGridItem/_loadMoreYearly/_yearlyLoadedCount 추가, 막대두께8px/태그스타일/금액정규화/그리드2열/모바일조정 CSS 변경 |
+| 2026-03-11 | 연간 누적 섹션 교체: 리스트+바 → 버블 차트(circle packing)+랭킹 리스트(뉴트럴 그라데이션). _packCircles/_renderYearlyBubbles/_renderYearlyRankList 추가, _renderYearlyListItem/_loadMoreYearly/_yearlyLoadedCount 제거, renderYearlySection 전면 교체, CSS 버블/랭킹 스타일 추가, 8번/12번 WORKFLOW.md 갱신 |
 ```

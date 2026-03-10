@@ -3661,45 +3661,82 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   color: var(--tx-m);
 }
 
-/* ─── 연간 리스트 수평 바 ─── */
-.exp-yearly-list-bar {
-  height: 4px;
-  background: rgba(0,0,0,.04);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 4px;
+/* ═══ 연간 버블 차트 ═══ */
+.exp-yearly-bubble-wrap {
+  margin: 16px auto 24px;
 }
 
-.exp-yearly-list-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--tab-color);
-  opacity: 0.35;
-  transition: width .3s ease;
+.exp-yearly-bubble:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  z-index: 2;
 }
 
-.exp-yearly-list-row:nth-child(1) .exp-yearly-list-bar-fill {
-  opacity: 0.7;
+.exp-yearly-bubble:active {
+  transform: scale(0.96);
 }
 
-.exp-yearly-list-row:nth-child(2) .exp-yearly-list-bar-fill {
-  opacity: 0.55;
+/* ═══ 연간 랭킹 리스트 ═══ */
+.exp-yearly-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.exp-yearly-list-row:nth-child(3) .exp-yearly-list-bar-fill {
-  opacity: 0.45;
+.exp-yearly-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity .12s;
 }
 
-/* 메달 순위 강조 */
-.exp-yearly-list-rank {
-  font-size: 14px;
-  font-weight: 600;
-  width: 24px;
-  min-width: 24px;
+.exp-yearly-rank-row:hover {
+  opacity: .8;
+}
+
+.exp-yearly-rank-row:active {
+  opacity: .7;
+}
+
+.exp-yearly-rank-num {
+  width: 28px;
+  min-width: 28px;
   text-align: center;
   flex-shrink: 0;
   font-family: 'JetBrains Mono', monospace;
-  transition: color .15s;
+  line-height: 1;
+}
+
+.exp-yearly-rank-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.exp-yearly-rank-icon img {
+  display: block;
+}
+
+.exp-yearly-rank-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exp-yearly-rank-amount {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--tx);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Pretendard', -apple-system, sans-serif;
 }
 
 .exp-yearly-hero-icon .exp-tl-item-icon {
@@ -3868,6 +3905,39 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
   .exp-yearly-hero-amount {
     font-size: 15px;
+  }
+
+  /* 연간 버블/랭킹 모바일 조정 */
+  .exp-yearly-bubble-wrap {
+    margin: 12px auto 20px;
+  }
+
+  .exp-yearly-rank-row {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .exp-yearly-rank-num {
+    width: 24px;
+    min-width: 24px;
+  }
+
+  .exp-yearly-rank-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .exp-yearly-rank-icon img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .exp-yearly-rank-name {
+    font-size: 14px;
+  }
+
+  .exp-yearly-rank-amount {
+    font-size: 14px;
   }
 }
 

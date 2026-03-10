@@ -49,7 +49,6 @@ function renderExpenseDashboard(platform) {
 
   if (platform === 'pc') {
     // ═══ PC/태블릿: 단일 스크롤 통합 대시보드 ═══
-    _yearlyLoadedCount = 5;
     var html = '';
     var nowYM = today().slice(0, 7);
     var isCurrentMonth = (thisYM === nowYM);
@@ -1814,14 +1813,15 @@ function renderYearlySection(year) {
   }
 
   var merchants = data.merchants;
-  var initialCount = 5;
-  var initialList = merchants.slice(0, initialCount);
-  var hasMore = merchants.length > initialCount;
 
   // 날짜 표시
   var now = new Date();
   var monthNum = now.getMonth() + 1;
   var dayNum = now.getDate();
+
+  // 버블 컨테이너 크기
+  var containerW = Math.min(680, window.innerWidth - 80);
+  var containerH = window.innerWidth <= 768 ? 220 : 280;
 
   var html = '<div class="exp-yearly-section">';
 
@@ -1830,17 +1830,17 @@ function renderYearlySection(year) {
   html += '<div class="exp-yearly-title">' + year + '년 ' + monthNum + '월 ' + dayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
   html += '</div>';
 
-  // 단순 리스트
-  html += '<div class="exp-mr-list" id="expYearlyList">';
-  initialList.forEach(function(m, i) {
-    html += _renderYearlyListItem(m, i + 1);
-  });
-  html += '</div>';
+  // 버블 차트
+  html += _renderYearlyBubbles(merchants, containerW, containerH);
 
-  // 더보기 버튼
-  if (hasMore) {
-    html += '<div class="exp-mr-more-wrap" id="expYearlyMoreWrap">';
-    html += '<button class="exp-cat-more-btn" id="expYearlyMoreBtn" onclick="_loadMoreYearly()">더보기</button>';
+  // 랭킹 리스트 (10개)
+  var rankLimit = Math.min(10, merchants.length);
+  html += _renderYearlyRankList(merchants, rankLimit);
+
+  // "전체 순위 보기" 버튼 (10개 초과 시)
+  if (merchants.length > 10) {
+    html += '<div class="exp-mr-more-wrap">';
+    html += '<button class="exp-cat-more-btn" onclick="openYearlyFullPopup(' + year + ')">전체 순위 보기</button>';
     html += '</div>';
   }
 
@@ -1860,67 +1860,180 @@ function _renderYearlyGridItem(m, rank) {
   return html;
 }
 
-// 연간 리스트 아이템 HTML 생성
-function _renderYearlyListItem(m, rank) {
-  var iconItem = { merchant: m.merchant, icon: null };
-  var maxAmount = 0;
-  // 최대 금액은 1위 기준 (부모에서 전달받지 않으므로 전역에서 조회)
-  var year = new Date(getExpenseViewYM() + '-01').getFullYear();
-  var data = getYearMerchantBreakdown(year);
-  if (data && data.merchants && data.merchants.length > 0) {
-    maxAmount = data.merchants[0].amount;
+// ═══════════════════════════════════════
+// 버블 차트 — Circle Packing
+// ═══════════════════════════════════════
+function _packCircles(items, containerW, containerH) {
+  // items: [{merchant, amount, ...}], 금액 내림차순 정렬 전제
+  if (!items || items.length === 0) return [];
+
+  var maxAmount = items[0].amount;
+  var minR = 18;
+  var maxR = Math.min(containerW, containerH) * 0.28;
+  var cx = containerW / 2;
+  var cy = containerH / 2;
+
+  // 반지름 계산 (면적 비례: r = sqrt(amount/max) * maxR)
+  var circles = items.map(function(item, i) {
+    var ratio = Math.sqrt(item.amount / maxAmount);
+    var r = Math.max(minR, ratio * maxR);
+    return { x: cx, y: cy, r: r, item: item, index: i };
+  });
+
+  // 첫 번째 원은 중앙
+  circles[0].x = cx;
+  circles[0].y = cy;
+
+  // 나머지 원들을 나선형으로 배치 후 충돌 해소
+  for (var i = 1; i < circles.length; i++) {
+    var angle = i * 2.4; // golden angle ~137.5°
+    var dist = circles[0].r + circles[i].r + 4;
+    circles[i].x = cx + Math.cos(angle) * dist * 0.6;
+    circles[i].y = cy + Math.sin(angle) * dist * 0.6;
   }
-  var barPct = maxAmount > 0 ? (m.amount / maxAmount) * 100 : 0;
 
-  // 메달 색상: 1위 금, 2위 은, 3위 동
-  var rankColor = 'var(--tx-hint)';
-  if (rank === 1) rankColor = '#E5A100';
-  else if (rank === 2) rankColor = '#8E8E93';
-  else if (rank === 3) rankColor = '#B87333';
+  // 간단한 force simulation (50회 반복)
+  for (var iter = 0; iter < 60; iter++) {
+    // 원끼리 겹침 해소
+    for (var i = 0; i < circles.length; i++) {
+      for (var j = i + 1; j < circles.length; j++) {
+        var dx = circles[j].x - circles[i].x;
+        var dy = circles[j].y - circles[i].y;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var minDist = circles[i].r + circles[j].r + 3;
+        if (dist < minDist) {
+          var overlap = (minDist - dist) / 2;
+          var nx = dx / dist;
+          var ny = dy / dist;
+          circles[i].x -= nx * overlap;
+          circles[i].y -= ny * overlap;
+          circles[j].x += nx * overlap;
+          circles[j].y += ny * overlap;
+        }
+      }
+    }
+    // 중앙으로 약하게 끌어당기기
+    for (var i = 0; i < circles.length; i++) {
+      circles[i].x += (cx - circles[i].x) * 0.03;
+      circles[i].y += (cy - circles[i].y) * 0.03;
+    }
+    // 컨테이너 경계 안에 유지
+    for (var i = 0; i < circles.length; i++) {
+      var c = circles[i];
+      if (c.x - c.r < 0) c.x = c.r;
+      if (c.x + c.r > containerW) c.x = containerW - c.r;
+      if (c.y - c.r < 0) c.y = c.r;
+      if (c.y + c.r > containerH) c.y = containerH - c.r;
+    }
+  }
 
-  var html = '<div class="exp-mr-row exp-yearly-list-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')">';
-  html += '<span class="exp-yearly-list-rank" style="color:' + rankColor + ';">' + rank + '</span>';
-  html += getMerchantIconHtml(iconItem);
-  html += '<div class="exp-mr-info">';
-  html += '<div class="exp-mr-name">' + m.merchant + '</div>';
-  html += '<div class="exp-mr-meta">';
-  html += '<span class="exp-mr-count">' + m.count + '건</span>';
-  html += '<span class="exp-mr-pct">' + m.percent + '%</span>';
-  html += '</div>';
-  // 수평 배경 바
-  html += '<div class="exp-yearly-list-bar"><div class="exp-yearly-list-bar-fill" style="width:' + Math.max(barPct, 3) + '%;"></div></div>';
-  html += '</div>';
-  html += '<div class="exp-mr-amount">' + formatAmount(m.amount) + '원</div>';
+  return circles;
+}
+
+// 버블 차트 HTML 생성
+function _renderYearlyBubbles(merchants, containerW, containerH) {
+  // 상위 10개 + 나머지를 "기타"로 묶기
+  var bubbleItems = merchants.slice(0, 10).map(function(m) {
+    return { merchant: m.merchant, amount: m.amount, category: m.category, icon: null };
+  });
+
+  // 기타 묶기
+  if (merchants.length > 10) {
+    var etcAmount = 0;
+    for (var i = 10; i < merchants.length; i++) etcAmount += merchants[i].amount;
+    if (etcAmount > 0) {
+      bubbleItems.push({ merchant: '기타', amount: etcAmount, category: 'etc', icon: null, isEtc: true });
+    }
+  }
+
+  var circles = _packCircles(bubbleItems, containerW, containerH);
+
+  var html = '<div class="exp-yearly-bubble-wrap" style="width:100%;height:' + containerH + 'px;position:relative;overflow:hidden;">';
+
+  circles.forEach(function(c) {
+    var catObj = EXPENSE_CATEGORIES.find(function(cat) { return cat.id === c.item.category; });
+    var bgColor = catObj ? catObj.bg : '#f0f0f0';
+    var borderColor = catObj ? catObj.color : '#ccc';
+    var size = Math.round(c.r * 2);
+    var left = Math.round(c.x - c.r);
+    var top = Math.round(c.y - c.r);
+    var imgSize = Math.max(20, Math.round(c.r * 0.9));
+
+    var onclick = c.item.isEtc
+      ? 'openYearlyFullPopup(' + new Date(getExpenseViewYM() + "-01").getFullYear() + ')'
+      : 'openMerchantDetail(\'' + _escMerchant(c.item.merchant) + '\')';
+
+    html += '<div class="exp-yearly-bubble" onclick="' + onclick + '" style="'
+      + 'position:absolute;'
+      + 'left:' + left + 'px;'
+      + 'top:' + top + 'px;'
+      + 'width:' + size + 'px;'
+      + 'height:' + size + 'px;'
+      + 'border-radius:50%;'
+      + 'background:' + bgColor + ';'
+      + 'border:1.5px solid ' + borderColor + '20;'
+      + 'display:flex;align-items:center;justify-content:center;'
+      + 'cursor:pointer;transition:transform .15s,box-shadow .15s;'
+      + '">';
+
+    if (c.item.isEtc) {
+      html += '<span style="font-size:' + Math.max(11, Math.round(c.r * 0.45)) + 'px;color:var(--tx-m);font-weight:500;">기타</span>';
+    } else {
+      var iconItem = { merchant: c.item.merchant, icon: c.item.icon };
+      // 파비콘만 — getMerchantIconHtml의 img 태그 크기 조정
+      var src = findMerchantIcon(c.item.merchant) || DEFAULT_ICON_URL;
+      html += '<img src="' + src + '" width="' + imgSize + '" height="' + imgSize + '" style="border-radius:50%;object-fit:cover;" onerror="this.onerror=null;this.src=\'' + DEFAULT_ICON_URL + '\';">';
+    }
+
+    html += '</div>';
+  });
+
   html += '</div>';
   return html;
 }
 
-// 연간 "더보기" — 5개씩 추가 로드
-var _yearlyLoadedCount = 5;
-function _loadMoreYearly() {
-  var year = new Date(getExpenseViewYM() + '-01').getFullYear();
-  var data = getYearMerchantBreakdown(year);
-  if (!data || !data.merchants) return;
+// 랭킹 리스트 HTML 생성
+function _renderYearlyRankList(merchants, limit) {
+  var showList = merchants.slice(0, limit);
 
-  var merchants = data.merchants;
-  var list = document.getElementById('expYearlyList');
-  if (!list) return;
+  var html = '<div class="exp-yearly-rank-list">';
 
-  var start = _yearlyLoadedCount;
-  var end = Math.min(start + 5, merchants.length);
-  var newHtml = '';
+  showList.forEach(function(m, i) {
+    var rank = i + 1;
+    // 뉴트럴 그라데이션: 1위 가장 진하고 아래로 갈수록 연해짐
+    var alpha = Math.max(0.03, 0.18 - (i * 0.016));
+    var bgColor = 'rgba(51,65,85,' + alpha + ')';
+    // 순위 번호 크기/무게: 1~3위 더 크게
+    var rankSize = rank <= 3 ? '20px' : '15px';
+    var rankWeight = rank <= 3 ? '700' : '600';
+    var rankColor = 'var(--tx-m)';
+    // 텍스트 색상: 1위만 살짝 진하게
+    var nameWeight = rank === 1 ? '600' : '400';
 
-  for (var i = start; i < end; i++) {
-    newHtml += _renderYearlyListItem(merchants[i], i + 1);
-  }
+    var iconItem = { merchant: m.merchant, icon: null };
+    var src = findMerchantIcon(m.merchant) || DEFAULT_ICON_URL;
 
-  list.insertAdjacentHTML('beforeend', newHtml);
-  _yearlyLoadedCount = end;
+    html += '<div class="exp-yearly-rank-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')" style="background:' + bgColor + ';">';
 
-  if (_yearlyLoadedCount >= merchants.length) {
-    var btn = document.getElementById('expYearlyMoreWrap');
-    if (btn) btn.style.display = 'none';
-  }
+    // 순위 번호
+    html += '<span class="exp-yearly-rank-num" style="font-size:' + rankSize + ';font-weight:' + rankWeight + ';color:' + rankColor + ';">' + rank + '</span>';
+
+    // 파비콘
+    html += '<div class="exp-yearly-rank-icon">';
+    html += '<img src="' + src + '" width="36" height="36" style="border-radius:50%;object-fit:cover;" onerror="this.onerror=null;this.src=\'' + DEFAULT_ICON_URL + '\';">';
+    html += '</div>';
+
+    // 상호명
+    html += '<div class="exp-yearly-rank-name" style="font-weight:' + nameWeight + ';">' + m.merchant + '</div>';
+
+    // 금액
+    html += '<div class="exp-yearly-rank-amount">' + formatAmount(m.amount) + '원</div>';
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+  return html;
 }
 
 // 연간 전체 상호 리스트 팝업
