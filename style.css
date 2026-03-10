@@ -4142,6 +4142,34 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     bottom: 0;
     z-index: 10;
   }
+  /* 가계부 폰트 — 토스 기준 최대값 */
+  .exp-summary-sub{font-size:14px}
+  .exp-month-day-amount{font-size:12px}
+  .exp-week-day-num{font-size:17px}
+  .exp-week-day-amount{font-size:12px}
+  .exp-category-title{font-size:20px}
+  .exp-category-sub{font-size:14px}
+  .exp-category-name{font-size:16px}
+  .exp-category-amount{font-size:16px}
+  .exp-projection-title{font-size:20px}
+  .exp-projection-sub{font-size:14px}
+  .exp-bar-value{font-size:14px}
+  .exp-bar-label{font-size:14px}
+  .exp-tl-item-sub{font-size:14px}
+  .exp-tl-date-header{font-size:14px}
+  .exp-mr-name{font-size:17px}
+  .exp-mr-meta{font-size:13px}
+  .exp-mr-amount{font-size:17px}
+  .exp-yearly-title{font-size:20px}
+  .exp-yearly-hero-amount{font-size:17px}
+  .exp-yearly-hero-desc{font-size:14px}
+  .exp-yearly-grid-name{font-size:15px}
+  .exp-yearly-grid-amount{font-size:13px}
+  .exp-yearly-rank-name{font-size:17px}
+  .exp-yearly-rank-amount{font-size:17px}
+  .exp-detail-title{font-size:17px}
+  .exp-search-input{font-size:15px}
+  .exp-more-btn{font-size:15px}
 }
 
 /* ═══ 전체 보기 팝업 내부 ═══ */
