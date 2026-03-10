@@ -159,7 +159,7 @@ function renderExpenseDashboard(platform) {
     var yearlyHtml = renderYearlySection(currentYear);
     if (yearlyHtml) {
       html += '<div class="exp-section-gap"></div>';
-      html += '<div style="padding:0 20px;">';
+      html += '<div style="padding:0 4px;">';
       html += yearlyHtml;
       html += '</div>';
     }
@@ -1839,13 +1839,17 @@ function renderYearlySection(year) {
 
   // 버블 컨테이너 크기
   var containerW = Math.min(680, window.innerWidth - 80);
-  var containerH = window.innerWidth <= 768 ? 220 : 280;
+  var containerH = window.innerWidth <= 768 ? 160 : 280;
 
   var html = '<div class="exp-yearly-section">';
 
   // 섹션 헤더
   html += '<div class="exp-yearly-header">';
-  html += '<div class="exp-yearly-title">' + year + '년 ' + monthNum + '월 ' + dayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+  if (window.innerWidth <= 768) {
+    html += '<div class="exp-yearly-title">올해 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+  } else {
+    html += '<div class="exp-yearly-title">' + year + '년 ' + monthNum + '월 ' + dayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+  }
   html += '</div>';
 
   // 버블 차트
@@ -1887,7 +1891,9 @@ function _packCircles(items, containerW, containerH) {
 
   var maxAmount = items[0].amount;
   var minR = 18;
-  var maxR = Math.min(containerW, containerH) * 0.28;
+  var maxR = window.innerWidth <= 768
+    ? Math.min(containerW, containerH) * 0.22
+    : Math.min(containerW, containerH) * 0.28;
   var cx = containerW / 2;
   var cy = containerH / 2;
 

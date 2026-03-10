@@ -3980,13 +3980,13 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
 
   .exp-yearly-rank-row {
-    padding: 12px 14px;
-    gap: 10px;
+    padding: 10px 8px;
+    gap: 8px;
   }
 
   .exp-yearly-rank-num {
-    width: 24px;
-    min-width: 24px;
+    width: 22px;
+    min-width: 22px;
   }
 
   .exp-yearly-rank-icon {
@@ -4001,6 +4001,18 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
   .exp-yearly-rank-name {
     font-size: 14px;
+  }
+
+  .exp-yearly-title {
+    font-size: 17px;
+  }
+
+  .exp-yearly-section {
+    padding: 16px 8px 12px;
+  }
+
+  .exp-yearly-rank-list {
+    gap: 4px;
   }
 
   .exp-yearly-rank-amount {
