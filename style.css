@@ -1720,13 +1720,13 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .side .q-card {
     background: none !important;
-    border: 1px solid rgba(255,255,255,.12) !important;
-    border-radius: 12px !important;
-    padding: 14px 16px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
     box-shadow: none !important;
   }
   .side .q-card:hover {
-    border-color: rgba(255,255,255,.2) !important;
+    border: none !important;
     background: none !important;
   }
   .side .q-text {
