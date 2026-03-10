@@ -4190,7 +4190,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-month-day.exp-day-selected {
   background: var(--bg-white) !important;
   border-radius: 14px;
-  transform: scale(0.88, 1.04) translateY(-6px);
+  transform: translateY(-4px);
   box-shadow:
     0 4px 8px rgba(0,0,0,.06),
     0 8px 20px rgba(0,0,0,.12),
@@ -4198,12 +4198,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   transition: transform 0.25s cubic-bezier(.2,.7,.2,1.05), box-shadow 0.25s cubic-bezier(.2,.7,.2,1.05);
   z-index: 2;
   position: relative;
-  overflow: hidden;
 }
 .exp-month-day.exp-day-selected .exp-month-day-num {
   color: var(--tx) !important;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
 }
 .exp-month-day.exp-day-selected .exp-month-day-amount {
   font-weight: 600;
