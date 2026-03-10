@@ -400,7 +400,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `TAB_COLORS` — 탭별 색상 (현재 미사용, 단일 색상 #E55643 적용)
 - `applyTabColor(tabId)` — CSS 변수 `--tab-color` 설정
 - `switchTab(t, keepLayout)` — **핵심 함수**. 모든 탭 전환의 진입점. 에디터 패널 전환, pane 표시/숨김, 레이아웃 클래스 조정, 데이터 로드 포함. expense 탭 진입 시 PC/태블릿에서 expFullDetailPane 명시적으로 숨김
-- `renderWritingGrid()` — 사이드바 글쓰기 메뉴 렌더링
+- `renderWritingGrid()` — 사이드바 글쓰기 메뉴 렌더링. `getTabCount()`로 글 개수를 `.badge-pill` 요소에 포함. PC에서만 표시(CSS `display:inline`), 모바일/태블릿은 숨김
 - `updateEdTabLabel()` — 에디터 상단 탭 라벨 텍스트
 
 **레이아웃 전환:**
