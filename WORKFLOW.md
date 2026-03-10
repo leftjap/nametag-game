@@ -941,6 +941,32 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 - `LockService`를 사용하는 함수(`saveDocument`, `saveRoutineToSheet`, `saveExpenseFromSMS`)를 수정할 때는 `finally` 블록의 lock 해제가 유지되는지 확인한다.
 - Code.gs는 메인 레포의 Git 관리 대상이 아니다. Code.gs 변경 사항은 `clasp push`로만 배포하며, Git 커밋 메시지에 Code.gs 변경 내용을 포함하지 않는다.
 
+### 사이드바 디자인 보호 규칙
+
+사이드바 디자인은 3플랫폼(모바일/태블릿/PC)에서 동일한 구조를 유지한다. 다음 항목을 변경하거나 롤백할 때는 3플랫폼 모두 일괄 적용해야 한다.
+
+**고정 요소 (제거/숨김 금지):**
+- `.quote-section` (오늘의 어구): 3플랫폼 모두 표시. 배경 없음, 테두리 없음, 다크 테마 텍스트.
+- `.badge-pill` (글 개수): 3플랫폼 모두 표시. `renderWritingGrid()`에서 `getTabCount()`로 생성. 색상 `rgba(255,255,255,.4)`.
+- 가계부 금액(`.expense-compact-amount`): 3플랫폼 모두 표시. `.badge-pill`과 동일 색상/크기.
+
+**숨김 요소 (표시 금지):**
+- 글쓰기 메뉴 화살표(`.side-nav .side-arrow`): 3플랫폼 모두 `display:none`.
+- 가계부 화살표(`.expense-compact .side-arrow`): 3플랫폼 모두 `display:none`.
+- 섹션 구분선(`.sec-border::after`, `.side-hdr::after`, `.side-nav border-bottom`): 3플랫폼 모두 제거.
+
+**유지 요소:**
+- 루틴 화살표(`.routine-compact .side-arrow`): 3플랫폼 모두 표시. `right: 28px`로 `.badge-pill` 우측과 정렬.
+
+**우측 정렬 기준:** 글 개수, 가계부 금액, 루틴 화살표의 우측 끝은 모두 사이드바 끝에서 28px 위치에 정렬한다. `.side-nav`의 인라인 패딩(`8px 12px 12px`)과 `.side-menu`의 우측 패딩(`16px`)의 합이 기준이다.
+
+**체크리스트 — 사이드바 관련 코드를 수정할 때:**
+1. `renderWritingGrid()`가 `.badge-pill`을 생성하는가?
+2. `.quote-section`이 3플랫폼 모두 `display:block`인가?
+3. 글쓰기/가계부 화살표가 3플랫폼 모두 `display:none`인가?
+4. 루틴 화살표 `right` 값이 28px인가?
+5. 구분선이 3플랫폼 모두 제거되어 있는가?
+
 ---
 
 ## 11. 코드 비대화 방지 규칙
@@ -1128,6 +1154,8 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 - [ ] 미디어쿼리 3곳(모바일/태블릿/PC) 모두 확인했는가?
 - [ ] 캘린더 선택 효과(::before 카드) 수정 시: (1) 가계부(.exp-month-day/.exp-week-day)와 루틴(.rc-day)은 셀 콘텐츠가 달라 카드 크기가 다르다. (2) 모바일(inset 방식)과 PC/태블릿(고정 크기 방식)도 별도 규칙이다. 한 곳만 수정하면 나머지 3곳이 깨질 수 있다.
 - [ ] 모바일 스트릭 그리드(`.streak-list`)가 3열(`repeat(3, 1fr)`)을 유지하는가? `auto-fill`이나 `minmax`로 변경하면 패딩에 따라 4열이 되어 텍스트가 넘칠 수 있다.
+- [ ] `renderWritingGrid()`에서 `.badge-pill`(글 개수)을 생성하는가? 롤백/리팩토링 시 HTML 생성 코드가 빠지면 CSS만으로는 표시되지 않는다.
+- [ ] `.quote-section`이 3플랫폼 모두 `display:block`인가? 개별 미디어쿼리에서 `display:none`이 남아있으면 안 된다.
 
 ---
 
@@ -1163,4 +1191,5 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-11 | 10번 사이드바 화살표 규칙에 예외 추가 (글쓰기 메뉴→글 개수, 가계부→금액만 표시, 화살표 숨김) |
 | 2026-03-11 | 사이드바 화살표/글 개수 변경 롤백 — 원래 상태(전체 화살표 + badge-pill 숨김)로 복원, 10번/19번 관련 항목 제거 |
 | 2026-03-11 | 모바일 스트릭 그리드 3열 복원, 19번 체크리스트에 스트릭 그리드 보호 규칙 추가 |
+| 2026-03-11 | 사이드바 디자인 보호 규칙 추가(10번): 어구/글개수/화살표/구분선 3플랫폼 통일 규칙, 19번 체크리스트에 badge-pill/quote-section 항목 추가 |
 ```
