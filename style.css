@@ -1029,6 +1029,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .side .side-menu-l{display:flex;align-items:center;font-size:16px}
 
+  /* 어구 숨김 */
+  .side .quote-section{display:none}
+
   /* 글쓰기 상위 라벨 */
   .side .sec-t{pointer-events:none;font-size:13px}
   .side .stat-label{font-size:13px !important;color:rgba(255,255,255,.9) !important}  .side .side-menu{padding:9px 16px 9px 32px}
@@ -1654,6 +1657,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .side .side-menu .tab-color-dot{display:none !important}
   .side .badge-pill{display:none !important}
+  /* 어구 숨김 */
+  .side .quote-section{display:none !important}
   .side .side-arrow {
     display: block !important;
     stroke: rgba(255,255,255, .25) !important;
