@@ -1432,6 +1432,19 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .rhythm-stat-num{font-size:24px}
   .rhythm-stat-label{font-size:14px}
   .rhythm-stat-unit{font-size:13px}
+  /* 루틴 간격 — 빽빽함 해소 */
+  .routine-card-hdr{height:64px;min-height:64px;margin-bottom:4px}
+  .routine-card-body .chk-row{height:46px}
+  .routine-card-body .chk-table{gap:5px}
+  .routine-streak{padding-top:24px;padding-bottom:16px}
+  .routine-streak::before{top:0}
+  .streak-title{margin-bottom:16px}
+  .streak-hero{padding:20px 24px}
+  .streak-row{padding:14px 10px;min-height:82px}
+  .streak-list{gap:10px}
+  .routine-monthly{padding-top:24px}
+  .routine-monthly::before{top:0}
+  .monthly-title{margin-bottom:16px}
 }
 .lp-item:has(.lp-thumbs){max-height:none}
 
