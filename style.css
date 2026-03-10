@@ -1445,6 +1445,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .routine-monthly{padding-top:24px}
   .routine-monthly::before{top:0}
   .monthly-title{margin-bottom:16px}
+  .routine-streak::before{display:none}
+  .routine-monthly::before{display:none}
 }
 .lp-item:has(.lp-thumbs){max-height:none}
 
