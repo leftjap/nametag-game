@@ -1748,6 +1748,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .expense-compact .side-arrow {
     display: none !important;
   }
+  .side .routine-compact .side-arrow {
+    right: 28px !important;
+  }
   .side .expense-compact-right {
     padding-right: 0 !important;
   }
