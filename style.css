@@ -979,7 +979,22 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     font-size: 14px;
   }
   .side .side-nav {
-    border-bottom: none;
+    border-bottom: none !important;
+  }
+  .side .sec-border {
+    border-bottom: none !important;
+  }
+  .side .sec-border::after {
+    display: none !important;
+  }
+  .side .side-hdr::after {
+    display: none !important;
+  }
+  .side .quote-section {
+    border-bottom: none !important;
+  }
+  .side .quote-section::after {
+    display: none !important;
   }
 
   /* 태블릿 스와이프 액션 */
@@ -1093,7 +1108,22 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     font-size: 14px;
   }
   .side .side-nav {
-    border-bottom: none;
+    border-bottom: none !important;
+  }
+  .side .sec-border {
+    border-bottom: none !important;
+  }
+  .side .sec-border::after {
+    display: none !important;
+  }
+  .side .side-hdr::after {
+    display: none !important;
+  }
+  .side .quote-section {
+    border-bottom: none !important;
+  }
+  .side .quote-section::after {
+    display: none !important;
   }
 
   /* 어구 숨김 */
