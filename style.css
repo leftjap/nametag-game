@@ -1028,9 +1028,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .sec-border{border-bottom:1px solid rgba(255,255,255,.08)}
   .side .sec-t{color:rgba(255,255,255,.35);font-size:11px;padding:0 16px;margin-bottom:4px}
 
-  /* 어구 숨김 */
-  .side .quote-section{display:none}
-
   /* 글쓰기 메뉴 베어 스타일 */
   .side .writing-grid{padding:4px 0;gap:0}
   .side .side-menu{
@@ -1643,9 +1640,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     left:16px !important;right:16px !important;
     background:rgba(255,255,255,.08) !important;
   }
-
-  /* 어구 숨김 */
-  .side .quote-section{display:none !important}
 
   /* 루틴 컴팩트 */
   .routine-full{display:none !important}
