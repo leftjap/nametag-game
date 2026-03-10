@@ -3911,27 +3911,26 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 4px;
-    padding: 12px 6px;
+    gap: 3px;
+    padding: 10px 6px 8px;
     min-height: 0;
   }
 
   .exp-yearly-grid-rank {
-    font-size: 11px;
-    width: auto;
-    min-width: auto;
+    display: none;
   }
 
   .exp-yearly-grid-icon .exp-tl-item-icon,
   .exp-yearly-grid-icon .exp-tl-item-icon img {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
   .exp-yearly-grid-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 4px;
+    justify-content: center;
   }
 
   .exp-yearly-grid-name {
@@ -3939,39 +3938,46 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    max-width: 70px;
   }
 
   .exp-yearly-grid-amount {
     font-size: 12px;
     color: var(--tx-m);
+    flex-shrink: 0;
   }
 
   .exp-yearly-hero {
-    padding: 12px;
-    gap: 10px;
+    padding: 14px 16px;
+    gap: 12px;
+    background: rgba(229, 86, 67, 0.06) !important;
+    border: 1px solid rgba(229, 86, 67, 0.12) !important;
+  }
+
+  .exp-yearly-hero-rank,
+  .exp-monthly-hero-rank {
+    display: none;
   }
 
   .exp-yearly-hero-icon .exp-tl-item-icon,
   .exp-yearly-hero-icon .exp-tl-item-icon img {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
 
   .exp-yearly-hero-name {
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 500;
   }
 
   .exp-yearly-hero-amount {
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #E55643;
   }
 
   .exp-yearly-hero-desc {
     font-size: 12px;
-  }
-
-  .exp-monthly-hero-rank {
-    font-size: 16px;
   }
 
   /* 연간 버블/랭킹 모바일 조정 */
