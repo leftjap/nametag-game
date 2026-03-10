@@ -393,7 +393,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 **탭 전환:**
 - `TAB_COLORS` — 탭별 색상 (현재 미사용, 단일 색상 #E55643 적용)
 - `applyTabColor(tabId)` — CSS 변수 `--tab-color` 설정
-- `switchTab(t, keepLayout)` — **핵심 함수**. 모든 탭 전환의 진입점. 에디터 패널 전환, pane 표시/숨김, 레이아웃 클래스 조정, 데이터 로드 포함
+- `switchTab(t, keepLayout)` — **핵심 함수**. 모든 탭 전환의 진입점. 에디터 패널 전환, pane 표시/숨김, 레이아웃 클래스 조정, 데이터 로드 포함. expense 탭 진입 시 PC/태블릿에서 expFullDetailPane 명시적으로 숨김
 - `renderWritingGrid()` — 사이드바 글쓰기 메뉴 렌더링
 - `updateEdTabLabel()` — 에디터 상단 탭 라벨 텍스트
 
@@ -457,7 +457,8 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 **대시보드 A (renderExpenseDashboard):**
 - `renderExpenseDashboard(platform)` — 'pc'|'mobile'. 요약+차트+카테고리+예상+주간캘린더+타임라인
 - `renderCumulativeChart(ym)` — 누적 곡선 SVG
-- `renderMonthlyBarChart(trend)` — 월별 막대 차트
+- `renderMonthlyBarChart(trend)` — 월별 막대 차트 (클릭 시 `_onBarChartClick()` 호출)
+- `_onBarChartClick(ym)` — PC/태블릿: 통합 대시보드 렌더, 모바일: B화면(showExpenseFullDetail) 표시
 - `renderWeeklyCalendar(ym)` — 주간 캘린더 그리드
 - `renderRecentExpenses(ym)` — 최근 7일 타임라인
 - `renderCategoryChart(catBreakdown)` — 카테고리별 수평 바 차트 (상위 4개 표시 + 더보기 + 행 클릭 시 openCategoryDetail)
@@ -467,7 +468,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `renderCategoryBarCompact(catBreakdown, total)` — 스택 바
 
 **전체 내역 B:**
-- `showExpenseFullDetail(ym)` — PC: B 표시, A 숨김
+- `showExpenseFullDetail(ym)` — PC/태블릿: 통합 대시보드 렌더 (B화면 진입 차단), 모바일: B 표시
 - `showExpenseFullDetailMobile(ym)` — 모바일: B 표시
 - `renderExpenseFullDetail(ym)` — PC B 렌더
 - `renderExpenseFullDetailMobile(ym)` — 모바일 B 렌더
@@ -476,8 +477,8 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `renderExpenseFullTimeline(ym, query)` — 검색/필터 적용 타임라인
 
 **A↔B 전환:**
-- `showExpenseDashboardFromDetail()` — PC: B→A
-- `showExpenseDashboardFromDetailMobile()` — 모바일: B→A
+- `showExpenseDashboardFromDetail()` — PC/태블릿: 통합 대시보드 렌더 (pane 관리는 switchTab에서), 모바일: A 표시
+- `showExpenseDashboardFromDetailMobile()` — 모바일: A 표시
 
 **월 이동:**
 - `getExpenseViewYM()`, `changeExpenseMonth(delta)`
@@ -505,7 +506,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 
 **타임라인 컨텍스트 메뉴:**
 - `showExpensePopup(expenseId, x, y)` — 타임라인 항목 우클릭/꾹누르기 팝업 (수정/삭제)
-- `_deleteExpenseFromPopup(expenseId)` — 팝업에서 삭제 실행 + 화면 리렌더
+- `_deleteExpenseFromPopup(expenseId)` — 팝업에서 삭제 실행 + PC/태블릿: 항상 통합 대시보드 렌더, 모바일: 현재 화면에 따라 리렌더
 - `setupExpenseContextMenu()` — document 레벨 이벤트 위임 등록 (우클릭 + 꾹누르기 600ms)
 
 **플로팅 팝업 (공용 컴포넌트):**

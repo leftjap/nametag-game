@@ -230,6 +230,10 @@ function switchTab(t, keepLayout) {
       var fullDb = document.getElementById('expenseFullDashboard');
       if (fullDb) fullDb.style.display = 'flex';
 
+      // expFullDetailPane 명시적으로 숨기기 (B화면 진입 차단)
+      var detailPane = document.getElementById('expFullDetailPane');
+      if (detailPane) detailPane.style.display = 'none';
+
       if (fab) fab.style.display = 'none';
 
       // 원페이지 대시보드 렌더

@@ -298,7 +298,7 @@ function renderMonthlyBarChart(trend) {
   trend.forEach(function(t) {
     var pct = (t.total / maxTotal) * 100;
     var isCurrentClass = t.isCurrent ? 'current' : '';
-    html += '<div class="exp-bar-item ' + isCurrentClass + '" onclick="_expenseViewYM=\'' + t.ym + '\';showExpenseFullDetail(\'' + t.ym + '\')" style="cursor:pointer;">'
+    html += '<div class="exp-bar-item ' + isCurrentClass + '" onclick="_onBarChartClick(\'' + t.ym + '\')" style="cursor:pointer;">'
       + (t.isCurrent && t.ym === today().slice(0, 7) ? '<div class="exp-bar-projected">예상</div>' : '')
       + '<div class="exp-bar-value">' + Math.round(t.total / 10000) + '</div>'
       + '<div class="exp-bar-fill" style="height:' + Math.max(pct, 4) + '%"></div>'
@@ -307,6 +307,21 @@ function renderMonthlyBarChart(trend) {
   });
   html += '</div>';
   return html;
+}
+
+function _onBarChartClick(ym) {
+  _expenseViewYM = ym;
+  if (window.innerWidth > 768) {
+    // PC/태블릿: 통합 대시보드 다시 렌더 (B화면 진입 차단)
+    var dashPane = document.getElementById('expFullDashboardPane');
+    var detailPane = document.getElementById('expFullDetailPane');
+    if (dashPane) dashPane.style.display = 'block';
+    if (detailPane) detailPane.style.display = 'none';
+    renderExpenseDashboard('pc');
+  } else {
+    // 모바일: 기존 B화면 동작
+    showExpenseFullDetail(ym);
+  }
 }
 
 function renderWeeklyCalendar(thisYM) {
@@ -710,14 +725,15 @@ function changeExpenseMonth(delta) {
 // ═══════════════════════════════════════
 function showExpenseFullDetail(yearMonth) {
   if (window.innerWidth > 768) {
+    // PC/태블릿: 통합 대시보드로 리다이렉트 (B화면 진입 차단)
+    _expenseViewYM = yearMonth;
     var dashPane = document.getElementById('expFullDashboardPane');
     var detailPane = document.getElementById('expFullDetailPane');
-    if (dashPane) dashPane.style.display = 'none';
-    if (detailPane) detailPane.style.display = 'block';
-    renderExpenseFullDetail(yearMonth);
-    var scrollWrap = document.querySelector('.expense-full-scroll');
-    if (scrollWrap) scrollWrap.scrollTop = 0;
+    if (dashPane) dashPane.style.display = 'block';
+    if (detailPane) detailPane.style.display = 'none';
+    renderExpenseDashboard('pc');
   } else {
+    // 모바일: 기존 B화면 동작
     var dashboard = document.getElementById('pane-expense-dashboard');
     var detail = document.getElementById('pane-expense-detail');
     if (dashboard) dashboard.style.display = 'none';
@@ -732,12 +748,10 @@ function showExpenseDashboardFromDetail() {
   _expenseViewYM = today().slice(0, 7);
   clearCategoryFilter();
   if (window.innerWidth > 768) {
-    var dashPane = document.getElementById('expFullDashboardPane');
-    var detailPane = document.getElementById('expFullDetailPane');
-    if (dashPane) dashPane.style.display = 'block';
-    if (detailPane) detailPane.style.display = 'none';
+    // PC/태블릿: 통합 대시보드 렌더 (pane 관리는 switchTab에서)
     renderExpenseDashboard('pc');
   } else {
+    // 모바일: 대시보드 패널 표시
     var dashboard = document.getElementById('pane-expense-dashboard');
     var detail = document.getElementById('pane-expense-detail');
     if (detail) detail.style.display = 'none';
@@ -1423,13 +1437,10 @@ function _deleteExpenseFromPopup(expenseId) {
   SYNC.scheduleDatabaseSave();
   // 현재 화면 리렌더
   if (window.innerWidth > 768) {
-    var detailPane = document.getElementById('expFullDetailPane');
-    if (detailPane && detailPane.style.display !== 'none') {
-      renderExpenseFullDetail(getExpenseViewYM());
-    } else {
-      renderExpenseDashboard('pc');
-    }
+    // PC/태블릿: 항상 통합 대시보드 렌더
+    renderExpenseDashboard('pc');
   } else {
+    // 모바일: 현재 표시된 화면에 따라 렌더
     var mDetail = document.getElementById('pane-expense-detail');
     if (mDetail && mDetail.style.display !== 'none') {
       renderExpenseFullDetailMobile(getExpenseViewYM());
