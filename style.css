@@ -1327,6 +1327,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   display:flex;align-items:center;gap:16px;
   padding:18px 20px;border-radius:14px;
   margin-bottom:12px;
+  background:rgba(229, 86, 67, 0.06);
+  border:1px solid rgba(229, 86, 67, 0.12);
 }
 .streak-hero-days{
   font-size:42px;font-weight:300;line-height:1;
@@ -3643,6 +3645,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   margin-bottom: 16px;
   cursor: pointer;
   transition: background .12s;
+  background: rgba(229, 86, 67, 0.06);
+  border: 1px solid rgba(229, 86, 67, 0.12);
 }
 
 .exp-yearly-hero:hover {
@@ -3965,8 +3969,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .exp-yearly-hero {
     padding: 14px 16px;
     gap: 12px;
-    background: rgba(229, 86, 67, 0.06) !important;
-    border: 1px solid rgba(229, 86, 67, 0.12) !important;
   }
 
   .exp-yearly-hero-rank,

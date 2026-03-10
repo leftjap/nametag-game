@@ -1749,8 +1749,6 @@ function renderMonthlyMerchantHero(merchants, thisYM, isCurrentMonth, monthNum) 
   var top1 = merchants[0];
   var gridItems = merchants.slice(1, 7); // 2~7위
 
-  var catObj1 = EXPENSE_CATEGORIES.find(function(c) { return c.id === top1.category; });
-  var catColor1 = catObj1 ? catObj1.color : '#B0B0B8';
   var iconItem1 = { merchant: top1.merchant, icon: null };
 
   var html = '<div style="padding:0;">';
@@ -1765,7 +1763,7 @@ function renderMonthlyMerchantHero(merchants, thisYM, isCurrentMonth, monthNum) 
   html += '</div>';
 
   // 히어로 카드 (1위)
-  html += '<div class="exp-yearly-hero" style="background:' + catColor1 + '10;border:1px solid ' + catColor1 + '20;" onclick="openMerchantDetail(\'' + _escMerchant(top1.merchant) + '\')">';
+  html += '<div class="exp-yearly-hero" onclick="openMerchantDetail(\'' + _escMerchant(top1.merchant) + '\')">';
   html += '<div class="exp-yearly-hero-rank exp-monthly-hero-rank">1</div>';
   html += '<div class="exp-yearly-hero-icon">' + getMerchantIconHtml(iconItem1) + '</div>';
   html += '<div class="exp-yearly-hero-body">';
