@@ -300,7 +300,6 @@ function renderCumulativeChart(yearMonth) {
 
 function renderMonthlyBarChart(trend) {
   var maxTotal = Math.max.apply(null, trend.map(function(t) { return t.total; }).concat([1]));
-  var projected = getProjectedMonthTotal();
   var nowYM = today().slice(0, 7);
   var html = '<div class="exp-bar-chart">';
   trend.forEach(function(t) {
@@ -309,7 +308,7 @@ function renderMonthlyBarChart(trend) {
     var isCurrentMonth = (t.ym === nowYM);
     html += '<div class="exp-bar-item ' + isCurrentClass + '" onclick="_onBarChartClick(\'' + t.ym + '\')" style="cursor:pointer;">';
     if (isCurrentMonth && t.isCurrent) {
-      html += '<div class="exp-bar-projected">예상 ' + Math.round(projected / 10000) + '만</div>';
+      html += '<div class="exp-bar-projected">현재 ' + Math.round(t.total / 10000) + '만</div>';
     }
     html += '<div class="exp-bar-value">' + Math.round(t.total / 10000) + '</div>';
     html += '<div class="exp-bar-fill" style="height:' + Math.max(pct, 4) + '%"></div>';
