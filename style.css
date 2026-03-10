@@ -1707,7 +1707,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-nav {
     border-bottom: none !important;
   }
-  .side .badge-pill{display:none !important}
+  .side .badge-pill {
+    display: inline !important;
+    color: rgba(255,255,255,.4) !important;
+    font-size: 14px !important;
+  }
   /* 어구 표시 (PC) */
   .side .quote-section {
     display: block !important;
@@ -1737,6 +1741,19 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-arrow {
     display: block !important;
     stroke: rgba(255,255,255, .25) !important;
+  }
+  .side .side-nav .side-arrow {
+    display: none !important;
+  }
+  .side .expense-compact .side-arrow {
+    display: none !important;
+  }
+  .side .expense-compact-right {
+    padding-right: 0 !important;
+  }
+  .side .expense-compact-amount {
+    color: rgba(255,255,255,.4) !important;
+    font-size: 14px !important;
   }
 }
 /* ═══ 스와이프 오버레이 (body 고정) ═══ */
