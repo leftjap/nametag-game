@@ -1417,3 +1417,80 @@ function setupExpenseContextMenu() {
     _expLpItem = null;
   }, { passive: true });
 }
+
+// ═══════════════════════════════════════
+// 플로팅 팝업 (공용)
+// ═══════════════════════════════════════
+function openExpenseFloatingPopup(title, contentHtml, anchorX, anchorY) {
+  closeExpenseFloatingPopup();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'expFloatingPopupOverlay';
+  overlay.className = 'exp-fp-overlay';
+
+  var popup = document.createElement('div');
+  popup.className = 'exp-fp-card';
+
+  // 헤더
+  var header = '<div class="exp-fp-header">'
+    + '<span class="exp-fp-title">' + title + '</span>'
+    + '<button class="exp-fp-close" onclick="closeExpenseFloatingPopup()">'
+    + '<svg width="16" height="16" viewBox="0 0 16 16"><line x1="2" y1="2" x2="14" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="2" x2="2" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+    + '</button>'
+    + '</div>';
+
+  // 본문
+  var body = '<div class="exp-fp-body">' + contentHtml + '</div>';
+
+  popup.innerHTML = header + body;
+  overlay.appendChild(popup);
+
+  // 바깥 클릭으로 닫기
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeExpenseFloatingPopup();
+  });
+
+  document.body.appendChild(overlay);
+
+  // 위치 계산 (팝업 크기 확인 후)
+  requestAnimationFrame(function() {
+    var popupRect = popup.getBoundingClientRect();
+    var popupW = popupRect.width;
+    var popupH = popupRect.height;
+    var winW = window.innerWidth;
+    var winH = window.innerHeight;
+
+    // 기본: 앵커 지점 근처. 공간 부족하면 화면 중앙
+    var left, top;
+
+    if (winW <= 768) {
+      // 모바일: 하단 시트 스타일 (CSS에서 처리)
+      left = 0;
+      top = 0;
+    } else {
+      // PC/태블릿: 앵커 근처 배치
+      left = anchorX - popupW / 2;
+      top = anchorY + 12;
+
+      // 화면 밖으로 넘어가지 않도록 보정
+      if (left < 16) left = 16;
+      if (left + popupW > winW - 16) left = winW - popupW - 16;
+      if (top + popupH > winH - 16) top = anchorY - popupH - 12;
+      if (top < 16) top = 16;
+
+      popup.style.left = left + 'px';
+      popup.style.top = top + 'px';
+    }
+
+    overlay.classList.add('open');
+  });
+}
+
+function closeExpenseFloatingPopup() {
+  var overlay = document.getElementById('expFloatingPopupOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(function() {
+    if (overlay.parentNode) overlay.remove();
+  }, 250);
+}

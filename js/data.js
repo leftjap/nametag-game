@@ -535,6 +535,98 @@ function getMonthlyTrendAround(centerYM) {
   return result;
 }
 
+function getMerchantBreakdown(ym) {
+  var expenses = getMonthExpenses(ym);
+  if (!expenses.length) return [];
+  var total = expenses.reduce(function(s, e) { return s + e.amount; }, 0);
+  var map = {};
+  expenses.forEach(function(e) {
+    var key = (e.merchant || '미분류').trim();
+    if (!map[key]) {
+      map[key] = { merchant: key, amount: 0, count: 0, catCount: {} };
+    }
+    map[key].amount += e.amount;
+    map[key].count += 1;
+    var cat = e.category || 'etc';
+    map[key].catCount[cat] = (map[key].catCount[cat] || 0) + 1;
+  });
+  var result = [];
+  Object.keys(map).forEach(function(key) {
+    var item = map[key];
+    // 최다 빈도 카테고리
+    var bestCat = 'etc';
+    var bestCatCount = 0;
+    Object.keys(item.catCount).forEach(function(cat) {
+      if (item.catCount[cat] > bestCatCount) {
+        bestCat = cat;
+        bestCatCount = item.catCount[cat];
+      }
+    });
+    result.push({
+      merchant: item.merchant,
+      amount: item.amount,
+      count: item.count,
+      percent: total > 0 ? Math.round(item.amount / total * 1000) / 10 : 0,
+      category: bestCat
+    });
+  });
+  result.sort(function(a, b) { return b.amount - a.amount; });
+  return result;
+}
+
+function getYearMerchantBreakdown(year) {
+  var allExp = getExpenses();
+  var yearStr = String(year);
+  var yearExpenses = allExp.filter(function(e) { return e.date && e.date.startsWith(yearStr); });
+  if (!yearExpenses.length) return { startDate: null, endDate: null, total: 0, merchants: [] };
+
+  var total = yearExpenses.reduce(function(s, e) { return s + e.amount; }, 0);
+  var dates = yearExpenses.map(function(e) { return e.date; }).sort();
+  var startDate = dates[0];
+  var todayStr = today();
+  var endDate = todayStr.startsWith(yearStr) ? todayStr : dates[dates.length - 1];
+
+  var map = {};
+  yearExpenses.forEach(function(e) {
+    var key = (e.merchant || '미분류').trim();
+    if (!map[key]) {
+      map[key] = { merchant: key, amount: 0, count: 0, catCount: {} };
+    }
+    map[key].amount += e.amount;
+    map[key].count += 1;
+    var cat = e.category || 'etc';
+    map[key].catCount[cat] = (map[key].catCount[cat] || 0) + 1;
+  });
+
+  var merchants = [];
+  Object.keys(map).forEach(function(key) {
+    var item = map[key];
+    var bestCat = 'etc';
+    var bestCatCount = 0;
+    Object.keys(item.catCount).forEach(function(cat) {
+      if (item.catCount[cat] > bestCatCount) {
+        bestCat = cat;
+        bestCatCount = item.catCount[cat];
+      }
+    });
+    merchants.push({
+      merchant: item.merchant,
+      amount: item.amount,
+      count: item.count,
+      percent: total > 0 ? Math.round(item.amount / total * 1000) / 10 : 0,
+      category: bestCat
+    });
+  });
+  merchants.sort(function(a, b) { return b.amount - a.amount; });
+
+  return {
+    startDate: startDate,
+    endDate: endDate,
+    total: total,
+    merchants: merchants
+  };
+}
+
 // ═══════════════════════════════════════
 // 가계부 상수 및 유틸 (storage.js에서 이동)
 // ═══════════════════════════════════════
