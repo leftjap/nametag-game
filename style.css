@@ -899,8 +899,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   }
   .side .sec-t{font-size:15px !important;padding:0 20px !important}
   .side .stat-label{font-size:16px !important;color:rgba(255,255,255,.9) !important}
-  .side .side-menu{padding:14px 20px !important;font-size:18px !important}
-  .side .side-menu.on{padding:14px 20px !important}
+  .side .side-menu{padding:14px 16px !important;font-size:18px !important}
+  .side .side-menu.on{padding:14px 16px !important}
 
   /* 사이드바 다크 */
   .side .side-hdr{background:transparent;border-bottom:none;position:relative;height:90px;min-height:90px;padding:0 20px;overflow:visible}
@@ -911,10 +911,31 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .sync-cloud-label{bottom:2px;font-size:9px}
   .side .cat-avatar{border:2px solid rgba(255,255,255,.15);width:52px;height:52px}
   .side .sec-t{color:rgba(255,255,255,.35);font-size:11px;padding:0 16px;margin-bottom:4px}
-  .side .sec-border{border-bottom:1px solid rgba(255,255,255,.08)}
+  .side .sec-border{border-bottom:none !important}
   .side .sec{padding:8px 0}
   .side .brand{display:none}
-  .side .quote-section{display:none}
+  .side .quote-section {
+    display: block;
+    padding: 12px 0;
+  }
+  .side .quote-section .q-card {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0 16px;
+    box-shadow: none;
+  }
+  .side .quote-section .q-card:hover {
+    border: none;
+    background: none;
+  }
+  .side .q-text {
+    color: rgba(255,255,255,.85);
+    font-size: 13px;
+  }
+  .side .q-by {
+    color: rgba(255,255,255,.4);
+  }
   .routine-full{display:none}
   .routine-compact{display:flex}
   .routine-compact-label{color:rgba(255,255,255,.9);font-size:16px}
@@ -932,10 +953,33 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu:hover{background:rgba(255,255,255,.06)}
   .side .side-menu.on{background:rgba(255,255,255,.1);color:#ffffff;font-weight:500}
   .side .side-menu .tab-color-dot{display:none}
-  .side .badge-pill{display:none}
+  .side .badge-pill {
+    display: inline;
+    color: rgba(255,255,255,.4);
+    font-size: 14px;
+  }
   .side .side-arrow {
     display: block;
     stroke: rgba(255,255,255, .25);
+  }
+  .side .side-nav .side-arrow {
+    display: none !important;
+  }
+  .side .expense-compact .side-arrow {
+    display: none !important;
+  }
+  .side .routine-compact .side-arrow {
+    right: 28px;
+  }
+  .side .expense-compact-right {
+    padding-right: 0;
+  }
+  .side .expense-compact-amount {
+    color: rgba(255,255,255,.4);
+    font-size: 14px;
+  }
+  .side .side-nav {
+    border-bottom: none;
   }
 
   /* 태블릿 스와이프 액션 */
@@ -1007,7 +1051,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .sync-cloud-label{bottom:2px;font-size:8px}
   .side .side-scroll{padding-bottom:env(safe-area-inset-bottom, 20px)}
   .side .sec{padding:8px 0}
-  .side .sec-border{border-bottom:1px solid rgba(255,255,255,.08)}
+  .side .sec-border{border-bottom:none !important}
   .side .sec-t{color:rgba(255,255,255,.35);font-size:11px;padding:0 16px;margin-bottom:4px}
 
   /* 글쓰기 메뉴 베어 스타일 */
@@ -1022,15 +1066,59 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .side .side-menu.on{background:rgba(255,255,255,.1);color:#ffffff;font-weight:500}
   .side .side-menu .tab-color-dot{width:14px;height:14px;border-radius:4px;margin-right:12px;border:1px solid rgba(255,255,255,.1)!important}
   .side .side-menu.on .tab-color-dot{border:1px solid rgba(255,255,255,.2)!important}
-  .side .badge-pill{display:none}
+  .side .badge-pill {
+    display: inline;
+    color: rgba(255,255,255,.4);
+    font-size: 14px;
+  }
   .side .side-arrow {
     display: block;
     stroke: rgba(255,255,255, .25);
   }
+  .side .side-nav .side-arrow {
+    display: none !important;
+  }
+  .side .expense-compact .side-arrow {
+    display: none !important;
+  }
+  .side .routine-compact .side-arrow {
+    right: 28px;
+  }
   .side .side-menu-l{display:flex;align-items:center;font-size:16px}
+  .side .expense-compact-right {
+    padding-right: 0;
+  }
+  .side .expense-compact-amount {
+    color: rgba(255,255,255,.4);
+    font-size: 14px;
+  }
+  .side .side-nav {
+    border-bottom: none;
+  }
 
   /* 어구 숨김 */
-  .side .quote-section{display:none}
+  .side .quote-section {
+    display: block;
+    padding: 12px 0;
+  }
+  .side .quote-section .q-card {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0 16px;
+    box-shadow: none;
+  }
+  .side .quote-section .q-card:hover {
+    border: none;
+    background: none;
+  }
+  .side .q-text {
+    color: rgba(255,255,255,.85);
+    font-size: 13px;
+  }
+  .side .q-by {
+    color: rgba(255,255,255,.4);
+  }
 
   /* 글쓰기 상위 라벨 */
   .side .sec-t{pointer-events:none;font-size:13px}
