@@ -3998,6 +3998,25 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .pane-expense-dashboard .exp-section-gap {
     margin: 0 -20px;
   }
+
+  /* 가계부 폼 활성 시 스크롤 바운스 방지 */
+  .editor.expense-edit-active #editorExpense {
+    overflow: hidden;
+  }
+  .editor.expense-edit-active #editorExpense .editor-scroll-area {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: auto;
+    overscroll-behavior: none;
+  }
+  .editor.expense-edit-active .swipe-edge {
+    display: none;
+  }
+
+  .editor.expense-edit-active .expense-form-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+  }
 }
 
 /* ═══ 전체 보기 팝업 내부 ═══ */
