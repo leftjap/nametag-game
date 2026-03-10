@@ -4183,6 +4183,20 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .exp-detail-title{font-size:17px}
   .exp-search-input{font-size:15px}
   .exp-more-btn{font-size:15px}
+  /* 가계부 간격 — 빽빽함 해소 */
+  .pane-expense-dashboard .exp-summary{padding-bottom:16px}
+  .pane-expense-dashboard .exp-pc-calendar-wrap .exp-month-grid{gap:8px 8px}
+  .pane-expense-dashboard .exp-week-grid{gap:20px}
+  .pane-expense-dashboard .exp-section-gap{height:24px}
+  .pane-expense-dashboard .exp-category-chart{padding:24px 0}
+  .pane-expense-dashboard .exp-category-row{padding:8px 0}
+  .pane-expense-dashboard .exp-projection{padding:24px 20px 20px}
+  .pane-expense-dashboard .exp-tl-item{padding:18px 20px 18px 0}
+  .pane-expense-dashboard .exp-tl-date-header{padding-top:20px}
+  .pane-expense-dashboard .exp-more-btn{margin:28px 0}
+  .pane-expense-dashboard .exp-yearly-hero{margin-bottom:20px}
+  .pane-expense-dashboard .exp-yearly-grid{gap:10px}
+  .pane-expense-dashboard .exp-yearly-section{padding-top:24px}
 }
 
 /* ═══ 전체 보기 팝업 내부 ═══ */
