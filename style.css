@@ -3630,7 +3630,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px;
+  padding: 16px 12px;
   border-radius: 14px;
   margin-bottom: 16px;
   cursor: pointer;
@@ -3653,21 +3653,53 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
 /* ─── 월간 히어로 순위 크기 확대 ─── */
 .exp-monthly-hero-rank {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  width: 28px;
+  width: 18px;
+  min-width: 18px;
+  text-align: center;
   color: var(--tx-m);
 }
 
-/* ─── 연간 리스트 순위 ─── */
+/* ─── 연간 리스트 수평 바 ─── */
+.exp-yearly-list-bar {
+  height: 4px;
+  background: rgba(0,0,0,.04);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.exp-yearly-list-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--tab-color);
+  opacity: 0.35;
+  transition: width .3s ease;
+}
+
+.exp-yearly-list-row:nth-child(1) .exp-yearly-list-bar-fill {
+  opacity: 0.7;
+}
+
+.exp-yearly-list-row:nth-child(2) .exp-yearly-list-bar-fill {
+  opacity: 0.55;
+}
+
+.exp-yearly-list-row:nth-child(3) .exp-yearly-list-bar-fill {
+  opacity: 0.45;
+}
+
+/* 메달 순위 강조 */
 .exp-yearly-list-rank {
   font-size: 14px;
   font-weight: 600;
-  color: var(--tx-hint);
   width: 24px;
+  min-width: 24px;
   text-align: center;
   flex-shrink: 0;
   font-family: 'JetBrains Mono', monospace;
+  transition: color .15s;
 }
 
 .exp-yearly-hero-icon .exp-tl-item-icon {
@@ -3748,6 +3780,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   font-weight: 600;
   color: var(--tx-hint);
   width: 18px;
+  min-width: 18px;
   text-align: center;
   flex-shrink: 0;
   font-family: 'JetBrains Mono', monospace;
@@ -3926,9 +3959,12 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-month-day.exp-day-selected {
   background: var(--bg-white) !important;
   border-radius: 14px;
-  transform: scale(1.08) translate(-1px, -3px);
-  box-shadow: 2px 6px 10px rgba(0,0,0,.08), 4px 12px 28px rgba(0,0,0,.14), 6px 16px 36px rgba(0,0,0,.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transform: scale(0.88, 1.04) translateY(-6px);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,.06),
+    0 8px 20px rgba(0,0,0,.12),
+    0 16px 40px rgba(0,0,0,.10);
+  transition: transform 0.25s cubic-bezier(.2,.7,.2,1.05), box-shadow 0.25s cubic-bezier(.2,.7,.2,1.05);
   z-index: 2;
   position: relative;
   overflow: hidden;
@@ -3936,7 +3972,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .exp-month-day.exp-day-selected .exp-month-day-num {
   color: var(--tx) !important;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 16px;
 }
 .exp-month-day.exp-day-selected .exp-month-day-amount {
   font-weight: 600;

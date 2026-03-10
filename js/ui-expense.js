@@ -1863,8 +1863,23 @@ function _renderYearlyGridItem(m, rank) {
 // 연간 리스트 아이템 HTML 생성
 function _renderYearlyListItem(m, rank) {
   var iconItem = { merchant: m.merchant, icon: null };
-  var html = '<div class="exp-mr-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')">';
-  html += '<span class="exp-yearly-list-rank">' + rank + '</span>';
+  var maxAmount = 0;
+  // 최대 금액은 1위 기준 (부모에서 전달받지 않으므로 전역에서 조회)
+  var year = new Date(getExpenseViewYM() + '-01').getFullYear();
+  var data = getYearMerchantBreakdown(year);
+  if (data && data.merchants && data.merchants.length > 0) {
+    maxAmount = data.merchants[0].amount;
+  }
+  var barPct = maxAmount > 0 ? (m.amount / maxAmount) * 100 : 0;
+
+  // 메달 색상: 1위 금, 2위 은, 3위 동
+  var rankColor = 'var(--tx-hint)';
+  if (rank === 1) rankColor = '#E5A100';
+  else if (rank === 2) rankColor = '#8E8E93';
+  else if (rank === 3) rankColor = '#B87333';
+
+  var html = '<div class="exp-mr-row exp-yearly-list-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')">';
+  html += '<span class="exp-yearly-list-rank" style="color:' + rankColor + ';">' + rank + '</span>';
   html += getMerchantIconHtml(iconItem);
   html += '<div class="exp-mr-info">';
   html += '<div class="exp-mr-name">' + m.merchant + '</div>';
@@ -1872,6 +1887,8 @@ function _renderYearlyListItem(m, rank) {
   html += '<span class="exp-mr-count">' + m.count + '건</span>';
   html += '<span class="exp-mr-pct">' + m.percent + '%</span>';
   html += '</div>';
+  // 수평 배경 바
+  html += '<div class="exp-yearly-list-bar"><div class="exp-yearly-list-bar-fill" style="width:' + Math.max(barPct, 3) + '%;"></div></div>';
   html += '</div>';
   html += '<div class="exp-mr-amount">' + formatAmount(m.amount) + '원</div>';
   html += '</div>';
