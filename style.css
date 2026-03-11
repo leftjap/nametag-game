@@ -2292,12 +2292,78 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
 /* 카테고리 */
 .expense-category-section { margin-bottom: 24px; }
+
+/* ═══ 카테고리 칩 (접힘 상태 표시) ═══ */
+.expense-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border-l);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  margin-bottom: 10px;
+}
+
+.expense-cat-chip:hover {
+  border-color: var(--border);
+  background: rgba(0,0,0,.02);
+}
+
+.expense-cat-chip.has-value {
+  border-color: #E55643;
+  background: color-mix(in srgb, #E55643 6%, var(--bg-white));
+}
+
+.expense-cat-chip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.expense-cat-chip-text {
+  font-size: 14px;
+  color: var(--tx-m);
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  font-weight: 400;
+}
+
+.expense-cat-chip.has-value .expense-cat-chip-text {
+  color: var(--tx);
+  font-weight: 500;
+}
+
+.expense-cat-chip-arrow {
+  color: var(--tx-hint);
+  flex-shrink: 0;
+  transition: transform .2s ease;
+}
+
+.expense-cat-chip.open .expense-cat-chip-arrow {
+  transform: rotate(180deg);
+}
+
+/* 그리드 펼침 애니메이션 */
+.expense-category-grid {
+  overflow: hidden;
+  transition: max-height .25s ease, opacity .2s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.expense-category-grid.grid-open {
+  max-height: 500px;
+  opacity: 1;
+}
+
 .expense-section-label {
   display: block; font-size: 12px; color: var(--tx-hint);
   font-weight: 500; margin-bottom: 10px; letter-spacing: .3px;
 }
 .expense-category-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  grid-template-columns: repeat(3, 1fr); gap: 8px;
 }
 .expense-cat-btn {
   padding: 10px 8px; border: 1.5px solid var(--border-l); border-radius: 10px;

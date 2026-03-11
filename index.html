@@ -496,7 +496,11 @@
         <!-- 카테고리 선택 -->
         <div class="expense-category-section">
           <span class="expense-section-label">카테고리</span>
-          <div class="expense-category-grid" id="expenseCategoryGrid">
+          <div class="expense-cat-chip" id="expenseCatChip" onclick="toggleCategoryGrid('normal')">
+            <span class="expense-cat-chip-text" id="expenseCatChipText">카테고리 선택</span>
+            <svg class="expense-cat-chip-arrow" width="12" height="12" viewBox="0 0 12 12"><polyline points="3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="expense-category-grid" id="expenseCategoryGrid" style="display:none;">
             <!-- JS에서 EXPENSE_CATEGORIES 기반 렌더링 -->
           </div>
         </div>
@@ -575,7 +579,11 @@
       <!-- 카테고리 선택 -->
       <div class="expense-category-section">
         <span class="expense-section-label">카테고리</span>
-        <div class="expense-category-grid" id="expenseCategoryGridModal">
+        <div class="expense-cat-chip" id="expenseCatChipModal" onclick="toggleCategoryGrid('modal')">
+          <span class="expense-cat-chip-text" id="expenseCatChipTextModal">카테고리 선택</span>
+          <svg class="expense-cat-chip-arrow" width="12" height="12" viewBox="0 0 12 12"><polyline points="3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="expense-category-grid" id="expenseCategoryGridModal" style="display:none;">
           <!-- JS에서 렌더링 -->
         </div>
       </div>

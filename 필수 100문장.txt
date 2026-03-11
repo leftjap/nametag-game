@@ -1,0 +1,102 @@
+리액션 | 네가 해냈구나!	You nailed it!
+리액션 | 과찬이야, 비행기 태우지 마.	I'm really flattered.
+리액션 | 나도 그래.	That makes two of us.
+리액션 | 좋은 지적이야.	That's a good point.
+리액션 | 그거 괜찮은데.	Sounds good.
+리액션 | 말도 안 돼.	No way.
+리액션 | 진짜? 몰랐어.	Really? I had no idea.
+리액션 | 그럴 줄 알았어.	I knew it.
+리액션 | 당연하지!	Of course!
+리액션 | 나도 같은 생각이야.	I was thinking the same thing.
+리액션 | 오래 살고 볼 일이다.	I've seen it all now.
+리액션 | 소름 돋는다.	That gives me goosebumps.
+리액션 | 완전 짱이다.	Can't beat that.
+리액션 | 식은 죽 먹기였어.	That was a no-brainer.
+리액션 | 얼마나 걸릴지 두고 보자.	We'll see how it goes.
+감정 | 나 겨우 버티고 있어.	I'm barely hanging in there.
+감정 | 나 지금 완전 스트레스 받아.	I'm so stressed out.
+감정 | 나 빈털터리야.	I'm broke.
+감정 | 너 때문에 정말 짜증나.	I am so fed up with you.
+감정 | 요즘 기운이 없어.	I've been feeling down lately.
+감정 | 이제 지긋지긋해.	I'm sick and tired of it.
+감정 | 기대된다!	I can't wait!
+감정 | 마음이 좀 놓인다.	That's a relief.
+감정 | 아직도 믿기지가 않아.	I still can't believe it.
+감정 | 뭔가 찜찜해.	Something doesn't feel right.
+의견 | 오해하지 마.	Don't get me wrong.
+의견 | 그건 좀 아닌 것 같은데.	I don't think that's right.
+의견 | 솔직히 잘 모르겠어.	Honestly, I'm not sure.
+의견 | 나라면 안 할 것 같아.	I wouldn't do that if I were you.
+의견 | 입장 바꿔서 생각해봐.	Put yourself in my shoes.
+의견 | 현실을 직시하자.	Let's face it.
+의견 | 말은 쉽지.	Talk is cheap.
+의견 | 그건 경우에 따라 다르지.	It depends on the situation.
+의견 | 그게 다가 아니야.	That's not the whole story.
+의견 | 뚜껑은 열어봐야 알지.	We won't know until we try.
+요청 | 천천히 말해줄 수 있어요?	Could you speak more slowly?
+요청 | 다시 한번 말해줄래요?	Could you say that again?
+요청 | 잠깐만요, 생각 좀 할게요.	Hold on, let me think for a second.
+요청 | 그건 나한테 맡겨.	Leave it to me.
+요청 | 내가 해결할게.	I got it covered.
+요청 | 나한테 이래라 저래라 하지 마.	Don't boss me around.
+요청 | 내 일에 신경 꺼.	Keep your nose out of my business.
+요청 | 서두르지 말고 천천히 해.	Take your time.
+요청 | 제발 그만해.	Can you just lay off, please?
+요청 | 그 얘기는 그만하자.	Let's not beat a dead horse.
+일상 | 별일 없어, 그냥 그래.	Nothing much, same old same old.
+일상 | 요즘 뭐 하고 지내?	What have you been up to lately?
+일상 | 얘기하면 길어.	It's a long story.
+일상 | 어떻게 됐어?	How did it go?
+일상 | 지금 내가 해야 할 일이 산더미야.	I have too much on my plate right now.
+일상 | 일 때문에 꼼짝 못하겠어.	I'm up to my ears in work.
+일상 | 난 죽어라 일만 해.	I work my butt off.
+일상 | 시간 진짜 빠르다.	Time really flies.
+일상 | 아 맞다, 깜빡했다.	Oh right, I totally forgot.
+일상 | 오늘은 그만하자.	Let's call it a day.
+일상 | 나 잘렸어.	I just got fired.
+일상 | 내 몸이 열 개라도 모자라.	There aren't enough hours in the day.
+일상 | 이제 나도 같은 처지네.	Welcome to my world.
+일상 | 난 최선을 다하고 있어.	I'm doing the best I can.
+일상 | 와이파이 비번 뭐야?	What's the Wi-Fi password?
+위로 | 자책하지 마.	Don't be too hard on yourself.
+위로 | 이미 엎질러진 물이야.	There's nothing you can do about it.
+위로 | 전화위복이 될 수도 있어.	Maybe it's a blessing in disguise.
+위로 | 겁먹고 도망치지 마.	Don't chicken out.
+위로 | 안전 구역에서 나와봐.	Get out of your comfort zone.
+위로 | 그동안 참 많은 일을 겪었네.	You've come a long way.
+위로 | 너 스스로를 너무 압박해.	You put so much pressure on yourself.
+위로 | 이 또한 지나갈 거야.	This too shall pass.
+위로 | 걱정 마, 다 잘 될 거야.	Don't worry, it'll work out.
+위로 | 내 한계인가 봐.	I'm hitting a wall.
+관계 | 그 말 취소할게. 미안해.	I take that back. I'm sorry.
+관계 | 널 비난하는 게 아니야.	I'm not judging you.
+관계 | 나한테 화풀이하지 마.	Don't take it out on me.
+관계 | 기운 복돋아주려고 한 건데.	I was trying to give you a boost.
+관계 | 역시 우리는 죽이 잘 맞아.	We click very well together.
+관계 | 괜찮은 사람인데 나하고는 안 맞아.	He's a decent person, but we're not compatible.
+관계 | 고마워, 신세 졌네.	Thanks, I owe you one.
+관계 | 왜 그렇게 눈치를 봐?	Why are you walking on eggshells?
+관계 | 도대체 왜 그러는 거야?	What's got into you?
+관계 | 나한테 이러면 안 되지!	You can't do this to me.
+시간 | 지금 아니면 영영 기회 없어.	It's now or never.
+시간 | 이런 기회는 흔하지 않아.	Opportunities like this don't come often.
+시간 | 급할수록 돌아가.	A watched pot never boils.
+시간 | 계획대로 되면 좋겠다.	If everything goes according to plan...
+시간 | 15분 후에 출발할게.	I'll leave in 15 minutes.
+시간 | 2시간 후에 시작해.	It starts in two hours.
+시간 | 발등에 불 떨어졌네.	I'm running out of time.
+시간 | 모든 계획이 무효가 됐어.	All bets are off.
+음식쇼핑 | 두 명이요.	Table for two, please.
+음식쇼핑 | 추천 메뉴가 뭐예요?	What do you recommend?
+음식쇼핑 | 계산서 주세요.	Can I get the check, please?
+음식쇼핑 | 따로따로 계산해주세요.	We'd like to pay separately.
+음식쇼핑 | 포장해주세요.	Can I get this to go?
+음식쇼핑 | 그냥 구경하는 거예요.	I'm just browsing, thanks.
+음식쇼핑 | 카드 돼요?	Do you take cards?
+여행 | 여기까지 얼마예요?	How much is it to get here?
+여행 | 이 주소로 가주세요.	Could you take me to this address?
+여행 | 여기서 내려주세요.	You can drop me off here.
+여행 | 걸어서 얼마나 걸려요?	How long does it take on foot?
+여행 | 길을 잃었어요.	I'm lost.
+여행 | 체크인 하려고요.	I'd like to check in, please.
+여행 | 입국 목적이요? 여행이요.	Purpose of visit? I'm here on vacation.

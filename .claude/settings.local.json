@@ -1,7 +1,16 @@
 {
-  "autoApprove": ["Bash", "Write", "Edit"],
   "permissions": {
-    "allow": ["Bash", "Write", "Edit"],
+    "allow": [
+      "Bash",
+      "Write",
+      "Edit",
+      "Read(//c/Users/leftj/Documents/바이브 코딩/gas-nametag/**)"
+    ],
     "deny": []
-  }
+  },
+  "autoApprove": [
+    "Bash",
+    "Write",
+    "Edit"
+  ]
 }

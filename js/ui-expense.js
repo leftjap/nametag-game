@@ -1170,6 +1170,9 @@ function loadExpense(id, mode = 'normal') {
   document.getElementById('expenseCardInput' + suffix).value = e.card;
   const d = new Date(e.date + 'T' + (e.time || '00:00'));
   document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(d);
+  // 그리드 접힌 상태 보장
+  var catGrid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (catGrid) { catGrid.classList.remove('grid-open'); catGrid.style.display = 'none'; }
   selectCategory(e.category, mode);
 
   // 아이콘 매핑 자동 채우기
@@ -1233,6 +1236,30 @@ function formatExpenseAmount(input) {
   updateExpenseSaveBtn();
 }
 
+function toggleCategoryGrid(mode) {
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var chip = document.getElementById('expenseCatChip' + suffix);
+  var grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (!chip || !grid) return;
+
+  var isOpen = grid.classList.contains('grid-open');
+  if (isOpen) {
+    // 접기
+    grid.classList.remove('grid-open');
+    grid.style.display = 'none';
+    chip.classList.remove('open');
+  } else {
+    // 펼치기
+    renderExpenseCategoryGrid(mode);
+    grid.style.display = 'grid';
+    // 다음 프레임에서 클래스 추가하여 애니메이션 트리거
+    requestAnimationFrame(function() {
+      grid.classList.add('grid-open');
+    });
+    chip.classList.add('open');
+  }
+}
+
 function renderExpenseCategoryGrid(mode = 'normal') {
   const suffix = mode === 'modal' ? 'Modal' : '';
   const grid = document.getElementById('expenseCategoryGrid' + suffix);
@@ -1245,15 +1272,38 @@ function renderExpenseCategoryGrid(mode = 'normal') {
 }
 
 function selectCategory(catId, mode = 'normal') {
-  const suffix = mode === 'modal' ? 'Modal' : '';
-  const grid = document.getElementById('expenseCategoryGrid' + suffix);
-  if (!grid) return;
-  const btns = grid.querySelectorAll('.expense-cat-btn');
-  btns.forEach(btn => {
-    const isSelected = btn.getAttribute('data-cat') === catId;
-    btn.classList.toggle('selected', isSelected);
-    btn.style.borderColor = '';
-  });
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (grid) {
+    var btns = grid.querySelectorAll('.expense-cat-btn');
+    btns.forEach(function(btn) {
+      var isSelected = btn.getAttribute('data-cat') === catId;
+      btn.classList.toggle('selected', isSelected);
+      btn.style.borderColor = '';
+    });
+  }
+
+  // 칩 텍스트 갱신
+  var chip = document.getElementById('expenseCatChip' + suffix);
+  var chipText = document.getElementById('expenseCatChipText' + suffix);
+  if (chip && chipText) {
+    var catObj = EXPENSE_CATEGORIES.find(function(c) { return c.id === catId; });
+    if (catObj) {
+      // 칩 내용을 색상 도트 + 카테고리명으로 교체
+      chipText.innerHTML = '<span class="expense-cat-chip-dot" style="background:' + catObj.color + ';"></span>' + catObj.name;
+      chip.classList.add('has-value');
+    } else {
+      chipText.textContent = '카테고리 선택';
+      chip.classList.remove('has-value');
+    }
+  }
+
+  // 그리드 접기
+  if (grid && grid.classList.contains('grid-open')) {
+    grid.classList.remove('grid-open');
+    setTimeout(function() { grid.style.display = 'none'; }, 250);
+    if (chip) chip.classList.remove('open');
+  }
 }
 
 function getSelectedCategory(mode = 'normal') {
@@ -1264,15 +1314,29 @@ function getSelectedCategory(mode = 'normal') {
   return sel ? sel.getAttribute('data-cat') : 'etc';
 }
 
-function clearCategorySelection(mode = 'normal') {
-  const suffix = mode === 'modal' ? 'Modal' : '';
-  const grid = document.getElementById('expenseCategoryGrid' + suffix);
-  if (!grid) return;
-  const btns = grid.querySelectorAll('.expense-cat-btn');
-  btns.forEach(btn => {
-    btn.classList.remove('selected');
-    btn.style.borderColor = '';
-  });
+function clearCategorySelection(mode) {
+  mode = mode || 'normal';
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var grid = document.getElementById('expenseCategoryGrid' + suffix);
+  if (grid) {
+    var btns = grid.querySelectorAll('.expense-cat-btn');
+    btns.forEach(function(btn) {
+      btn.classList.remove('selected');
+      btn.style.borderColor = '';
+    });
+    // 그리드 접기
+    grid.classList.remove('grid-open');
+    grid.style.display = 'none';
+  }
+
+  // 칩 초기화
+  var chip = document.getElementById('expenseCatChip' + suffix);
+  var chipText = document.getElementById('expenseCatChipText' + suffix);
+  if (chip && chipText) {
+    chipText.textContent = '카테고리 선택';
+    chip.classList.remove('has-value');
+    chip.classList.remove('open');
+  }
 }
 
 function formatExpenseDate(d) {

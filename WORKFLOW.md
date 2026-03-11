@@ -511,6 +511,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `handleSmsPaste()` — textarea 내용 파싱 → 폼 반영
 - `prefetchClipboardForExpense(mode)` — FAB/새글 클릭 시 클립보드 사전 읽기 + SMS 자동 폼 반영
 - `deleteExpenseFromForm(mode)` — 기존 항목 삭제 (확인 대화 포함, 모바일|모달 모드 지원)
+- `toggleCategoryGrid(mode)` — 카테고리 칩 클릭 시 그리드 펼침/접힘 토글
 
 **타임라인 컨텍스트 메뉴:**
 - `showExpensePopup(expenseId, x, y)` — 타임라인 항목 우클릭/꾹누르기 팝업 (수정/삭제)
@@ -1205,4 +1206,5 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-11 | 모바일 스트릭 그리드 3열 복원, 19번 체크리스트에 스트릭 그리드 보호 규칙 추가 |
 | 2026-03-11 | 사이드바 디자인 보호 규칙 추가(10번): 어구/글개수/화살표/구분선 3플랫폼 통일 규칙, 19번 체크리스트에 badge-pill/quote-section 항목 추가 |
 | 2026-03-11 | 가계부 카테고리 AI 자동 분류: EXPENSE_CATEGORIES 12개 재구성(data.js), autoMatchCategory 규칙 업데이트(sms-parser.js/Code.gs), Gemini 2.5 Flash 연동(classifyMerchantWithGemini/reclassifyAllExpenses 추가, Code.gs), saveExpenseFromSMS에 Gemini→폴백 흐름 추가, 14번 호출 체인에 SMS 가계부 흐름 추가 |
+| 2026-03-11 | 가계부 입력 폼 카테고리 UI 변경: 그리드 항상 펼침 → 칩(선택된 태그) + 탭하면 펼치기로 변경. toggleCategoryGrid 추가, selectCategory/clearCategorySelection/loadExpense 수정, 칩 HTML(index.html) 및 CSS 추가 |
 ```
