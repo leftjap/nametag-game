@@ -319,7 +319,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 
 **전역 상수:**
 - `APP_TOKEN` — 동기화 인증 토큰
-- `K` — LocalStorage 키 객체 (docs, checks, books, quotes, memos, expenses)
+- `K` — LocalStorage 키 객체 (docs, checks, books, quotes, memos, expenses, merchantIcons, merchantAliases)
 
 **유틸 함수:**
 - `L(key)` / `S(key, val)` — LocalStorage 읽기/쓰기
@@ -380,6 +380,11 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `getMonthlyTrendAround(centerYM)` — 중심 월 기준 월별 추이
 - `getMerchantBreakdown(ym)` — 월간 상호별 지출 분석 [{merchant, amount, count, percent, category}, ...]
 - `getYearMerchantBreakdown(year)` — 연간 상호별 지출 분석 {startDate, endDate, total, merchants: [...]}
+
+**매출처 별명:**
+- `getMerchantAliases()`, `saveMerchantAliases(arr)` — 별명 매핑 읽기/쓰기
+- `setMerchantAlias(originalMerchant, alias)` — 별명 설정 (빈 문자열이면 제거)
+- `resolveAlias(merchant)` — 원본 매출처명 → 별명 변환 (매핑 없으면 원본 반환)
 
 **기타:** `getTabCount(t)`, `updateWritingStats()`, `updateBookStats()`, `showRandomQuote()`, `togglePin(type, id, e)`
 
@@ -512,6 +517,9 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `prefetchClipboardForExpense(mode)` — FAB/새글 클릭 시 클립보드 사전 읽기 + SMS 자동 폼 반영
 - `deleteExpenseFromForm(mode)` — 기존 항목 삭제 (확인 대화 포함, 모바일|모달 모드 지원)
 - `toggleCategoryGrid(mode)` — 카테고리 칩 클릭 시 그리드 펼침/접힘 토글
+- `newExpenseForm(mode)` — 새 항목 폼 초기화 (금액/매출처/카드/별명/아이콘 필드 초기화)
+- `loadExpense(id, mode)` — 기존 항목 로드 (별명 필드 자동 채우기)
+- `saveExpenseForm(mode)` — 폼 저장 (별명 매핑 저장 + 아이콘 매핑)
 
 **타임라인 컨텍스트 메뉴:**
 - `showExpensePopup(expenseId, x, y)` — 타임라인 항목 우클릭/꾹누르기 팝업 (수정/삭제)
@@ -1116,6 +1124,15 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 { "YYYY-MM-DD": { exercise: true, vitamin: false, ... } }
 ```
 
+### 매출처 별명 (K.merchantAliases)
+```
+[
+  { original: "뉴코인싱어노", alias: "노래방" },
+  { original: "스타벅스강남점", alias: "카페" },
+  ...
+]
+```
+
 ---
 
 ## 16. 동기화 호출 규칙
@@ -1209,4 +1226,5 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-11 | 가계부 카테고리 AI 자동 분류: EXPENSE_CATEGORIES 12개 재구성(data.js), autoMatchCategory 규칙 업데이트(sms-parser.js/Code.gs), Gemini 2.5 Flash 연동(classifyMerchantWithGemini/reclassifyAllExpenses 추가, Code.gs), saveExpenseFromSMS에 Gemini→폴백 흐름 추가, 14번 호출 체인에 SMS 가계부 흐름 추가 |
 | 2026-03-11 | 가계부 입력 폼 카테고리 UI 변경: 그리드 항상 펼침 → 칩(선택된 태그) + 탭하면 펼치기로 변경. toggleCategoryGrid 추가, selectCategory/clearCategorySelection/loadExpense 수정, 칩 HTML(index.html) 및 CSS 추가 |
 | 2026-03-11 | GAS 웹앱 재배포 규칙 강화: clasp push 후 재배포를 "라우팅 변경 시"에서 "항상 필수"로 변경, 템플릿에 사용자 수동 재배포 안내 필수 포함, 10번 주의사항에 재배포 항목 추가 |
+| 2026-03-11 | 매출처 별명(alias) 시스템 추가: K.merchantAliases 키 추가(storage.js), 별명 CRUD 함수 4개 추가(data.js), getMerchantBreakdown/getYearMerchantBreakdown에 별명 기준 합산 적용, getMerchantIconHtml/renderExpenseItem/openMerchantDetail에 별명 표시 적용, _renderYearlyBubbles/_renderYearlyRankList 아이콘 폴백 추가, 가계부 폼에 별명 입력 필드 추가(index.html), loadExpense/saveExpenseForm/newExpenseForm에 별명 필드 연동, WORKFLOW.md 8번/15번 업데이트 |
 ```

@@ -541,7 +541,8 @@ function getMerchantBreakdown(ym) {
   var total = expenses.reduce(function(s, e) { return s + e.amount; }, 0);
   var map = {};
   expenses.forEach(function(e) {
-    var key = (e.merchant || '미분류').trim();
+    var raw = (e.merchant || '미분류').trim();
+    var key = resolveAlias(raw);
     if (!map[key]) {
       map[key] = { merchant: key, amount: 0, count: 0, catCount: {} };
     }
@@ -588,7 +589,8 @@ function getYearMerchantBreakdown(year) {
 
   var map = {};
   yearExpenses.forEach(function(e) {
-    var key = (e.merchant || '미분류').trim();
+    var raw = (e.merchant || '미분류').trim();
+    var key = resolveAlias(raw);
     if (!map[key]) {
       map[key] = { merchant: key, amount: 0, count: 0, catCount: {} };
     }
@@ -715,6 +717,43 @@ function saveMerchantIcon(keyword, iconUrl) {
     icons.push({ keyword: keyword, icon: iconUrl });
   }
   saveMerchantIcons(icons);
+}
+
+// ═══════════════════════════════════════
+// 매출처 별명(alias) 매핑
+// ═══════════════════════════════════════
+function getMerchantAliases() {
+  return L(K.merchantAliases) || [];
+}
+
+function saveMerchantAliases(arr) {
+  S(K.merchantAliases, arr);
+}
+
+function setMerchantAlias(originalMerchant, alias) {
+  var aliases = getMerchantAliases();
+  var idx = aliases.findIndex(function(a) { return a.original === originalMerchant; });
+  if (alias && alias.trim()) {
+    if (idx !== -1) {
+      aliases[idx].alias = alias.trim();
+    } else {
+      aliases.push({ original: originalMerchant, alias: alias.trim() });
+    }
+  } else {
+    // 별명이 빈 문자열이면 해당 매핑 제거
+    if (idx !== -1) aliases.splice(idx, 1);
+  }
+  saveMerchantAliases(aliases);
+}
+
+function resolveAlias(merchant) {
+  if (!merchant) return merchant;
+  var trimmed = merchant.trim();
+  var aliases = getMerchantAliases();
+  for (var i = 0; i < aliases.length; i++) {
+    if (aliases[i].original === trimmed) return aliases[i].alias;
+  }
+  return trimmed;
 }
 
 // ═══════════════════════════════════════

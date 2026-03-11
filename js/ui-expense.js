@@ -7,8 +7,9 @@ var DEFAULT_ICON_URL = 'default-icon.jpg';
 
 function getMerchantIconHtml(item) {
   var merchant = (item.merchant || '').trim();
-  // 1. 사용자 지정 아이콘 매핑 확인
-  var iconUrl = findMerchantIcon(merchant);
+  var resolved = resolveAlias(merchant);
+  // 1. 사용자 지정 아이콘 매핑 확인 (별명 → 원본 순서로 검색)
+  var iconUrl = findMerchantIcon(resolved) || findMerchantIcon(merchant);
   // 2. 항목 자체에 icon 필드가 있으면 우선
   if (item.icon) iconUrl = item.icon;
   // 3. 아이콘 URL이 있으면 해당 이미지, 없으면 고양이
@@ -378,11 +379,12 @@ function renderWeeklyCalendar(thisYM) {
 
 // 지출 항목 하나를 HTML로 생성
 function renderExpenseItem(item, clickAction) {
+  var displayMerchant = resolveAlias((item.merchant || '').trim()) || '미분류';
   var html = '<div class="exp-tl-item" data-expense-id="' + item.id + '" onclick="' + clickAction + '">';
   html += getMerchantIconHtml(item);
   html += '<div class="exp-tl-item-left">';
   html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
-  html += '<span class="exp-tl-item-sub">' + (item.merchant || '미분류');
+  html += '<span class="exp-tl-item-sub">' + displayMerchant;
   if (item.card) html += ' | ' + item.card;
   html += '</span>';
   html += '</div>';
@@ -1146,6 +1148,8 @@ function newExpenseForm(mode = 'normal') {
   document.getElementById('expenseCardInput' + suffix).value = '';
   document.getElementById('expenseIconKeyword' + suffix).value = '';
   document.getElementById('expenseIconUrl' + suffix).value = '';
+  var aliasEl = document.getElementById('expenseAliasInput' + suffix);
+  if (aliasEl) aliasEl.value = '';
   // 상단 휴지통 버튼 숨기기
   var trashBtn = document.getElementById(mode === 'modal' ? 'expenseTrashBtnModal' : 'expenseTrashBtn');
   if (trashBtn) trashBtn.style.display = 'none';
@@ -1190,6 +1194,13 @@ function loadExpense(id, mode = 'normal') {
   } else {
     document.getElementById('expenseIconKeyword' + suffix).value = '';
     document.getElementById('expenseIconUrl' + suffix).value = '';
+  }
+
+  // 별명 자동 채우기
+  var aliasEl = document.getElementById('expenseAliasInput' + suffix);
+  if (aliasEl) {
+    var currentAlias = resolveAlias(e.merchant);
+    aliasEl.value = (currentAlias !== e.merchant.trim()) ? currentAlias : '';
   }
 
   // 기존 항목이므로 상단 휴지통 버튼 표시
@@ -1459,6 +1470,14 @@ function saveExpenseForm(mode = 'normal') {
   var iconUrl = document.getElementById('expenseIconUrl' + suffix).value.trim();
   if (iconKeyword && iconUrl) {
     saveMerchantIcon(iconKeyword, iconUrl);
+    SYNC.scheduleDatabaseSave();
+  }
+
+  // 매출처 별명 저장
+  var aliasEl = document.getElementById('expenseAliasInput' + suffix);
+  var aliasVal = aliasEl ? aliasEl.value.trim() : '';
+  if (merchant) {
+    setMerchantAlias(merchant, aliasVal);
     SYNC.scheduleDatabaseSave();
   }
 
@@ -1742,14 +1761,14 @@ function openMerchantDetail(merchant, year) {
     // 연간 모드: 해당 연도 전체 내역
     var yearStr = String(year);
     expenses = getExpenses()
-      .filter(function(e) { return e.date && e.date.startsWith(yearStr) && (e.merchant || '').trim() === merchant; })
+      .filter(function(e) { return e.date && e.date.startsWith(yearStr) && resolveAlias((e.merchant || '').trim()) === merchant; })
       .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
     titleSuffix = year + '년';
   } else {
     // 월간 모드: 현재 보고 있는 월
     var ym = getExpenseViewYM();
     expenses = getMonthExpenses(ym)
-      .filter(function(e) { return (e.merchant || '').trim() === merchant; })
+      .filter(function(e) { return resolveAlias((e.merchant || '').trim()) === merchant; })
       .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
     var parts = ym.split('-');
     var mo = parseInt(parts[1]);
@@ -2118,7 +2137,7 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
     } else {
       var iconItem = { merchant: c.item.merchant, icon: c.item.icon };
       // 파비콘만 — getMerchantIconHtml의 img 태그 크기 조정
-      var src = findMerchantIcon(c.item.merchant) || DEFAULT_ICON_URL;
+      var src = findMerchantIcon(c.item.merchant) || findMerchantIcon(resolveAlias(c.item.merchant)) || DEFAULT_ICON_URL;
       html += '<img src="' + src + '" width="' + imgSize + '" height="' + imgSize + '" style="border-radius:50%;object-fit:cover;" onerror="this.onerror=null;this.src=\'' + DEFAULT_ICON_URL + '\';">';
     }
 
@@ -2142,7 +2161,7 @@ function _renderYearlyRankList(merchants, limit, year) {
     var rankColor = 'var(--tx-m)';
     var nameWeight = rank === 1 ? '600' : '400';
 
-    var src = findMerchantIcon(m.merchant) || DEFAULT_ICON_URL;
+    var src = findMerchantIcon(m.merchant) || findMerchantIcon(resolveAlias(m.merchant)) || DEFAULT_ICON_URL;
 
     html += '<div class="exp-yearly-rank-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')">';
 
