@@ -1154,7 +1154,6 @@ function newExpenseForm(mode = 'normal') {
   document.getElementById('expenseAmountInput' + suffix).value = '';
   document.getElementById('expenseMerchantInput' + suffix).value = '';
   document.getElementById('expenseCardInput' + suffix).value = '';
-  document.getElementById('expenseIconKeyword' + suffix).value = '';
   document.getElementById('expenseIconUrl' + suffix).value = '';
   var aliasEl = document.getElementById('expenseAliasInput' + suffix);
   if (aliasEl) aliasEl.value = '';
@@ -1190,17 +1189,8 @@ function loadExpense(id, mode = 'normal') {
   // 아이콘 매핑 자동 채우기
   var existingIcon = findMerchantIcon(e.merchant);
   if (existingIcon) {
-    var icons = getMerchantIcons();
-    icons.sort(function(a, b) { return b.keyword.length - a.keyword.length; });
-    for (var mi = 0; mi < icons.length; mi++) {
-      if (e.merchant.indexOf(icons[mi].keyword) !== -1) {
-        document.getElementById('expenseIconKeyword' + suffix).value = icons[mi].keyword;
-        document.getElementById('expenseIconUrl' + suffix).value = icons[mi].icon;
-        break;
-      }
-    }
+    document.getElementById('expenseIconUrl' + suffix).value = existingIcon;
   } else {
-    document.getElementById('expenseIconKeyword' + suffix).value = '';
     document.getElementById('expenseIconUrl' + suffix).value = '';
   }
 
@@ -1474,7 +1464,6 @@ function saveExpenseForm(mode = 'normal') {
   }
 
   // 매출처 아이콘 매핑 저장
-  var iconKeyword = document.getElementById('expenseIconKeyword' + suffix).value.trim();
   var iconUrl = document.getElementById('expenseIconUrl' + suffix).value.trim();
   if (iconUrl && !iconUrl.match(/^https?:\/\//)) {
     var urlInput = document.getElementById('expenseIconUrl' + suffix);
@@ -1483,8 +1472,8 @@ function saveExpenseForm(mode = 'normal') {
     if (errorEl) errorEl.classList.add('show');
     return;
   }
-  if (iconKeyword && iconUrl) {
-    saveMerchantIcon(iconKeyword, iconUrl);
+  if (merchant && iconUrl) {
+    saveMerchantIcon(merchant, iconUrl);
     SYNC.scheduleDatabaseSave();
   }
 
