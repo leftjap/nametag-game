@@ -210,7 +210,7 @@ Code.gs를 수정하는 작업지시서에는 반드시 `clasp push` Step을 포
 
 **양쪽 모두 수정한 경우** (예: sync.js의 action 이름 변경 + Code.gs의 switch 분기 추가), GAS 배포가 먼저 성공한 뒤 Git 커밋 & 푸시를 실행한다. GAS 배포가 실패하면 클라이언트 코드도 푸시하지 않는다.
 
-**`clasp push` 후 웹앱 재배포가 필요한 경우:** `doGet` 또는 `doPost`의 라우팅이 바뀌거나 새 action이 추가된 경우, `clasp push`만으로는 웹앱 URL에 반영되지 않는다. 이때는 Step에 재배포 안내를 포함한다.
+**`clasp push` 후 웹앱 재배포는 항상 필요하다.** GAS 웹앱은 특정 배포 버전에 고정되어 있어, `clasp push`만으로는 웹앱 URL에 최신 코드가 반영되지 않는다. Code.gs를 수정하는 모든 작업지시서의 `clasp push` Step에 재배포 안내를 필수로 포함한다. 재배포는 사용자가 GAS 편집기에서 수동으로 실행한다.
 
 **템플릿:**
 
@@ -224,7 +224,7 @@ Code.gs를 수정하는 작업지시서에는 반드시 `clasp push` Step을 포
   ```
 - 완료 확인: `clasp push` 출력에 "Pushed N files."가 표시된다.
 - 실패 시: 에러 메시지를 사용자에게 보고하고 작업을 중단한다.
-- [웹앱 재배포 필요 시] 안내: GAS 편집기(https://script.google.com)에서 배포 > 배포 관리 > 새 버전으로 배포를 실행하세요.
+- **웹앱 재배포 (사용자 수동 실행):** GAS 편집기(https://script.google.com)에서 배포 > 배포 관리 > 연필 아이콘 > 버전: 새 버전 > 배포를 실행하세요. 이 단계를 생략하면 iOS 단축어 등 외부 호출에 최신 코드가 반영되지 않습니다.
 ```
 
 ### 작업 실패 시 WORKFLOW.md 처리
@@ -944,6 +944,7 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 - GAS 함수 내부의 스프레드시트 ID, 폴더명 등 상수를 변경할 때는 실제 구글 드라이브의 리소스와 일치하는지 확인하는 안내를 Step에 포함한다.
 - `LockService`를 사용하는 함수(`saveDocument`, `saveRoutineToSheet`, `saveExpenseFromSMS`)를 수정할 때는 `finally` 블록의 lock 해제가 유지되는지 확인한다.
 - Code.gs는 메인 레포의 Git 관리 대상이 아니다. Code.gs 변경 사항은 `clasp push`로만 배포하며, Git 커밋 메시지에 Code.gs 변경 내용을 포함하지 않는다.
+- `clasp push`만으로는 GAS 웹앱 URL에 최신 코드가 반영되지 않는다. **Code.gs를 수정할 때마다** GAS 편집기에서 웹앱 재배포(배포 > 배포 관리 > 연필 아이콘 > 버전: 새 버전 > 배포)를 실행해야 한다. 이것은 사용자가 수동으로 수행하며, 작업지시서의 `clasp push` Step에 항상 안내를 포함한다.
 
 ### 사이드바 디자인 보호 규칙
 
@@ -1207,4 +1208,5 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-11 | 사이드바 디자인 보호 규칙 추가(10번): 어구/글개수/화살표/구분선 3플랫폼 통일 규칙, 19번 체크리스트에 badge-pill/quote-section 항목 추가 |
 | 2026-03-11 | 가계부 카테고리 AI 자동 분류: EXPENSE_CATEGORIES 12개 재구성(data.js), autoMatchCategory 규칙 업데이트(sms-parser.js/Code.gs), Gemini 2.5 Flash 연동(classifyMerchantWithGemini/reclassifyAllExpenses 추가, Code.gs), saveExpenseFromSMS에 Gemini→폴백 흐름 추가, 14번 호출 체인에 SMS 가계부 흐름 추가 |
 | 2026-03-11 | 가계부 입력 폼 카테고리 UI 변경: 그리드 항상 펼침 → 칩(선택된 태그) + 탭하면 펼치기로 변경. toggleCategoryGrid 추가, selectCategory/clearCategorySelection/loadExpense 수정, 칩 HTML(index.html) 및 CSS 추가 |
+| 2026-03-11 | GAS 웹앱 재배포 규칙 강화: clasp push 후 재배포를 "라우팅 변경 시"에서 "항상 필수"로 변경, 템플릿에 사용자 수동 재배포 안내 필수 포함, 10번 주의사항에 재배포 항목 추가 |
 ```
