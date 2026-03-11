@@ -1733,17 +1733,31 @@ function _escMerchant(str) {
   return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
-// 상호 클릭 → 해당 상호의 월간 내역을 플로팅 팝업으로 표시
-function openMerchantDetail(merchant) {
-  var ym = getExpenseViewYM();
-  var expenses = getMonthExpenses(ym)
-    .filter(function(e) { return (e.merchant || '').trim() === merchant; })
-    .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
+// 상호 클릭 → 해당 상호의 월간/연간 내역을 플로팅 팝업으로 표시
+function openMerchantDetail(merchant, year) {
+  var expenses;
+  var titleSuffix;
+
+  if (year) {
+    // 연간 모드: 해당 연도 전체 내역
+    var yearStr = String(year);
+    expenses = getExpenses()
+      .filter(function(e) { return e.date && e.date.startsWith(yearStr) && (e.merchant || '').trim() === merchant; })
+      .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
+    titleSuffix = year + '년';
+  } else {
+    // 월간 모드: 현재 보고 있는 월
+    var ym = getExpenseViewYM();
+    expenses = getMonthExpenses(ym)
+      .filter(function(e) { return (e.merchant || '').trim() === merchant; })
+      .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
+    var parts = ym.split('-');
+    var mo = parseInt(parts[1]);
+    titleSuffix = mo + '월';
+  }
 
   var total = expenses.reduce(function(s, e) { return s + e.amount; }, 0);
-  var parts = ym.split('-');
-  var mo = parseInt(parts[1]);
-  var title = merchant + ' · ' + mo + '월';
+  var title = merchant + ' · ' + titleSuffix;
 
   var contentHtml = '';
 
@@ -1954,7 +1968,7 @@ function renderYearlySection(year) {
 
   // 랭킹 리스트 (10개)
   var rankLimit = Math.min(10, merchants.length);
-  html += _renderYearlyRankList(merchants, rankLimit);
+  html += _renderYearlyRankList(merchants, rankLimit, year);
 
   // "전체 순위 보기" 버튼 (10개 초과 시)
   if (merchants.length > 10) {
@@ -1968,9 +1982,10 @@ function renderYearlySection(year) {
 }
 
 // 연간 그리드 아이템 HTML 생성 (공통)
-function _renderYearlyGridItem(m, rank) {
+function _renderYearlyGridItem(m, rank, year) {
   var iconItem = { merchant: m.merchant, icon: null };
-  var html = '<div class="exp-yearly-grid-item" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')">';
+  var onclickYear = year ? ',' + year : '';
+  var html = '<div class="exp-yearly-grid-item" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\'' + onclickYear + ')">';
   html += '<div class="exp-yearly-grid-rank">' + rank + '</div>';
   html += '<div class="exp-yearly-grid-icon">' + getMerchantIconHtml(iconItem) + '</div>';
   html += '<div class="exp-yearly-grid-row"><span class="exp-yearly-grid-name">' + m.merchant + '</span><span class="exp-yearly-grid-amount">' + formatAmount(m.amount) + '원</span></div>';
@@ -2080,9 +2095,10 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
     var top = Math.round(c.y - c.r);
     var imgSize = Math.round(c.r * 2 - 4);
 
+    var yearVal = new Date(getExpenseViewYM() + '-01').getFullYear();
     var onclick = c.item.isEtc
-      ? 'openYearlyFullPopup(' + new Date(getExpenseViewYM() + "-01").getFullYear() + ')'
-      : 'openMerchantDetail(\'' + _escMerchant(c.item.merchant) + '\')';
+      ? 'openYearlyFullPopup(' + yearVal + ')'
+      : 'openMerchantDetail(\'' + _escMerchant(c.item.merchant) + '\',' + yearVal + ')';
 
     html += '<div class="exp-yearly-bubble" onclick="' + onclick + '" style="'
       + 'position:absolute;'
@@ -2114,7 +2130,7 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
 }
 
 // 랭킹 리스트 HTML 생성
-function _renderYearlyRankList(merchants, limit) {
+function _renderYearlyRankList(merchants, limit, year) {
   var showList = merchants.slice(0, limit);
 
   var html = '<div class="exp-yearly-rank-list">';
@@ -2128,7 +2144,7 @@ function _renderYearlyRankList(merchants, limit) {
 
     var src = findMerchantIcon(m.merchant) || DEFAULT_ICON_URL;
 
-    html += '<div class="exp-yearly-rank-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')">';
+    html += '<div class="exp-yearly-rank-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')">';
 
     html += '<span class="exp-yearly-rank-num" style="font-size:' + rankSize + ';font-weight:' + rankWeight + ';color:' + rankColor + ';">' + rank + '</span>';
 
