@@ -705,6 +705,13 @@ function findMerchantIcon(merchant) {
   for (var i = 0; i < icons.length; i++) {
     if (merchant.indexOf(icons[i].keyword) !== -1) return icons[i].icon;
   }
+  // 별명→원본 역조회 후 재검색
+  var originals = reverseAlias(merchant);
+  for (var j = 0; j < originals.length; j++) {
+    for (var k = 0; k < icons.length; k++) {
+      if (originals[j].indexOf(icons[k].keyword) !== -1) return icons[k].icon;
+    }
+  }
   return null;
 }
 
@@ -754,6 +761,19 @@ function resolveAlias(merchant) {
     if (aliases[i].original === trimmed) return aliases[i].alias;
   }
   return trimmed;
+}
+
+function reverseAlias(alias) {
+  if (!alias) return [];
+  var trimmed = alias.trim();
+  var aliases = getMerchantAliases();
+  var originals = [];
+  for (var i = 0; i < aliases.length; i++) {
+    if (aliases[i].alias === trimmed) {
+      originals.push(aliases[i].original);
+    }
+  }
+  return originals;
 }
 
 // ═══════════════════════════════════════

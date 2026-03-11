@@ -385,6 +385,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `getMerchantAliases()`, `saveMerchantAliases(arr)` — 별명 매핑 읽기/쓰기
 - `setMerchantAlias(originalMerchant, alias)` — 별명 설정 (빈 문자열이면 제거)
 - `resolveAlias(merchant)` — 원본 매출처명 → 별명 변환 (매핑 없으면 원본 반환)
+- `reverseAlias(alias)` — 별명 → 원본 매출처명 배열 반환 (역조회, 같은 별명에 여러 원본 가능)
 
 **기타:** `getTabCount(t)`, `updateWritingStats()`, `updateBookStats()`, `showRandomQuote()`, `togglePin(type, id, e)`
 
