@@ -6,6 +6,7 @@
 let CARD_NAME_MAP = {
   '삼성1337': '삼성카드 & MILEAGE PLATINUM',
   '삼성2737': '삼성카드 iD SIMPLE',
+  '삼성': '삼성카드 iD SIMPLE',
   '신한8244': '신한카드 Air',
   '신한8579': 'K-패스 신한카드 체크'
 };
@@ -30,12 +31,19 @@ function parseSMS(text) {
   result.amount = parseInt(amountMatch[1].replace(/,/g, ''));
   if (result.amount <= 0) return null;
 
-  // 카드사 + 번호 매핑: "삼성1337", "신한카드(8244)", "[신한체크승인] 김*연(8579)" 등
-  const cardNumMatch = text.match(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)\D{0,20}(\d{4})/);
+  // 카드사 + 번호: "삼성1337" (연속), "신한카드(8244)" 또는 "[신한체크승인] 김*연(8579)" (괄호)
+  let cardNumMatch = text.match(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)(\d{4})/);
+  if (!cardNumMatch) {
+    const bracketMatch = text.match(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)[^(]{0,20}\((\d{4})\)/);
+    if (bracketMatch) cardNumMatch = bracketMatch;
+  }
   if (cardNumMatch) {
     const shortKey = cardNumMatch[1] + cardNumMatch[2];
     if (CARD_NAME_MAP[shortKey]) {
       result.card = CARD_NAME_MAP[shortKey];
+    } else if (CARD_NAME_MAP[cardNumMatch[1]]) {
+      // 번호 매핑이 없으면 카드사명만으로 폴백
+      result.card = CARD_NAME_MAP[cardNumMatch[1]];
     } else {
       const defaultCardNames = {
         '삼성': '삼성카드', '신한': '신한카드', '국민': 'KB국민카드',
