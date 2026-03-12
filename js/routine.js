@@ -2,7 +2,7 @@
 // routine.js — 데일리 루틴 데이터 + 렌더링
 // ═══════════════════════════════════════
 
-const ROUTINE_META = [
+let ROUTINE_META = [
   { id:'exercise', name:'운동',    color:'#e87461', bg:'#fdf1ef' },
   { id:'vitamin',  name:'영양제',  color:'#f0a848', bg:'#fef6eb' },
   { id:'english',  name:'영어',    color:'#5a8ec4', bg:'#eff3f9' },

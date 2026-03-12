@@ -112,14 +112,19 @@ function setTagSearch(tag) {
 function renderWritingGrid() {
   const nav = document.getElementById('sideNav');
   if (!nav) return;
-  const tabs = [
-    { id:'navi',    label:'오늘의 네비' },
-    { id:'fiction', label:'단편 습작'   },
-    { id:'blog',    label:'블로그'      },
-    { id:'book',    label:'서재'        },
-    { id:'quote',   label:'어구'        },
-    { id:'memo',    label:'메모'        }
-  ];
+  // config.tabs에서 expense를 제외한 탭 목록 동적 생성
+  var allTabs = Object.keys(TAB_META);
+  var tabs = [];
+  // textTypes 먼저, 그 다음 나머지 (expense 제외)
+  var ordered = [];
+  textTypes.forEach(function(t) { ordered.push(t); });
+  allTabs.forEach(function(t) {
+    if (t !== 'expense' && ordered.indexOf(t) === -1) ordered.push(t);
+  });
+  ordered.forEach(function(id) {
+    if (id === 'expense') return;
+    tabs.push({ id: id, label: TAB_META[id] || id });
+  });
   nav.innerHTML = tabs.map(t => {
     const count = getTabCount(t.id);
     return `

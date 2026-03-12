@@ -4,20 +4,14 @@
 
 // ═══ 인증 ═══
 const GOOGLE_CLIENT_ID = '910366325974-3ollm3pose37r1fvv8ngnd0v09f2p57l.apps.googleusercontent.com';
-const ALLOWED_EMAIL    = 'leftjap@gmail.com';
 
 function handleCredentialResponse(response) {
   try {
-    const jwt     = response.credential;
-    const payload = JSON.parse(atob(jwt.split('.')[1]));
-    if (payload.email === ALLOWED_EMAIL) {
-      localStorage.setItem('gb_auth',     '1');
-      localStorage.setItem('gb_id_token', jwt);
-      document.getElementById('lockScreen').classList.add('hidden');
-      showApp();
-    } else {
-      document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
-    }
+    const jwt = response.credential;
+    localStorage.setItem('gb_auth',     '1');
+    localStorage.setItem('gb_id_token', jwt);
+    document.getElementById('lockScreen').classList.add('hidden');
+    showApp();
   } catch (e) {
     document.getElementById('lockErr').textContent = '로그인 처리 중 오류가 발생했습니다.';
   }
@@ -45,7 +39,27 @@ async function showApp() {
   const loading = document.getElementById('loadingScreen');
   loading.classList.remove('hidden');
   SYNC.setSyncStatus('동기화 중', 'syncing');
-  await SYNC.loadDatabase();
+
+  var serverConfig = null;
+  try {
+    serverConfig = await SYNC.loadDatabase();
+  } catch (e) {
+    if (e && e.message === 'Unauthorized') {
+      // 인증 실패: 로컬 토큰 삭제 후 로그인 화면으로
+      localStorage.removeItem('gb_auth');
+      localStorage.removeItem('gb_id_token');
+      loading.classList.add('hidden');
+      document.getElementById('lockScreen').classList.remove('hidden');
+      document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
+      return;
+    }
+  }
+
+  // 서버 config 적용 (사용자별 탭/루틴/카테고리)
+  if (serverConfig) {
+    applyServerConfig(serverConfig);
+  }
+
   injectMockData();
   injectExpenseMockData();
   // 태블릿뷰: ed-topbar-right를 body로 이동하여 스와이프 영향 차단
@@ -134,7 +148,7 @@ function setupTabletGestures() {}
 // ═══ 앱 초기화 ═══
 function init() {
   try {
-    applyTabColor('navi');
+    applyTabColor(activeTab);
     renderChk();
     renderRoutineRing();
     updateBookStats();
@@ -164,10 +178,11 @@ function init() {
     setupListContextMenu();
     setupExpenseContextMenu();
 
-    // 초기 문서 로드
-    const naviDocs = getDocs('navi');
-    if (naviDocs.length) loadDoc('navi', naviDocs[0].id, true);
-    else { const nd = newDoc('navi'); loadDoc('navi', nd.id, true); }
+    // 초기 문서 로드 (동적 첫 번째 텍스트 탭)
+    var initialTab = textTypes[0] || 'navi';
+    var initialDocs = getDocs(initialTab);
+    if (initialDocs.length) loadDoc(initialTab, initialDocs[0].id, true);
+    else { var nd = newDoc(initialTab); loadDoc(initialTab, nd.id, true); }
 
     updateEdTabLabel();
 

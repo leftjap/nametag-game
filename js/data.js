@@ -4,8 +4,8 @@
 
 // ═══ 상태 변수 ═══
 let activeTab = 'navi';
-const textTypes = ['navi', 'fiction', 'blog'];
-const TAB_META  = {
+let textTypes = ['navi', 'fiction', 'blog'];
+let TAB_META  = {
   navi: '오늘의 네비', fiction: '단편 습작', blog: '블로그',
   book: '서재', quote: '어구', memo: '메모', expense: '가계부'
 };
@@ -671,7 +671,7 @@ function hasRoutineDataInMonth(ym) {
 // ═══════════════════════════════════════
 // 가계부 카테고리 상수
 // ═══════════════════════════════════════
-const EXPENSE_CATEGORIES = [
+let EXPENSE_CATEGORIES = [
   { id: 'food',      name: '식비',       color: '#E55643', bg: '#E55643' },
   { id: 'dining',    name: '외식/배달',  color: '#E8845A', bg: '#E8845A' },
   { id: 'shopping',  name: '쇼핑',       color: '#D4789A', bg: '#D4789A' },
@@ -774,6 +774,101 @@ function reverseAlias(alias) {
     }
   }
   return originals;
+}
+
+// ═══════════════════════════════════════
+// 서버 config 동적 적용
+// ═══════════════════════════════════════
+function applyServerConfig(config) {
+  if (!config) return;
+
+  // 탭 구성
+  if (config.textTypes && Array.isArray(config.textTypes)) {
+    textTypes = config.textTypes;
+  }
+  if (config.tabNames && typeof config.tabNames === 'object') {
+    TAB_META = Object.assign({}, config.tabNames);
+    // expense는 tabNames에 없을 수 있으므로 보장
+    if (!TAB_META.expense) TAB_META.expense = '가계부';
+  }
+
+  // 초기 activeTab을 config.tabs의 첫 번째 항목으로 설정
+  if (config.tabs && config.tabs.length > 0) {
+    // textTypes에 포함된 첫 번째 탭을 기본 탭으로 설정
+    var firstTextTab = null;
+    for (var i = 0; i < config.tabs.length; i++) {
+      if (textTypes.indexOf(config.tabs[i]) !== -1) {
+        firstTextTab = config.tabs[i];
+        break;
+      }
+    }
+    if (firstTextTab) {
+      activeTab = firstTextTab;
+    }
+  }
+
+  // 루틴
+  if (config.routines && Array.isArray(config.routines)) {
+    ROUTINE_META = config.routines.map(function(r) {
+      return {
+        id:    r.id,
+        name:  r.name,
+        color: r.color || '#E55643',
+        bg:    r.bg || '#fdf1ef'
+      };
+    });
+  }
+
+  // 가계부 카테고리
+  if (config.expenseCategories && Array.isArray(config.expenseCategories)) {
+    EXPENSE_CATEGORIES = config.expenseCategories.map(function(c) {
+      // 서버에서 color/bg가 올 수도 있고, id만 올 수도 있음
+      // 기존 EXPENSE_CATEGORIES의 color/bg를 id로 매칭하여 재사용
+      var existing = null;
+      var defaultCats = [
+        { id: 'food', color: '#E55643', bg: '#E55643' },
+        { id: 'dining', color: '#E8845A', bg: '#E8845A' },
+        { id: 'shopping', color: '#D4789A', bg: '#D4789A' },
+        { id: 'transport', color: '#5A8EC4', bg: '#5A8EC4' },
+        { id: 'subscribe', color: '#F0A848', bg: '#F0A848' },
+        { id: 'medical', color: '#6AB0A0', bg: '#6AB0A0' },
+        { id: 'leisure', color: '#9A6CB8', bg: '#9A6CB8' },
+        { id: 'beauty', color: '#C4885A', bg: '#C4885A' },
+        { id: 'pet', color: '#E87461', bg: '#E87461' },
+        { id: 'invest', color: '#5B6ABF', bg: '#5B6ABF' },
+        { id: 'utility', color: '#8B8B8B', bg: '#8B8B8B' },
+        { id: 'etc', color: '#B0B0B8', bg: '#B0B0B8' },
+        // 아내 전용 카테고리 기본색
+        { id: 'cafe', color: '#C4885A', bg: '#C4885A' },
+        { id: 'convenience', color: '#F0A848', bg: '#F0A848' },
+        { id: 'cat', color: '#E87461', bg: '#E87461' },
+        { id: 'health', color: '#6AB0A0', bg: '#6AB0A0' },
+        { id: 'culture', color: '#9A6CB8', bg: '#9A6CB8' },
+        { id: 'fashion', color: '#D4789A', bg: '#D4789A' },
+        { id: 'gift', color: '#E8845A', bg: '#E8845A' },
+        { id: 'overseas', color: '#5A8EC4', bg: '#5A8EC4' }
+      ];
+      for (var j = 0; j < defaultCats.length; j++) {
+        if (defaultCats[j].id === c.id) { existing = defaultCats[j]; break; }
+      }
+      return {
+        id:    c.id,
+        name:  c.name,
+        color: c.color || (existing ? existing.color : '#B0B0B8'),
+        bg:    c.bg || (existing ? existing.bg : '#B0B0B8')
+      };
+    });
+  }
+
+  // 카드 매핑 (sms-parser.js의 CARD_NAME_MAP 덮어쓰기)
+  if (config.cardNameMap && typeof config.cardNameMap === 'object') {
+    CARD_NAME_MAP = config.cardNameMap;
+  }
+
+  // folderMap 저장 (sync.js에서 사용)
+  if (config.folderMap) {
+    window._serverFolderMap = config.folderMap;
+  }
 }
 
 // ═══════════════════════════════════════

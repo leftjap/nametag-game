@@ -79,17 +79,24 @@ const SYNC = {
         if (db[K.checks])  S(K.checks,  db[K.checks]);
         if (db[K.expenses]) S(K.expenses, db[K.expenses]);
         if (db[K.merchantIcons]) S(K.merchantIcons, db[K.merchantIcons]);
+        if (db[K.merchantAliases]) S(K.merchantAliases, db[K.merchantAliases]);
         this.isDbLoaded = true;
         this.setSyncStatus('동기화 완료', 'ok');
+        return res.config || null;
       } else {
         this.isDbLoaded = true;
         this.setSyncStatus('신규 상태', 'ok');
+        return null;
       }
     } catch (e) {
+      if (e.message === 'Unauthorized') {
+        throw e; // showApp()에서 처리
+      }
       this.isDbLoaded = true;
       if (e.message === 'LocalMode') this.setSyncStatus('로컬 전용', 'error');
       else this.setSyncStatus('불러오기 실패', 'error');
       console.warn('loadDatabase 실패:', e.message);
+      return null;
     }
   },
 
@@ -97,13 +104,14 @@ const SYNC = {
     if (!this.isDbLoaded) return;
     try {
       const dbData = {
-        [K.docs]:          L(K.docs)          || [],
-        [K.books]:         L(K.books)         || [],
-        [K.memos]:         L(K.memos)         || [],
-        [K.quotes]:        L(K.quotes)        || [],
-        [K.checks]:        L(K.checks)        || {},
-        [K.expenses]:      L(K.expenses)      || [],
-        [K.merchantIcons]: L(K.merchantIcons) || []
+        [K.docs]:            L(K.docs)            || [],
+        [K.books]:           L(K.books)           || [],
+        [K.memos]:           L(K.memos)           || [],
+        [K.quotes]:          L(K.quotes)          || [],
+        [K.checks]:          L(K.checks)          || {},
+        [K.expenses]:        L(K.expenses)        || [],
+        [K.merchantIcons]:   L(K.merchantIcons)   || [],
+        [K.merchantAliases]: L(K.merchantAliases) || []
       };
       await this._post({ action: 'save_db', dbData });
     } catch (e) {
