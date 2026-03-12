@@ -4,7 +4,10 @@
 
 // 카드번호 → 풀네임 매핑
 let CARD_NAME_MAP = {
-  '삼성1337': '삼성카드 & MILEAGE PLATINUM'
+  '삼성1337': '삼성카드 & MILEAGE PLATINUM',
+  '삼성2737': '삼성카드 iD SIMPLE',
+  '신한8244': '신한카드 Air',
+  '신한8579': 'K-패스 신한카드 체크'
 };
 
 function parseSMS(text) {
@@ -12,6 +15,9 @@ function parseSMS(text) {
 
   // 거절/취소 문자는 무시
   if (/거절|취소/.test(text)) return null;
+
+  // 명세서/결제예정 안내 문자는 무시 (실제 결제가 아님)
+  if (/명세서|결제금액.*기준/.test(text)) return null;
 
   const result = {
     amount: 0, merchant: '', card: '',
@@ -24,8 +30,8 @@ function parseSMS(text) {
   result.amount = parseInt(amountMatch[1].replace(/,/g, ''));
   if (result.amount <= 0) return null;
 
-  // 카드사 + 번호 매핑 (예: "삼성1337승인" → "삼성카드 & MILEAGE PLATINUM")
-  const cardNumMatch = text.match(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)(\d{4})/);
+  // 카드사 + 번호 매핑: "삼성1337", "신한카드(8244)", "[신한체크승인] 김*연(8579)" 등
+  const cardNumMatch = text.match(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)\D{0,20}(\d{4})/);
   if (cardNumMatch) {
     const shortKey = cardNumMatch[1] + cardNumMatch[2];
     if (CARD_NAME_MAP[shortKey]) {
@@ -40,6 +46,7 @@ function parseSMS(text) {
     }
   } else {
     const cardPatterns = [
+      '현대백화점카드',
       '신한카드','삼성카드','국민카드','KB국민','KB카드',
       '현대카드','롯데카드','하나카드','NH카드','NH농협',
       '우리카드','BC카드','씨티카드','카카오페이','네이버페이',
