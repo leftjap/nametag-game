@@ -2063,8 +2063,8 @@ function _packCircles(items, containerW, containerH) {
     circles[i].y = cy + Math.sin(angle) * dist * 0.6;
   }
 
-  // 간단한 force simulation (50회 반복)
-  for (var iter = 0; iter < 60; iter++) {
+  // 간단한 force simulation (80회 반복)
+  for (var iter = 0; iter < 80; iter++) {
     // 원끼리 겹침 해소
     for (var i = 0; i < circles.length; i++) {
       for (var j = i + 1; j < circles.length; j++) {
@@ -2103,15 +2103,15 @@ function _packCircles(items, containerW, containerH) {
 
 // 버블 차트 HTML 생성
 function _renderYearlyBubbles(merchants, containerW, containerH) {
-  // 상위 10개 + 나머지를 "기타"로 묶기
-  var bubbleItems = merchants.slice(0, 10).map(function(m) {
+  // 상위 15개 + 나머지를 "기타"로 묶기
+  var bubbleItems = merchants.slice(0, 15).map(function(m) {
     return { merchant: m.merchant, amount: m.amount, category: m.category, icon: null };
   });
 
   // 기타 묶기
-  if (merchants.length > 10) {
+  if (merchants.length > 15) {
     var etcAmount = 0;
-    for (var i = 10; i < merchants.length; i++) etcAmount += merchants[i].amount;
+    for (var i = 15; i < merchants.length; i++) etcAmount += merchants[i].amount;
     if (etcAmount > 0) {
       bubbleItems.push({ merchant: '기타', amount: etcAmount, category: 'etc', icon: null, isEtc: true });
     }
@@ -2132,7 +2132,7 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
 
     var yearVal = new Date(getExpenseViewYM() + '-01').getFullYear();
     var onclick = c.item.isEtc
-      ? 'openYearlyFullPopup(' + yearVal + ',10)'
+      ? 'openYearlyFullPopup(' + yearVal + ',15)'
       : 'openMerchantDetail(\'' + _escMerchant(c.item.merchant) + '\',' + yearVal + ')';
 
     html += '<div class="exp-yearly-bubble" onclick="' + onclick + '" style="'
@@ -2142,8 +2142,8 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
       + 'width:' + size + 'px;'
       + 'height:' + size + 'px;'
       + 'border-radius:50%;'
-      + 'background:' + bgColor + ';'
-      + 'border:2.5px solid #fff;'
+      + 'background:' + bgColor + ';opacity:0.9;'
+      + 'box-shadow:0 2px 8px rgba(0,0,0,0.12);'
       + 'display:flex;align-items:center;justify-content:center;'
       + 'cursor:pointer;transition:transform .15s,box-shadow .15s;'
       + '">';
