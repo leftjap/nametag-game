@@ -1020,6 +1020,7 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 | currentListView | data.js | 리스트 뷰 모드 (list/photo/calendar) |
 | _expenseViewYM | ui-expense.js | 가계부에서 보고 있는 월 |
 | _selectedExpenseDate | ui-expense.js | 가계부 캘린더 선택 날짜 |
+| _yearlyRankLoaded | ui-expense.js | 연간 랭킹 현재 로드된 개수 |
 | _expenseCategoryFilter | ui-expense.js | 가계부 카테고리 필터 ID |
 | _expenseCategoryFilterName | ui-expense.js | 가계부 카테고리 필터 이름 |
 | _expenseDetailSearchQuery | ui-expense.js | 가계부 전체 내역 검색어 |

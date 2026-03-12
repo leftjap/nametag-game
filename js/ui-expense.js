@@ -652,6 +652,7 @@ function onExpenseModalOverlayClick(e) {
 // 월 이동 상태 관리
 // ═══════════════════════════════════════
 var _expenseViewYM = null;
+var _yearlyRankLoaded = 10;
 
 function getExpenseViewYM() {
   if (!_expenseViewYM) _expenseViewYM = today().slice(0, 7);
@@ -688,6 +689,7 @@ function renderCategoryBarCompact(catBreakdown, total) {
 // ═══════════════════════════════════════
 function changeExpenseMonth(delta) {
   _selectedExpenseDate = null;
+  _yearlyRankLoaded = 10;
   var current = getExpenseViewYM();
   var nowYM = today().slice(0, 7);
 
@@ -2000,7 +2002,7 @@ function renderYearlySection(year) {
   html += _renderYearlyBubbles(merchants, containerW, containerH);
 
   // 랭킹 리스트 (10개)
-  var rankLimit = Math.min(10, merchants.length);
+  var rankLimit = Math.min(Math.max(10, _yearlyRankLoaded), merchants.length);
   html += '<div id="yearlyRankListWrap" data-year="' + year + '" data-loaded="' + rankLimit + '">';
   html += _renderYearlyRankList(merchants, rankLimit, year);
   html += '</div>';
@@ -2245,6 +2247,7 @@ function loadMoreYearlyRank() {
   // loaded 카운트 갱신
   var newLoaded = loaded + nextBatch.length;
   wrap.setAttribute('data-loaded', newLoaded);
+  _yearlyRankLoaded = newLoaded;
 
   // 더 이상 항목이 없으면 버튼 숨김
   if (newLoaded >= merchants.length && moreWrap) {
