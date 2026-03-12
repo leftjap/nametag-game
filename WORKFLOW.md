@@ -874,6 +874,68 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 
 ---
 
+### gas-nametag/Code.js (GAS 서버)
+**역할:** Google Apps Script 서버. 클라이언트 동기화, SMS 파싱, 매출처 자동 분류, Drive 파일 관리.
+
+**멀티유저 설정:**
+- `USER_CONFIG` — 사용자별 설정 객체. 각 이메일에 대해:
+  - `rootFolder` — Google Drive 루트 폴더명
+  - `routineSheetId`, `quoteSheetId`, `cardSmsSheetId` — 시트 ID (없으면 null)
+  - `cardNameMap` — 카드번호 → 카드명 매핑
+  - `folderMap` — 탭 타입 → 폴더명 매핑
+  - `routines` — 루틴 배열 [{id, name, color, bg}, ...]
+  - `tabs`, `textTypes`, `tabNames` — 탭 설정
+  - `expenseCategories` — 카테고리 배열 [{id, name}, ...]
+
+**인증:**
+- `getUserConfig(idToken, fallbackToken)` — JWT 파싱 후 USER_CONFIG에서 사용자 config 반환. 레거시 토큰 'nametag2026' 지원.
+
+**웹 라우터:**
+- `doPost(e)` — 모든 POST 요청 진입점. getUserConfig로 사용자 인증 → config 기반 함수 호출
+- `doGet(e)` — 매출처 로고 검색 (Google Custom Search API)
+
+**폴더/DB 유틸 (config 의존):**
+- `getOrCreateFolder(parent, name)` — 공용, config 불필요
+- `getSubFolder(name, config)` — config.rootFolder 기반 서브폴더 조회
+- `getDatabaseFile(config)` — app_database.json 파일 조회/생성
+
+**문서 저장:**
+- `saveDocument(docId, driveId, folderName, title, content, config)` — 구글 드라이브 문서 저장
+
+**루틴/어구/이미지:**
+- `saveRoutineToSheet(dateStr, checks, config)` — config.routines 배열 기반 동적 컬럼 생성
+- `saveQuoteToSheet(text, by, config)` — config.quoteSheetId가 없으면 스킵
+- `uploadImageToDrive(bytes, mimeType, filename, config)` — 첨부이미지 폴더
+
+**DB 동기화:**
+- `saveDatabase(dbData, config)` — DB 저장
+- `loadDatabase(config)` — DB 로드 + 사용자 config 응답에 포함
+
+**SMS/가계부 자동 분류:**
+- `saveExpenseFromSMS(smsText, config)` — SMS 파싱 → Gemini 분류 → DB 저장
+- `parseSMSServer(text, config)` — SMS 파싱. config.cardNameMap 사용
+- `classifyMerchantWithGemini(merchant, config)` — Gemini API로 카테고리 분류. config.expenseCategories 동적 생성 프롬프트
+- `autoMatchCategoryServer(merchant, config)` — 규칙 기반 카테고리 매칭. config.expenseCategories에 없는 카테고리 건너뜀
+
+**수동 실행 유틸 함수 (GAS 편집기에서 직접 호출):**
+- `_getConfigForEmail(email)` — 헬퍼. 매개변수 없으면 기본값 'leftjap@gmail.com' 사용
+- `importCardSmsSheet(email)` — SMS 시트에서 가계부 일괄 가져오기. config.cardSmsSheetId 사용
+- `removeFakeSms(email)` — source='import' 항목만 유지 (테스트용)
+- `clearAllExpenses(email)` — 가계부 전체 삭제
+- `reclassifyAllExpenses(email)` — Gemini로 기존 가계부 일괄 재분류
+- `fixFutureExpenses(email)` — 미래 날짜 항목 보정
+
+**전역 API 키 (공용, config 불필요):**
+- `GOOGLE_CSE_API_KEY`, `GOOGLE_CSE_CX` — Google Custom Search
+- `GEMINI_API_KEY` — Gemini API
+
+**배포:**
+- `clasp push` 명령으로 배포. 웹앱 재배포는 GAS 편집기(https://script.google.com)에서 수동 실행 필요.
+
+**이 파일을 업로드해야 할 때:** 멀티유저 추가, 새 시트/폴더 추가, SMS 파싱 로직 변경, 새 카테고리 추가
+
+---
+
 ## 9. 주요 흐름 참고
 
 ### 탭 전환 흐름
@@ -1055,6 +1117,19 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 
 ## 14. 핵심 함수 호출 체인
 
+### doPost(e) [GAS 서버]
+```
+→ getUserConfig(idToken, fallbackToken) → config (멀티유저 인증)
+→ action 분기:
+  ├─ 'save_db': saveDatabase(dbData, config)
+  ├─ 'load_db': loadDatabase(config) → 응답에 config 필드 포함
+  ├─ 'save_doc': saveDocument(docId, driveId, folderName, title, content, config)
+  ├─ 'save_routine': saveRoutineToSheet(dateStr, checks, config)
+  ├─ 'save_quote': quoteSheetId 있으면 saveQuoteToSheet(text, by, config)
+  ├─ 'upload_image': uploadImageToDrive(bytes, mimeType, filename, config)
+  └─ 'save_expense_sms': saveExpenseFromSMS(smsText, config)
+```
+
 ### switchTab(t)
 ```
 → saveCurDoc() (이전 탭 저장)
@@ -1078,12 +1153,12 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 → 중복 로드 체크 → curIds 갱신 → 에디터 필드 반영 → updateWC() → updateMetaBar() → renderListPanel()
 ```
 
-### saveExpenseFromSMS(smsText) [GAS 서버]
+### saveExpenseFromSMS(smsText, config) [GAS 서버]
 ```
-→ parseSMSServer(smsText)
-→ classifyMerchantWithGemini(merchant)
-→ [실패 시] autoMatchCategoryServer(merchant)
-→ app_database.json에 expense 추가
+→ parseSMSServer(smsText, config) [config.cardNameMap 사용]
+→ classifyMerchantWithGemini(merchant, config) [config.expenseCategories 동적 프롬프트]
+→ [실패 시] autoMatchCategoryServer(merchant, config) [config.expenseCategories 필터]
+→ getDatabaseFile(config)에 expense 추가
 → [클라이언트] visibilitychange → SYNC.mergeServerExpenses() → 대시보드 리렌더
 ```
 
