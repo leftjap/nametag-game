@@ -76,6 +76,10 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
 
 /* 어구록 */
 .quote-section{padding:12px 14px}
+.quote-section.quote-hidden,
+.side .quote-section.quote-hidden {
+  display: none !important;
+}
 .q-card{
   cursor:pointer;transition:.2s;
   padding:14px 16px;

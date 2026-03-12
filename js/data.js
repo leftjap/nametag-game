@@ -872,13 +872,13 @@ function applyServerConfig(config) {
     window._serverFolderMap = config.folderMap;
   }
 
-  // 어구 섹션 표시/숨김
+  // 어구 섹션 표시/숨김 (CSS !important를 이기기 위해 클래스 기반)
   var quoteSection = document.querySelector('.quote-section');
   if (quoteSection) {
     if (config.tabs && config.tabs.indexOf('quote') === -1) {
-      quoteSection.style.display = 'none';
+      quoteSection.classList.add('quote-hidden');
     } else {
-      quoteSection.style.display = '';
+      quoteSection.classList.remove('quote-hidden');
     }
   }
 }
