@@ -5257,7 +5257,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  padding: 4px 6px;
+  padding: 6px 10px;
   cursor: pointer;
   transition: opacity .12s;
   overflow: hidden;
