@@ -2031,10 +2031,10 @@ function renderYearlySection(year) {
 
   var merchants = data.merchants;
 
-  // 날짜 표시
+  // 현재 연도 판별
   var now = new Date();
-  var monthNum = now.getMonth() + 1;
-  var dayNum = now.getDate();
+  var currentYear = now.getFullYear();
+  var isCurrentYear = (year === currentYear);
 
   // 버블 컨테이너 크기
   var containerW = Math.min(680, window.innerWidth - 80);
@@ -2044,10 +2044,22 @@ function renderYearlySection(year) {
 
   // 섹션 헤더
   html += '<div class="exp-yearly-header">';
-  if (window.innerWidth <= 768) {
-    html += '<div class="exp-yearly-title">올해 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+  if (isCurrentYear) {
+    // 현재 연도: "2026년 3월 13일까지 총 X원 쓰고 있어요"
+    var monthNum = now.getMonth() + 1;
+    var dayNum = now.getDate();
+    if (window.innerWidth <= 768) {
+      html += '<div class="exp-yearly-title">올해 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+    } else {
+      html += '<div class="exp-yearly-title">' + year + '년 ' + monthNum + '월 ' + dayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+    }
   } else {
-    html += '<div class="exp-yearly-title">' + year + '년 ' + monthNum + '월 ' + dayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+    // 과거 연도: "2025년 총 X원 썼어요"
+    if (window.innerWidth <= 768) {
+      html += '<div class="exp-yearly-title">' + year + '년 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 썼어요</div>';
+    } else {
+      html += '<div class="exp-yearly-title">' + year + '년 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 썼어요</div>';
+    }
   }
   html += '</div>';
 
