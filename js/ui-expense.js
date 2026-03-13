@@ -2771,6 +2771,12 @@ function renderCategoryTreemap(year, endYM) {
     }
   });
 
+  // 총액 대비 2% 미만 카테고리 제외 (트리맵에서 시각적으로 의미 없음)
+  var minThreshold = total * 0.02;
+  items = items.filter(function(item) {
+    return item.amount >= minThreshold;
+  });
+
   if (items.length === 0) return '';
 
   // 기타를 분리하고 나머지를 금액 내림차순 정렬
@@ -2882,12 +2888,22 @@ function renderCategoryTreemap(year, endYM) {
     // 금액 텍스트
     var amountText = Math.round(item.amount / 10000) + '만';
 
-    // 레이아웃 판단: 세로 여유 있으면 세로(이름 위 + 금액 아래), 없으면 가로(이름 + 금액 나란히)
-    var useVertical = cellPxH >= 35;
-    var showAmount = !item.isEtc; // 기타는 금액 숨김
+    // 레이아웃 판단
+    var useVertical = cellPxH >= 40;
+    var showAmount = !item.isEtc;
+    var showName = true;
 
-    // 가로 배치인데 너비도 부족하면 금액 숨김
+    // 가로 배치인데 너비 부족하면 금액 숨김
     if (!useVertical && cellPxW < 70) showAmount = false;
+
+    // 셀이 너무 작으면 금액 숨김
+    if (cellPxH < 30) showAmount = false;
+
+    // 셀이 극히 작으면 이름도 숨김 (높이 18px 미만 또는 너비 30px 미만)
+    if (cellPxH < 18 || cellPxW < 30) {
+      showName = false;
+      showAmount = false;
+    }
 
     var cellStyle = 'left:' + r.x + '%;top:' + r.y + 'px;width:' + r.w + '%;height:' + r.h + 'px;'
       + 'background:' + item.treemapColor + ';';
@@ -2901,7 +2917,9 @@ function renderCategoryTreemap(year, endYM) {
     }
 
     html += '<div class="exp-treemap-cell" onclick="openCategoryExpensePopup(\'' + item.id + '\',\'' + item.name.replace(/'/g, "\\'") + '\',' + year + ')" style="' + cellStyle + '">';
-    html += '<span class="exp-treemap-name" style="font-size:' + nameFontSize + 'px;">' + item.name + '</span>';
+    if (showName) {
+      html += '<span class="exp-treemap-name" style="font-size:' + nameFontSize + 'px;">' + item.name + '</span>';
+    }
     if (showAmount) {
       html += '<span class="exp-treemap-amount" style="font-size:' + amountFontSize + 'px;">' + amountText + '</span>';
     }
