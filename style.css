@@ -4345,8 +4345,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* 모바일: 2열 그리드 */
 @media (max-width: 768px) {
   .exp-yearly-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .exp-yearly-grid-item {
@@ -4368,8 +4368,8 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 
   .exp-yearly-grid-icon .exp-tl-item-icon,
   .exp-yearly-grid-icon .exp-tl-item-icon img {
-    width: 33px;
-    height: 33px;
+    width: 28px;
+    height: 28px;
   }
 
   .exp-yearly-grid-row {
