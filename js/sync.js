@@ -82,6 +82,13 @@ const SYNC = {
         if (db[K.merchantAliases]) S(K.merchantAliases, db[K.merchantAliases]);
         if (db[K.brandIcons]) S(K.brandIcons, db[K.brandIcons]);
         if (db[K.brandOverrides]) S(K.brandOverrides, db[K.brandOverrides]);
+
+        // 마스터 brandIcons 병합 (마스터 기본 + 사용자 것 우선)
+        if (res.masterBrandIcons && typeof res.masterBrandIcons === 'object') {
+          var merged = Object.assign({}, res.masterBrandIcons, L(K.brandIcons) || {});
+          S(K.brandIcons, merged);
+        }
+
         this.isDbLoaded = true;
         this.setSyncStatus('동기화 완료', 'ok');
         return res.config || null;
