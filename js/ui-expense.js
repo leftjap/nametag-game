@@ -1879,17 +1879,25 @@ function openMerchantDetail(merchant, year) {
   var titleSuffix;
 
   if (year) {
-    // 연간 모드: 해당 연도 전체 내역
+    // 연간 모드 — _yearlyEndYM이 있으면 해당 월까지만
     var yearStr = String(year);
+    var mdEndDate = null;
+    if (_yearlyEndYM) {
+      var mdParts = _yearlyEndYM.split('-');
+      var mdLastDay = new Date(parseInt(mdParts[0]), parseInt(mdParts[1]), 0).getDate();
+      mdEndDate = _yearlyEndYM + '-' + String(mdLastDay).padStart(2, '0');
+    }
     expenses = getExpenses()
       .filter(function(e) {
         if (!e.date || !e.date.startsWith(yearStr)) return false;
+        if (mdEndDate && e.date > mdEndDate) return false;
         if (e.brand && e.brand === merchant) return true;
         if (!e.brand && (e.merchant || '').trim() === merchant) return true;
         return false;
       })
       .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
-    titleSuffix = year + '년';
+    var mdMonth = _yearlyEndYM ? parseInt(_yearlyEndYM.split('-')[1]) : null;
+    titleSuffix = (mdMonth && mdMonth < 12 ? year + '년 1~' + mdMonth + '월' : year + '년');
   } else {
     // 월간 모드: 현재 보고 있는 월
     var ym = getExpenseViewYM();
@@ -1999,12 +2007,23 @@ function openCategoryExpensePopup(catId, catName, year) {
   var title;
 
   if (year) {
-    // 연간 모드
+    // 연간 모드 — _yearlyEndYM이 있으면 해당 월까지만
     var yearStr = String(year);
+    var endDate = null;
+    if (_yearlyEndYM) {
+      var epParts = _yearlyEndYM.split('-');
+      var epLastDay = new Date(parseInt(epParts[0]), parseInt(epParts[1]), 0).getDate();
+      endDate = _yearlyEndYM + '-' + String(epLastDay).padStart(2, '0');
+    }
     expenses = getExpenses()
-      .filter(function(e) { return e.date && e.date.startsWith(yearStr) && e.category === catId; })
+      .filter(function(e) {
+        if (!e.date || !e.date.startsWith(yearStr) || e.category !== catId) return false;
+        if (endDate && e.date > endDate) return false;
+        return true;
+      })
       .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
-    title = catName + ' · ' + year + '년';
+    var epMonth = _yearlyEndYM ? parseInt(_yearlyEndYM.split('-')[1]) : null;
+    title = catName + ' · ' + (epMonth && epMonth < 12 ? year + '년 1~' + epMonth + '월' : year + '년');
   } else {
     // 월간 모드 (기존 동작)
     var ym = getExpenseViewYM();
