@@ -2772,26 +2772,17 @@ function renderCategoryTreemap(year, endYM) {
 
   var items = [];
   EXPENSE_CATEGORIES.forEach(function(c) {
+    // 기타(etc)는 트리맵에서 제외 — 정보 가치 없음
+    if (c.id === 'etc') return;
     if (catMap[c.id] && catMap[c.id] > 0) {
       items.push({ id: c.id, name: c.name, color: c.color, amount: catMap[c.id] });
     }
   });
 
-  // 총액 대비 2% 미만 카테고리 제외
-  var minThreshold = total * 0.02;
-  items = items.filter(function(item) { return item.amount >= minThreshold; });
-
   if (items.length === 0) return '';
 
-  // 기타 분리 → 마지막에 배치
-  var etcItem = null;
-  var mainItems = [];
-  items.forEach(function(item) {
-    if (item.id === 'etc') etcItem = item;
-    else mainItems.push(item);
-  });
-  mainItems.sort(function(a, b) { return b.amount - a.amount; });
-  if (etcItem) mainItems.push(etcItem);
+  // 금액 내림차순 정렬
+  var mainItems = items.slice().sort(function(a, b) { return b.amount - a.amount; });
 
   // 코랄 단색 그라데이션 팔레트
   var coralPalette = [
@@ -2805,20 +2796,17 @@ function renderCategoryTreemap(year, endYM) {
   var adjustedItems = mainItems.map(function(item, idx) {
     var val = item.amount;
     var colorIdx = Math.min(idx, coralPalette.length - 1);
-    if (item.id === 'etc') colorIdx = coralPalette.length - 1;
     return {
       id: item.id, name: item.name,
       treemapColor: coralPalette[colorIdx],
       amount: item.amount,
-      adjusted: Math.pow(val, 0.7),
-      isEtc: item.id === 'etc'
+      adjusted: Math.pow(val, 0.7)
     };
   });
 
-  // 최소 비율 보장 (기타 제외): 전체의 5% 미만이면 5%로 올림
+  // 최소 비율 보장: 전체의 5% 미만이면 5%로 올림
   var adjustedTotal = adjustedItems.reduce(function(s, it) { return s + it.adjusted; }, 0);
   adjustedItems.forEach(function(it) {
-    if (it.isEtc) return;
     var pct = it.adjusted / adjustedTotal * 100;
     if (pct < 5) it.adjusted = adjustedTotal * 5 / 95;
   });
@@ -2885,7 +2873,7 @@ function renderCategoryTreemap(year, endYM) {
 
     // 레이아웃: 세로 배치 가능 여부
     var useVertical = cellPxH >= 42;
-    var showAmount = !item.isEtc;
+    var showAmount = true;
 
     // 가로 배치일 때 너비 부족하면 금액 숨김
     if (!useVertical && cellPxW < 75) showAmount = false;
