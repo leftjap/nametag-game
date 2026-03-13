@@ -2420,15 +2420,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* ═══ 별명 칩 목록 (가계부 폼) ═══ */
 .expense-alias-chips {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
   padding: 4px 0 12px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.expense-alias-chips::-webkit-scrollbar {
-  display: none;
 }
 
 .expense-alias-chips:empty {
