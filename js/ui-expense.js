@@ -2411,7 +2411,7 @@ function _renderYearlyRankList(merchants, limit, year) {
     }
 
     var rankOnclick = m.isEtcGroup
-      ? 'openYearlyFullPopup(' + year + ',0)'
+      ? 'openEtcGroupPopup(' + year + ')'
       : 'openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')';
     html += '<div class="exp-yearly-rank-row" onclick="' + rankOnclick + '">';
 
@@ -2481,7 +2481,7 @@ function loadMoreYearlyRank() {
     }
 
     var rankOnclick = m.isEtcGroup
-      ? 'openYearlyFullPopup(' + year + ',0)'
+      ? 'openEtcGroupPopup(' + year + ')'
       : 'openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')';
     html += '<div class="exp-yearly-rank-row" onclick="' + rankOnclick + '">';
     html += '<span class="exp-yearly-rank-num" style="font-size:' + rankSize + ';font-weight:' + rankWeight + ';color:' + rankColor + ';">' + rank + '</span>';
@@ -2565,6 +2565,46 @@ function openYearlyFullPopup(year, startFrom) {
   contentHtml += '<div class="exp-fp-footer">';
   contentHtml += '<span class="exp-fp-footer-label">' + merchants.length + '개 상호 합계</span>';
   contentHtml += '<span class="exp-fp-footer-amount">' + formatAmount(displayTotal) + '원</span>';
+  contentHtml += '</div>';
+
+  var cx = window.innerWidth / 2;
+  var cy = window.innerHeight / 2 - 50;
+  openExpenseFloatingPopup(title, contentHtml, cx, cy);
+}
+
+// "기타" 묶음 클릭 → 소액 항목 리스트 팝업
+function openEtcGroupPopup(year) {
+  var data = getYearMerchantBreakdown(year);
+  if (!data || !data.merchants) return;
+
+  var etcEntry = data.merchants.find(function(m) { return m.isEtcGroup; });
+  if (!etcEntry || !etcEntry.etcItems || etcEntry.etcItems.length === 0) return;
+
+  var items = etcEntry.etcItems.slice().sort(function(a, b) { return b.amount - a.amount; });
+  var total = items.reduce(function(s, m) { return s + m.amount; }, 0);
+  var title = '기타 · ' + year + '년 (1만원 이하)';
+
+  var contentHtml = '<div class="exp-fp-yearly-list">';
+
+  items.forEach(function(m, i) {
+    var iconItem = { merchant: m.merchant, icon: null, category: m.category };
+
+    contentHtml += '<div class="exp-fp-yearly-row" style="cursor:pointer;" onclick="closeExpenseFloatingPopup(); openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')">';
+    contentHtml += '<span class="exp-fp-yearly-rank">' + (i + 1) + '</span>';
+    contentHtml += getMerchantIconHtml(iconItem);
+    contentHtml += '<div class="exp-fp-yearly-info">';
+    contentHtml += '<div class="exp-fp-yearly-name">' + m.merchant + '</div>';
+    contentHtml += '<div class="exp-fp-yearly-meta">' + m.count + '건</div>';
+    contentHtml += '</div>';
+    contentHtml += '<div class="exp-fp-yearly-amount">' + formatAmount(m.amount) + '원</div>';
+    contentHtml += '</div>';
+  });
+
+  contentHtml += '</div>';
+
+  contentHtml += '<div class="exp-fp-footer">';
+  contentHtml += '<span class="exp-fp-footer-label">' + items.length + '개 상호 합계</span>';
+  contentHtml += '<span class="exp-fp-footer-amount">' + total.toLocaleString() + '원</span>';
   contentHtml += '</div>';
 
   var cx = window.innerWidth / 2;

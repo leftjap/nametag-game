@@ -593,6 +593,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `_renderYearlyGridItem(m, rank)` — 연간 그리드 아이템 HTML 생성 (월간 히어로 그리드에서 사용)
 - `loadMoreYearlyRank()` — 연간 랭킹 리스트 로드모어 (10개씩 추가 표시, DOM data-attribute로 카운트 관리)
 - `openYearlyFullPopup(year)` — 연간 전체 상호 리스트 팝업 (순위+파비콘+상호명+금액 리스트)
+- `openEtcGroupPopup(year)` — 연간 "기타" 묶음(1만원 이하) 클릭 시 소액 항목 리스트 팝업
 
 **주요 렌더 함수 출력 구조:**
 - `renderWeeklyCalendar()` → `.exp-week-cal > .exp-week-grid > (.exp-week-dow-row > .exp-week-dow×7) + .exp-week-day×7` + `#expWeekDaySlot`
