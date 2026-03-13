@@ -134,7 +134,7 @@ function renderExpenseDashboard(platform) {
 
     // ── 섹션 5: 연간 누적 (단순 리스트, 5위까지 + 더보기) ──
     var currentYear = ymDate.getFullYear();
-    var yearlyHtml = renderYearlySection(currentYear);
+    var yearlyHtml = renderYearlySection(currentYear, thisYM);
     if (yearlyHtml) {
       html += '<div class="exp-section-gap"></div>';
       html += '<div style="padding:0 20px;">';
@@ -192,7 +192,7 @@ function renderExpenseDashboard(platform) {
 
     // ── 섹션 5: 연간 누적 ──
     var currentYear = ymDate.getFullYear();
-    var yearlyHtml = renderYearlySection(currentYear);
+    var yearlyHtml = renderYearlySection(currentYear, thisYM);
     if (yearlyHtml) {
       html += '<div class="exp-section-gap"></div>';
       html += '<div style="padding:0 4px;">';
@@ -688,6 +688,7 @@ function onExpenseModalOverlayClick(e) {
 // ═══════════════════════════════════════
 var _expenseViewYM = null;
 var _yearlyRankLoaded = 10;
+var _yearlyEndYM = null;
 
 function getExpenseViewYM() {
   if (!_expenseViewYM) _expenseViewYM = today().slice(0, 7);
@@ -1947,7 +1948,7 @@ function openMerchantDetail(merchant, year) {
 
 // 연간 카테고리별 기타 클릭 → 해당 카테고리 내 상호별 소계 팝업
 function openCategoryEtcPopup(catId, displayName, year) {
-  var data = getYearMerchantBreakdown(year);
+  var data = getYearMerchantBreakdown(year, _yearlyEndYM);
   if (!data || !data.merchants) return;
 
   // 해당 카테고리 기타 항목 찾기
@@ -2143,8 +2144,9 @@ function renderMonthlyMerchantHero(merchants, thisYM, isCurrentMonth, monthNum) 
 // ═══════════════════════════════════════
 // 연간 누적 섹션
 // ═══════════════════════════════════════
-function renderYearlySection(year) {
-  var data = getYearMerchantBreakdown(year);
+function renderYearlySection(year, endYM) {
+  _yearlyEndYM = endYM || null;
+  var data = getYearMerchantBreakdown(year, endYM);
   if (!data || !data.merchants || data.merchants.length === 0) {
     return '';
   }
@@ -2160,23 +2162,34 @@ function renderYearlySection(year) {
   var containerW = Math.min(680, window.innerWidth - 80);
   var containerH = window.innerWidth <= 768 ? 160 : 280;
 
-  var html = '<div class="exp-yearly-section">';
+  // 헤더 텍스트에 월 정보 반영
+  var endMonthNum = null;
+  var endDayNum = null;
+  var nowYM = today().slice(0, 7);
+  if (endYM) {
+    var epParts = endYM.split('-');
+    endMonthNum = parseInt(epParts[1]);
+    if (endYM === nowYM) {
+      endDayNum = new Date().getDate();
+    }
+  }
 
-  // 섹션 헤더
+  var html = '<div class="exp-yearly-section">';
   html += '<div class="exp-yearly-header">';
-  if (isCurrentYear) {
-    // 현재 연도: "2026년 3월 13일까지 총 X원 쓰고 있어요"
-    var monthNum = now.getMonth() + 1;
-    var dayNum = now.getDate();
+  if (isCurrentYear && endYM === nowYM) {
+    // 현재 연도 + 현재 월: "올해 ~까지 총 X원 쓰고 있어요"
     if (window.innerWidth <= 768) {
       html += '<div class="exp-yearly-title">올해 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
     } else {
-      html += '<div class="exp-yearly-title">' + year + '년 ' + monthNum + '월 ' + dayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
+      html += '<div class="exp-yearly-title">' + year + '년 ' + endMonthNum + '월 ' + endDayNum + '일까지 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 쓰고 있어요</div>';
     }
+  } else if (isCurrentYear && endYM && endYM !== nowYM) {
+    // 현재 연도 + 과거 월: "2026년 1~7월 총 X원 썼어요"
+    html += '<div class="exp-yearly-title">' + year + '년 1~' + endMonthNum + '월 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 썼어요</div>';
   } else {
-    // 과거 연도: "2025년 총 X원 썼어요"
-    if (window.innerWidth <= 768) {
-      html += '<div class="exp-yearly-title">' + year + '년 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 썼어요</div>';
+    // 과거 연도
+    if (endYM && endMonthNum < 12) {
+      html += '<div class="exp-yearly-title">' + year + '년 1~' + endMonthNum + '월 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 썼어요</div>';
     } else {
       html += '<div class="exp-yearly-title">' + year + '년 <span style="color:#E55643;">총 ' + formatAmount(data.total) + '원</span> 썼어요</div>';
     }
@@ -2184,14 +2197,14 @@ function renderYearlySection(year) {
   html += '</div>';
 
   // 카테고리 트리맵
-  html += renderCategoryTreemap(year);
+  html += renderCategoryTreemap(year, endYM);
 
   // 버블 차트
   html += _renderYearlyBubbles(merchants, containerW, containerH);
 
   // 랭킹 리스트 (10개)
   var rankLimit = Math.min(Math.max(10, _yearlyRankLoaded), merchants.length);
-  html += '<div id="yearlyRankListWrap" data-year="' + year + '" data-loaded="' + rankLimit + '">';
+  html += '<div id="yearlyRankListWrap" data-year="' + year + '" data-endym="' + (endYM || '') + '" data-loaded="' + rankLimit + '">';
   html += _renderYearlyRankList(merchants, rankLimit, year);
   html += '</div>';
 
@@ -2438,7 +2451,9 @@ function loadMoreYearlyRank() {
 
   var year = parseInt(wrap.getAttribute('data-year'));
   var loaded = parseInt(wrap.getAttribute('data-loaded'));
-  var data = getYearMerchantBreakdown(year);
+  var endYM = wrap.getAttribute('data-endym') || null;
+  if (endYM === '') endYM = null;
+  var data = getYearMerchantBreakdown(year, endYM);
   if (!data || !data.merchants) return;
 
   var merchants = data.merchants;
@@ -2506,7 +2521,7 @@ function loadMoreYearlyRank() {
 
 // 연간 전체 상호 리스트 팝업
 function openYearlyFullPopup(year, startFrom) {
-  var data = getYearMerchantBreakdown(year);
+  var data = getYearMerchantBreakdown(year, _yearlyEndYM);
   if (!data || !data.merchants || data.merchants.length === 0) return;
 
   var allMerchants = data.merchants;
@@ -2562,7 +2577,7 @@ function openYearlyFullPopup(year, startFrom) {
 
 // "기타" 묶음 클릭 → 소액 항목 리스트 팝업
 function openEtcGroupPopup(year) {
-  var data = getYearMerchantBreakdown(year);
+  var data = getYearMerchantBreakdown(year, _yearlyEndYM);
   if (!data || !data.merchants) return;
 
   var etcEntry = data.merchants.find(function(m) { return m.isEtcGroup; });
@@ -2724,9 +2739,19 @@ function deleteAlias(originalMerchant, mode) {
 // ═══════════════════════════════════════
 // 카테고리 트리맵 (연간)
 // ═══════════════════════════════════════
-function renderCategoryTreemap(year) {
+function renderCategoryTreemap(year, endYM) {
   var yearStr = String(year);
-  var allExp = getExpenses().filter(function(e) { return e.date && e.date.startsWith(yearStr); });
+  var allExp;
+  if (endYM) {
+    var tmParts = endYM.split('-');
+    var tmEndYear = parseInt(tmParts[0]);
+    var tmEndMonth = parseInt(tmParts[1]);
+    var tmLastDay = new Date(tmEndYear, tmEndMonth, 0).getDate();
+    var tmEndDate = endYM + '-' + String(tmLastDay).padStart(2, '0');
+    allExp = getExpenses().filter(function(e) { return e.date && e.date.startsWith(yearStr) && e.date <= tmEndDate; });
+  } else {
+    allExp = getExpenses().filter(function(e) { return e.date && e.date.startsWith(yearStr); });
+  }
   if (!allExp.length) return '';
 
   var total = allExp.reduce(function(s, e) { return s + e.amount; }, 0);

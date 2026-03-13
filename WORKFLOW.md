@@ -407,7 +407,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `getMonthlyTrend(count)` — 월별 추이 (count: 개월수, 기본값 6)
 - `getMonthlyTrendAround(centerYM)` — 중심 월 기준 월별 추이
 - `getMerchantBreakdown(ym)` — 월간 상호별 지출 분석. brand 기준 그룹핑 (brand 있으면 brand로, 없으면 매출처명으로 그룹). [{merchant, amount, count, percent, category, isBrand}, ...]
-- `getYearMerchantBreakdown(year)` — 연간 상호별 지출 분석. brand 기준 그룹핑. 1만원 이하는 단일 "기타"로 묶기 (isEtcGroup, etcItems 필드 포함). {startDate, endDate, total, merchants: [{..., isBrand, isEtcGroup, etcItems}, ...]}
+- `getYearMerchantBreakdown(year, endYM)` — 연간 상호별 지출 분석. brand 기준 그룹핑. endYM이 주어지면 해당 월까지만 집계 (예: '2025-07' → 1~7월). 1만원 이하는 단일 "기타"로 묶기 (isEtcGroup, etcItems 필드 포함). {startDate, endDate, total, merchants: [{..., isBrand, isEtcGroup, etcItems}, ...]}
 
 **매출처 별명:**
 - `getMerchantAliases()`, `saveMerchantAliases(arr)` — 별명 매핑 읽기/쓰기
@@ -582,8 +582,8 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `openMerchantDetail(merchant)` — 상호 클릭 → 월간 내역을 플로팅 팝업으로 표시
 
 **연간 누적 섹션 (버블 차트 + 카테고리 트리맵 + 랭킹):**
-- `renderYearlySection(year)` — 연간 누적 섹션 (카테고리 트리맵 + 버블 차트 + 랭킹 리스트 10개 + "더 보기") HTML 생성
-- `renderCategoryTreemap(year)` — 연간 카테고리 트리맵 HTML 생성 (squarified 알고리즘)
+- `renderYearlySection(year, endYM)` — 연간 누적 섹션 (카테고리 트리맵 + 버블 차트 + 랭킹 리스트 10개 + "더 보기") HTML 생성. endYM이 주어지면 해당 월까지만 집계
+- `renderCategoryTreemap(year, endYM)` — 연간 카테고리 트리맵 HTML 생성 (squarified 알고리즘). endYM이 주어지면 해당 월까지만 집계
 - `_squarify(values, x, y, w, h)` — squarified treemap 레이아웃 계산
 - `_worstAspect(row, rowTotal, totalArea, shortSide)` — aspect ratio 평가 헬퍼
 - `_packCircles(items, containerW, containerH)` — circle packing 알고리즘 (force-based, 금액 비례 반지름)
@@ -1171,6 +1171,7 @@ Haiku 4.5는 전체 프로젝트 맥락을 알지 못할 수 있다. 각 Step에
 | _expenseViewYM | ui-expense.js | 가계부에서 보고 있는 월 |
 | _selectedExpenseDate | ui-expense.js | 가계부 캘린더 선택 날짜 |
 | _yearlyRankLoaded | ui-expense.js | 연간 랭킹 현재 로드된 개수 |
+| _yearlyEndYM | ui-expense.js | 연간 섹션이 집계하는 마지막 월 (YYYY-MM). renderYearlySection에서 설정, 팝업 함수에서 참조 |
 | _expenseCategoryFilter | ui-expense.js | 가계부 카테고리 필터 ID |
 | _expenseCategoryFilterName | ui-expense.js | 가계부 카테고리 필터 이름 |
 | _expenseDetailSearchQuery | ui-expense.js | 가계부 전체 내역 검색어 |
@@ -1418,4 +1419,5 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-11 | 연간 랭킹 "전체 순위 보기" → "더 보기" 로드모어 변경: renderYearlySection에서 버튼/래퍼 교체, loadMoreYearlyRank 추가, 8번 상세 맵 갱신 |
 | 2026-03-12 | 아내 가계부 카드 매핑 보강: soyoun312 cardNameMap에 신한8619 추가, parseSMSServer/parseSMS에 현대백화점카드 태그/지점명/신한체크 (금액) 태그 정제 추가, WORKFLOW.md 10번에 사용자별 카드 현황 표 추가 |
 | 2026-03-13 | 브랜드 시스템 2-1: getMerchantBreakdown/getYearMerchantBreakdown를 brand 기준 그룹핑으로 변경, getMerchantIconHtml 조회순서 변경(brandIcons→merchantIcons→카테고리폴백), _logoFallback 추가, renderExpenseItem brand명 표시, _renderYearlyBubbles/_renderYearlyRankList/loadMoreYearlyRank 아이콘 조회 변경, openMerchantDetail 필터 brand 기준으로 변경, 8번 갱신 |
+| 2026-03-13 | 연간 누적 섹션 월별 집계: getYearMerchantBreakdown에 endYM 매개변수 추가, renderYearlySection/renderCategoryTreemap에 endYM 전달, renderExpenseDashboard에서 thisYM 전달, 연간 팝업 함수들(_yearlyEndYM 참조), 전역변수 _yearlyEndYM 추가, 8번/12번 갱신 |
 ```

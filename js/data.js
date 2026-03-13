@@ -585,17 +585,38 @@ function getMerchantBreakdown(ym) {
   return result;
 }
 
-function getYearMerchantBreakdown(year) {
+function getYearMerchantBreakdown(year, endYM) {
   var allExp = getExpenses();
   var yearStr = String(year);
-  var yearExpenses = allExp.filter(function(e) { return e.date && e.date.startsWith(yearStr); });
+  var yearExpenses;
+  if (endYM) {
+    // endYM이 주어지면 해당 월까지만 필터 (예: '2025-07' → 2025-07-31까지)
+    var endParts = endYM.split('-');
+    var endYear = parseInt(endParts[0]);
+    var endMonth = parseInt(endParts[1]);
+    var lastDay = new Date(endYear, endMonth, 0).getDate();
+    var endDate = endYM + '-' + String(lastDay).padStart(2, '0');
+    yearExpenses = allExp.filter(function(e) { return e.date && e.date.startsWith(yearStr) && e.date <= endDate; });
+  } else {
+    yearExpenses = allExp.filter(function(e) { return e.date && e.date.startsWith(yearStr); });
+  }
   if (!yearExpenses.length) return { startDate: null, endDate: null, total: 0, merchants: [] };
 
   var total = yearExpenses.reduce(function(s, e) { return s + e.amount; }, 0);
   var dates = yearExpenses.map(function(e) { return e.date; }).sort();
   var startDate = dates[0];
   var todayStr = today();
-  var endDate = todayStr.startsWith(yearStr) ? todayStr : dates[dates.length - 1];
+  var displayEndDate;
+  if (endYM) {
+    var eParts = endYM.split('-');
+    var eY = parseInt(eParts[0]);
+    var eM = parseInt(eParts[1]);
+    var eLastDay = new Date(eY, eM, 0).getDate();
+    var nowYM = todayStr.slice(0, 7);
+    displayEndDate = (endYM === nowYM) ? todayStr : endYM + '-' + String(eLastDay).padStart(2, '0');
+  } else {
+    displayEndDate = todayStr.startsWith(yearStr) ? todayStr : dates[dates.length - 1];
+  }
 
   var map = {};
   yearExpenses.forEach(function(e) {
@@ -675,7 +696,7 @@ function getYearMerchantBreakdown(year) {
 
   return {
     startDate: startDate,
-    endDate: endDate,
+    endDate: displayEndDate,
     total: total,
     merchants: merchants
   };
