@@ -347,7 +347,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 
 **전역 상수:**
 - `APP_TOKEN` — 동기화 인증 토큰
-- `K` — LocalStorage 키 객체 (docs, checks, books, quotes, memos, expenses, merchantIcons, merchantAliases)
+- `K` — LocalStorage 키 객체 (docs, checks, books, quotes, memos, expenses, merchantIcons, merchantAliases, brandIcons, brandOverrides)
 
 **유틸 함수:**
 - `L(key)` / `S(key, val)` — LocalStorage 읽기/쓰기
@@ -414,6 +414,16 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `setMerchantAlias(originalMerchant, alias)` — 별명 설정 (빈 문자열이면 제거)
 - `resolveAlias(merchant)` — 원본 매출처명 → 별명 변환 (매핑 없으면 원본 반환)
 - `reverseAlias(alias)` — 별명 → 원본 매출처명 배열 반환 (역조회, 같은 별명에 여러 원본 가능)
+
+**브랜드 아이콘:**
+- `getBrandIcons()`, `saveBrandIcons(obj)` — brandIcons 객체 읽기/쓰기
+- `getBrandIcon(brand)` — 브랜드명으로 아이콘 URL 조회
+- `setBrandIcon(brand, iconUrl)` — 브랜드 아이콘 설정 (빈 값이면 삭제)
+
+**브랜드 오버라이드:**
+- `getBrandOverrides()`, `saveBrandOverrides(obj)` — brandOverrides 객체 읽기/쓰기
+- `getBrandOverride(merchant)` — 매출처명으로 오버라이드 조회
+- `setBrandOverride(merchant, brand)` — 매출처명에 대한 브랜드 오버라이드 설정
 
 **기타:** `getTabCount(t)`, `updateWritingStats()`, `updateBookStats()`, `showRandomQuote()`, `togglePin(type, id, e)`
 
@@ -1286,6 +1296,16 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
   { original: "스타벅스강남점", alias: "카페" },
   ...
 ]
+```
+
+### 브랜드 아이콘 (K.brandIcons)
+```
+{ "CU": "https://cu-logo.png", "스타벅스": "https://starbucks-logo.png", ... }
+```
+
+### 브랜드 오버라이드 (K.brandOverrides)
+```
+{ "씨유홍대3호점": { "brand": "CU", "created": "2026-03-13" }, ... }
 ```
 
 ---

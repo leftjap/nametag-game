@@ -12,7 +12,9 @@ const K = {
   memos:            'gb_memos',
   expenses:         'gb_expenses',
   merchantIcons:    'gb_merchant_icons',
-  merchantAliases:  'gb_merchant_aliases'
+  merchantAliases:  'gb_merchant_aliases',
+  brandIcons:       'gb_brand_icons',
+  brandOverrides:   'gb_brand_overrides'
 };
 
 // ═══ LocalStorage 읽기/쓰기 ═══

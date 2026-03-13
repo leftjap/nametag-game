@@ -80,6 +80,8 @@ const SYNC = {
         if (db[K.expenses]) S(K.expenses, db[K.expenses]);
         if (db[K.merchantIcons]) S(K.merchantIcons, db[K.merchantIcons]);
         if (db[K.merchantAliases]) S(K.merchantAliases, db[K.merchantAliases]);
+        if (db[K.brandIcons]) S(K.brandIcons, db[K.brandIcons]);
+        if (db[K.brandOverrides]) S(K.brandOverrides, db[K.brandOverrides]);
         this.isDbLoaded = true;
         this.setSyncStatus('동기화 완료', 'ok');
         return res.config || null;
@@ -111,7 +113,9 @@ const SYNC = {
         [K.checks]:          L(K.checks)          || {},
         [K.expenses]:        L(K.expenses)        || [],
         [K.merchantIcons]:   L(K.merchantIcons)   || [],
-        [K.merchantAliases]: L(K.merchantAliases) || []
+        [K.merchantAliases]: L(K.merchantAliases) || [],
+        [K.brandIcons]:      L(K.brandIcons)      || {},
+        [K.brandOverrides]:  L(K.brandOverrides)  || {}
       };
       await this._post({ action: 'save_db', dbData });
     } catch (e) {

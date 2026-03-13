@@ -779,6 +779,61 @@ function reverseAlias(alias) {
 }
 
 // ═══════════════════════════════════════
+// 브랜드 아이콘 (K.brandIcons)
+// ═══════════════════════════════════════
+function getBrandIcons() {
+  return L(K.brandIcons) || {};
+}
+
+function saveBrandIcons(obj) {
+  S(K.brandIcons, obj);
+}
+
+function getBrandIcon(brand) {
+  if (!brand) return null;
+  var icons = getBrandIcons();
+  return icons[brand] || null;
+}
+
+function setBrandIcon(brand, iconUrl) {
+  if (!brand) return;
+  var icons = getBrandIcons();
+  if (iconUrl) {
+    icons[brand] = iconUrl;
+  } else {
+    delete icons[brand];
+  }
+  saveBrandIcons(icons);
+}
+
+// ═══════════════════════════════════════
+// 브랜드 오버라이드 (K.brandOverrides)
+// ═══════════════════════════════════════
+function getBrandOverrides() {
+  return L(K.brandOverrides) || {};
+}
+
+function saveBrandOverrides(obj) {
+  S(K.brandOverrides, obj);
+}
+
+function getBrandOverride(merchant) {
+  if (!merchant) return null;
+  var overrides = getBrandOverrides();
+  return overrides[merchant] || null;
+}
+
+function setBrandOverride(merchant, brand) {
+  if (!merchant) return;
+  var overrides = getBrandOverrides();
+  overrides[merchant] = {
+    brand: brand,
+    created: today()
+  };
+  saveBrandOverrides(overrides);
+}
+
+// ═══════════════════════════════════════
 // 서버 config 동적 적용
 // ═══════════════════════════════════════
 function applyServerConfig(config) {
