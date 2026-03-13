@@ -5195,3 +5195,65 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .expense-alias-manage-btn:hover {
   border-color: var(--tx-hint) !important;
 }
+
+/* ═══ 카테고리 트리맵 ═══ */
+.exp-treemap-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.exp-treemap-cell {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: opacity .12s;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+.exp-treemap-cell:hover {
+  opacity: .85;
+}
+
+.exp-treemap-cell:active {
+  opacity: .7;
+}
+
+.exp-treemap-name {
+  color: #fff;
+  font-weight: 600;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0,0,0,.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.exp-treemap-amount {
+  color: rgba(255,255,255,.85);
+  font-size: 11px;
+  font-weight: 400;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(0,0,0,.2);
+  white-space: nowrap;
+}
+
+.exp-treemap-pct {
+  color: rgba(255,255,255,.6);
+  font-size: 10px;
+  font-weight: 400;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(0,0,0,.2);
+}

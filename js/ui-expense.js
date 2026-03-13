@@ -1890,17 +1890,30 @@ function openMerchantDetail(merchant, year) {
   openExpenseFloatingPopup(title, contentHtml, cx, cy);
 }
 
-// 카테고리 태그 클릭 → 해당 카테고리의 월간 내역을 플로팅 팝업으로 표시
-function openCategoryExpensePopup(catId, catName) {
-  var ym = getExpenseViewYM();
-  var expenses = getMonthExpenses(ym)
-    .filter(function(e) { return e.category === catId; })
-    .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
+// 카테고리 태그 클릭 → 해당 카테고리의 월간(year 없음) 또는 연간(year 있음) 내역을 플로팅 팝업으로 표시
+function openCategoryExpensePopup(catId, catName, year) {
+  var expenses;
+  var title;
+
+  if (year) {
+    // 연간 모드
+    var yearStr = String(year);
+    expenses = getExpenses()
+      .filter(function(e) { return e.date && e.date.startsWith(yearStr) && e.category === catId; })
+      .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
+    title = catName + ' · ' + year + '년';
+  } else {
+    // 월간 모드 (기존 동작)
+    var ym = getExpenseViewYM();
+    expenses = getMonthExpenses(ym)
+      .filter(function(e) { return e.category === catId; })
+      .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
+    var parts = ym.split('-');
+    var mo = parseInt(parts[1]);
+    title = catName + ' · ' + mo + '월';
+  }
 
   var total = expenses.reduce(function(s, e) { return s + e.amount; }, 0);
-  var parts = ym.split('-');
-  var mo = parseInt(parts[1]);
-  var title = catName + ' · ' + mo + '월';
 
   var contentHtml = '';
 
@@ -2067,6 +2080,9 @@ function renderYearlySection(year) {
     }
   }
   html += '</div>';
+
+  // 카테고리 트리맵
+  html += renderCategoryTreemap(year);
 
   // 버블 차트
   html += _renderYearlyBubbles(merchants, containerW, containerH);
@@ -2488,4 +2504,172 @@ function deleteAlias(originalMerchant, mode) {
   setTimeout(function() {
     openAliasManager(mode);
   }, 300);
+}
+
+// ═══════════════════════════════════════
+// 카테고리 트리맵 (연간)
+// ═══════════════════════════════════════
+function renderCategoryTreemap(year) {
+  var yearStr = String(year);
+  var allExp = getExpenses().filter(function(e) { return e.date && e.date.startsWith(yearStr); });
+  if (!allExp.length) return '';
+
+  var total = allExp.reduce(function(s, e) { return s + e.amount; }, 0);
+  if (total <= 0) return '';
+
+  // 카테고리별 합산
+  var catMap = {};
+  allExp.forEach(function(e) {
+    var cat = e.category || 'etc';
+    catMap[cat] = (catMap[cat] || 0) + e.amount;
+  });
+
+  // EXPENSE_CATEGORIES 순서대로 정렬, 금액 0 제외
+  var items = [];
+  EXPENSE_CATEGORIES.forEach(function(c) {
+    if (catMap[c.id] && catMap[c.id] > 0) {
+      items.push({ id: c.id, name: c.name, color: c.color, amount: catMap[c.id], pct: Math.round(catMap[c.id] / total * 1000) / 10 });
+    }
+  });
+
+  // 금액 내림차순 정렬
+  items.sort(function(a, b) { return b.amount - a.amount; });
+
+  if (items.length === 0) return '';
+
+  // 컨테이너 크기
+  var containerW = 100; // 퍼센트 기반
+  var containerH = window.innerWidth <= 768 ? 180 : 240;
+
+  // squarified treemap 레이아웃 계산
+  var rects = _squarify(items.map(function(it) { return it.amount; }), 0, 0, containerW, containerH);
+
+  var html = '<div class="exp-treemap-wrap" style="height:' + containerH + 'px;">';
+
+  items.forEach(function(item, i) {
+    var r = rects[i];
+    if (!r) return;
+    var w = r.w;
+    var h = r.h;
+    var x = r.x;
+    var y = r.y;
+
+    // 셀 크기에 따라 텍스트 표시 결정
+    var cellArea = (w / 100 * (window.innerWidth <= 768 ? window.innerWidth - 40 : 680)) * h;
+    var showName = cellArea > 2000;
+    var showAmount = cellArea > 3500;
+    var fontSize = cellArea > 8000 ? 14 : (cellArea > 4000 ? 12 : 11);
+
+    html += '<div class="exp-treemap-cell" onclick="openCategoryExpensePopup(\'' + item.id + '\',\'' + item.name.replace(/'/g, "\\'") + '\',' + year + ')" style="';
+    html += 'left:' + x + '%;';
+    html += 'top:' + y + 'px;';
+    html += 'width:' + w + '%;';
+    html += 'height:' + h + 'px;';
+    html += 'background:' + item.color + ';';
+    html += '">';
+
+    if (showName) {
+      html += '<span class="exp-treemap-name" style="font-size:' + fontSize + 'px;">' + item.name + '</span>';
+    }
+    if (showAmount) {
+      html += '<span class="exp-treemap-amount">' + formatAmount(item.amount) + '원</span>';
+    }
+    if (showName && item.pct >= 1) {
+      html += '<span class="exp-treemap-pct">' + item.pct + '%</span>';
+    }
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+  return html;
+}
+
+// squarified treemap 알고리즘
+function _squarify(values, x, y, w, h) {
+  var total = values.reduce(function(s, v) { return s + v; }, 0);
+  if (total <= 0 || values.length === 0) return [];
+  if (values.length === 1) {
+    return [{ x: x, y: y, w: w, h: h }];
+  }
+
+  var rects = [];
+  var remaining = values.slice();
+  var remainingTotal = total;
+  var cx = x, cy = y, cw = w, ch = h;
+
+  while (remaining.length > 0) {
+    // 짧은 축 결정
+    var isHorizontal = cw >= ch; // false면 세로 분할
+    var shortSide = isHorizontal ? ch : cw;
+
+    // 현재 행에 넣을 항목 결정
+    var row = [remaining[0]];
+    var rowTotal = remaining[0];
+    var bestAspect = _worstAspect(row, rowTotal, remainingTotal, shortSide);
+
+    for (var i = 1; i < remaining.length; i++) {
+      var testRow = row.concat([remaining[i]]);
+      var testTotal = rowTotal + remaining[i];
+      var testAspect = _worstAspect(testRow, testTotal, remainingTotal, shortSide);
+      if (testAspect <= bestAspect) {
+        row = testRow;
+        rowTotal = testTotal;
+        bestAspect = testAspect;
+      } else {
+        break;
+      }
+    }
+
+    // 행 배치
+    var rowFraction = rowTotal / remainingTotal;
+    var rowSize = isHorizontal ? cw * rowFraction : ch * rowFraction;
+
+    var offset = 0;
+    row.forEach(function(val) {
+      var frac = val / rowTotal;
+      var cellSize = shortSide * frac;
+
+      if (isHorizontal) {
+        rects.push({ x: cx, y: cy + offset, w: rowSize, h: cellSize });
+      } else {
+        rects.push({ x: cx + offset, y: cy, w: cellSize, h: rowSize });
+      }
+      offset += cellSize;
+    });
+
+    // 남은 영역 갱신
+    remaining = remaining.slice(row.length);
+    remainingTotal -= rowTotal;
+
+    if (isHorizontal) {
+      cx += rowSize;
+      cw -= rowSize;
+    } else {
+      cy += rowSize;
+      ch -= rowSize;
+    }
+  }
+
+  return rects;
+}
+
+function _worstAspect(row, rowTotal, totalArea, shortSide) {
+  if (shortSide <= 0 || rowTotal <= 0 || totalArea <= 0) return Infinity;
+  var rowArea = shortSide * (rowTotal / totalArea) * shortSide; // 근사
+  var s2 = shortSide * shortSide;
+  var rowFrac = rowTotal / totalArea;
+  var rowLen = shortSide;
+  var rowThickness = rowLen * rowFrac; // 근사
+
+  var worst = 0;
+  row.forEach(function(val) {
+    var frac = val / rowTotal;
+    var cellW = rowThickness;
+    var cellH = rowLen * frac;
+    if (cellW <= 0 || cellH <= 0) return;
+    var aspect = Math.max(cellW / cellH, cellH / cellW);
+    if (aspect > worst) worst = aspect;
+  });
+  return worst;
 }

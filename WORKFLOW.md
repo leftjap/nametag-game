@@ -506,7 +506,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `openCategoryDetail(catId, catName)` — 카테고리 클릭 → 화면B 진입 및 필터 설정
 - `clearCategoryFilter()` — 카테고리 필터 초기화
 - `renderCategoryBarCompact(catBreakdown, total)` — 스택 바
-- `openCategoryExpensePopup(catId, catName)` — 카테고리 태그 클릭 → 해당 카테고리 월간 내역 플로팅 팝업
+- `openCategoryExpensePopup(catId, catName, year)` — 카테고리 태그/트리맵 셀 클릭 → 월간(year 없음) 또는 연간(year 있음) 내역 플로팅 팝업
 
 **전체 내역 B:**
 - `showExpenseFullDetail(ym)` — PC/태블릿: 통합 대시보드 렌더 (B화면 진입 차단), 모바일: B 표시
@@ -570,8 +570,11 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `_escMerchant(str)` — onclick에서 상호명 안전하게 이스케이프
 - `openMerchantDetail(merchant)` — 상호 클릭 → 월간 내역을 플로팅 팝업으로 표시
 
-**연간 누적 섹션 (버블 차트 + 랭킹):**
-- `renderYearlySection(year)` — 연간 누적 섹션 (버블 차트 + 랭킹 리스트 10개 + "전체 순위 보기") HTML 생성
+**연간 누적 섹션 (버블 차트 + 카테고리 트리맵 + 랭킹):**
+- `renderYearlySection(year)` — 연간 누적 섹션 (카테고리 트리맵 + 버블 차트 + 랭킹 리스트 10개 + "더 보기") HTML 생성
+- `renderCategoryTreemap(year)` — 연간 카테고리 트리맵 HTML 생성 (squarified 알고리즘)
+- `_squarify(values, x, y, w, h)` — squarified treemap 레이아웃 계산
+- `_worstAspect(row, rowTotal, totalArea, shortSide)` — aspect ratio 평가 헬퍼
 - `_packCircles(items, containerW, containerH)` — circle packing 알고리즘 (force-based, 금액 비례 반지름)
 - `_renderYearlyBubbles(merchants, containerW, containerH)` — 버블 차트 HTML 생성 (상위 10개 + 기타, 파비콘 표시, 카테고리 배경색)
 - `_renderYearlyRankList(merchants, limit)` — 랭킹 리스트 HTML 생성 (뉴트럴 그라데이션 배경, 순위+파비콘+상호명+금액)
@@ -846,6 +849,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `.exp-fp-*` (`.exp-fp-overlay`, `.exp-fp-card`, `.exp-fp-header`, `.exp-fp-body`, `.exp-fp-footer`) → 12번 가계부 플로팅 팝업
 - `.exp-mr-*` (`.exp-mr-list`, `.exp-mr-row`, `.exp-mr-info`, `.exp-mr-bar-wrap`, `.exp-mr-amount` 등) → 12번 상호별 랭킹 카드
 - `.exp-yearly-*` (`.exp-yearly-section`, `.exp-yearly-bubble-wrap`, `.exp-yearly-bubble`, `.exp-yearly-rank-list`, `.exp-yearly-rank-row`, `.exp-yearly-rank-num`, `.exp-yearly-rank-icon`, `.exp-yearly-rank-name`, `.exp-yearly-rank-amount`, `.exp-yearly-grid`, `.exp-yearly-grid-item`, `.exp-yearly-header`, `.exp-yearly-title` 등) → 12번 연간 누적 섹션
+- `.exp-treemap-*` (`.exp-treemap-wrap`, `.exp-treemap-cell`, `.exp-treemap-name`, `.exp-treemap-amount`, `.exp-treemap-pct`) → 12번 연간 누적 섹션 (카테고리 트리맵)
 - `.exp-fp-yearly-*` (`.exp-fp-yearly-list`, `.exp-fp-yearly-row`, `.exp-fp-yearly-rank`, `.exp-fp-yearly-amount` 등) → 12번 연간 전체 보기 팝업 내부
 - `.exp-day-selected`, `.exp-day-detail` → 13번 가계부 캘린더 선택
 - `.rc-*` → 14번 루틴 캘린더 뷰
