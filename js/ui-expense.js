@@ -2324,12 +2324,7 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
   var yearVal = new Date(getExpenseViewYM() + '-01').getFullYear();
 
   if (bubbleItems.length === 0) {
-    var html = '<div class="exp-yearly-bubble-wrap" style="width:100%;height:40px;position:relative;">';
-    if (etcItemCount > 0) {
-      html += _renderEtcBanner(etcItemCount, yearVal);
-    }
-    html += '</div>';
-    return html;
+    return '';
   }
 
   var circles = _packCircles(bubbleItems, containerW, containerH);
@@ -2368,13 +2363,6 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
   });
 
   html += '</div>';
-
-  // "그 외" 태그 — 버블 영역 바로 아래 우측 정렬
-  if (etcItemCount > 0) {
-    html += '<div style="display:flex;justify-content:flex-end;padding:4px 0 20px;">';
-    html += _renderEtcBanner(etcItemCount, yearVal);
-    html += '</div>';
-  }
 
   return html;
 }
