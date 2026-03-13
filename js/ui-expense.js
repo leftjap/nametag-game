@@ -1232,13 +1232,15 @@ function loadExpense(id, mode = 'normal') {
   if (catGrid) { catGrid.classList.remove('grid-open'); catGrid.style.display = 'none'; }
   selectCategory(e.category, mode);
 
-  // 아이콘 매핑 자동 채우기
-  var existingIcon = findMerchantIcon(e.merchant);
-  if (existingIcon) {
-    document.getElementById('expenseIconUrl' + suffix).value = existingIcon;
-  } else {
-    document.getElementById('expenseIconUrl' + suffix).value = '';
+  // 아이콘 매핑 자동 채우기 (브랜드/비브랜드 분기)
+  var existingIcon = null;
+  if (e.brand) {
+    existingIcon = getBrandIcon(e.brand);
   }
+  if (!existingIcon) {
+    existingIcon = findMerchantIcon(e.merchant);
+  }
+  document.getElementById('expenseIconUrl' + suffix).value = existingIcon || '';
 
   // 브랜드 표시
   var brandField = document.getElementById('expenseBrandField' + suffix);
@@ -1522,7 +1524,7 @@ function saveExpenseForm(mode = 'normal') {
     newExpense({ amount, category, merchant, card, memo, date, time, source: 'manual' });
   }
 
-  // 매출처 아이콘 매핑 저장
+  // 매출처 아이콘 매핑 저장 (브랜드/비브랜드 분기)
   var iconUrl = document.getElementById('expenseIconUrl' + suffix).value.trim();
   if (iconUrl && !iconUrl.match(/^https?:\/\//)) {
     var urlInput = document.getElementById('expenseIconUrl' + suffix);
@@ -1531,11 +1533,34 @@ function saveExpenseForm(mode = 'normal') {
     if (errorEl) errorEl.classList.add('show');
     return;
   }
-  if (merchant && iconUrl) {
+
+  // 현재 항목의 브랜드 확인 (기존 항목이면 DB에서, 새 항목이면 null)
+  var currentBrand = null;
+  if (curExpenseId) {
+    var savedExp = getExpenses().find(function(x) { return x.id === curExpenseId; });
+    if (savedExp) currentBrand = savedExp.brand || null;
+  }
+
+  if (currentBrand && iconUrl) {
+    // 브랜드 매출처 → brandIcons에 저장
+    var sameBrandCount = getExpenses().filter(function(ex) { return ex.brand === currentBrand; }).length;
+    if (sameBrandCount > 1) {
+      if (!confirm(currentBrand + ' 브랜드 전체 ' + sameBrandCount + '건에 새 아이콘이 적용됩니다. 계속할까요?')) return;
+    }
+    setBrandIcon(currentBrand, iconUrl);
+    SYNC.scheduleDatabaseSave();
+  } else if (currentBrand && !iconUrl) {
+    // 브랜드 아이콘 삭제
+    if (getBrandIcon(currentBrand)) {
+      setBrandIcon(currentBrand, null);
+      SYNC.scheduleDatabaseSave();
+    }
+  } else if (!currentBrand && merchant && iconUrl) {
+    // 비브랜드 매출처 → merchantIcons에 저장
     saveMerchantIcon(merchant, iconUrl);
     SYNC.scheduleDatabaseSave();
-  } else if (merchant && !iconUrl) {
-    // URL이 비워졌으면 해당 merchant의 정확 일치 매핑만 제거
+  } else if (!currentBrand && merchant && !iconUrl) {
+    // 비브랜드 아이콘 삭제
     var icons = getMerchantIcons();
     var cleaned = icons.filter(function(item) {
       return item.keyword !== merchant;
@@ -2699,7 +2724,108 @@ function deleteAlias(originalMerchant, mode) {
 
 // ═══ 브랜드 수정/삭제 (3-2에서 구현 예정) ═══
 function openBrandEditPopup(mode) {
-  alert('브랜드 수정 기능은 다음 업데이트에서 추가됩니다.');
+  if (!curExpenseId) return;
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var e = getExpenses().find(function(x) { return x.id === curExpenseId; });
+  if (!e) return;
+  var currentBrand = e.brand || '';
+  var merchant = (e.merchant || '').trim();
+
+  // 같은 브랜드를 가진 항목 수 (전체 적용 시 영향 범위)
+  var sameBrandCount = 0;
+  if (currentBrand) {
+    sameBrandCount = getExpenses().filter(function(ex) { return ex.brand === currentBrand; }).length;
+  }
+
+  var contentHtml = '<div style="padding:0 18px 18px;">';
+
+  // 브랜드명 입력
+  contentHtml += '<div style="margin-bottom:16px;">';
+  contentHtml += '<label style="display:block;font-size:12px;color:var(--tx-hint);font-weight:500;margin-bottom:6px;">브랜드명</label>';
+  contentHtml += '<input type="text" id="brandEditInput" value="' + currentBrand.replace(/"/g, '&quot;') + '" placeholder="브랜드명 (비우면 비브랜드)" style="width:100%;border:none;border-bottom:1.5px solid var(--border-l);background:none;outline:none;padding:10px 0;font-size:15px;color:var(--tx);font-family:Pretendard,sans-serif;">';
+  contentHtml += '</div>';
+
+  // 매출처명 참고
+  contentHtml += '<div style="font-size:12px;color:var(--tx-hint);margin-bottom:20px;">매출처: ' + merchant + '</div>';
+
+  // 버튼들
+  contentHtml += '<div style="display:flex;flex-direction:column;gap:8px;">';
+
+  // "이 항목만 변경" 버튼
+  contentHtml += '<button onclick="_applyBrandEdit(\'single\',\'' + mode + '\')" style="width:100%;padding:14px;background:#E55643;border:none;border-radius:10px;font-size:15px;color:#fff;font-weight:600;cursor:pointer;font-family:Pretendard,sans-serif;">이 항목만 변경</button>';
+
+  // "이 브랜드 전체 변경" 버튼 (현재 브랜드가 있고 2건 이상일 때만)
+  if (currentBrand && sameBrandCount > 1) {
+    contentHtml += '<button onclick="_applyBrandEdit(\'all\',\'' + mode + '\')" style="width:100%;padding:14px;background:none;border:1px solid var(--border);border-radius:10px;font-size:15px;color:var(--tx-d);font-weight:500;cursor:pointer;font-family:Pretendard,sans-serif;">이 브랜드 전체 변경 (' + sameBrandCount + '건)</button>';
+  }
+
+  contentHtml += '</div>';
+  contentHtml += '</div>';
+
+  var cx = window.innerWidth / 2;
+  var cy = window.innerHeight / 2 - 50;
+  openExpenseFloatingPopup('브랜드 수정', contentHtml, cx, cy);
+}
+
+function _applyBrandEdit(scope, mode) {
+  if (!curExpenseId) return;
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var inputEl = document.getElementById('brandEditInput');
+  if (!inputEl) return;
+  var newBrand = inputEl.value.trim() || null; // 빈 문자열 → null (비브랜드)
+  var e = getExpenses().find(function(x) { return x.id === curExpenseId; });
+  if (!e) return;
+  var oldBrand = e.brand || null;
+  var merchant = (e.merchant || '').trim();
+
+  closeExpenseFloatingPopup();
+
+  if (scope === 'single') {
+    // "이 항목만 변경" — expense 업데이트 + brandOverrides 기록
+    updateExpense(curExpenseId, { brand: newBrand });
+    setBrandOverride(merchant, newBrand);
+
+  } else if (scope === 'all') {
+    // "이 브랜드 전체 변경" — 같은 brand 가진 모든 expense 일괄 업데이트
+    if (!oldBrand) return;
+    var expenses = getExpenses();
+    var changed = 0;
+    for (var i = 0; i < expenses.length; i++) {
+      if (expenses[i].brand === oldBrand) {
+        expenses[i].brand = newBrand;
+        changed++;
+      }
+    }
+    saveExpenses(expenses);
+
+    // 새 브랜드에 기존 아이콘이 있으면 적용 안내
+    if (newBrand && getBrandIcon(newBrand)) {
+      // 이미 아이콘 있음 — 별도 처리 불필요
+    } else if (newBrand && oldBrand && getBrandIcon(oldBrand)) {
+      // 기존 브랜드 아이콘을 새 브랜드로 복사
+      var oldIcon = getBrandIcon(oldBrand);
+      setBrandIcon(newBrand, oldIcon);
+    }
+  }
+
+  // UI 갱신: 브랜드 영역 업데이트
+  var brandField = document.getElementById('expenseBrandField' + suffix);
+  var brandNameEl = document.getElementById('expenseBrandName' + suffix);
+  if (brandField && brandNameEl) {
+    if (newBrand) {
+      brandNameEl.textContent = newBrand;
+      brandField.style.display = 'block';
+    } else {
+      brandField.style.display = 'none';
+    }
+  }
+
+  SYNC.scheduleDatabaseSave();
+
+  // 대시보드 리렌더
+  if (mode === 'modal' && window.innerWidth > 768) {
+    renderExpenseDashboard('pc');
+  }
 }
 
 function removeBrandFromForm(mode) {
