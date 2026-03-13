@@ -2405,14 +2405,6 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
   return html;
 }
 
-// "그 외" 인라인 태그 HTML (버블 영역 내부 우하단)
-function _renderEtcBanner(etcItemCount, year) {
-  return '<div class="exp-yearly-etc-tag" onclick="openYearlyFullPopup(' + year + ',20)">'
-    + '<span class="exp-yearly-etc-tag-text">그 외 ' + etcItemCount + '개</span>'
-    + '<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="4.5 2 8.5 6 4.5 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    + '</div>';
-}
-
 // 랭킹 리스트 HTML 생성
 function _renderYearlyRankList(merchants, limit, year) {
   var showList = merchants.slice(0, limit);
