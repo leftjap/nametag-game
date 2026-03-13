@@ -2291,26 +2291,50 @@ function _packCircles(items, containerW, containerH) {
 
 // 버블 차트 HTML 생성
 function _renderYearlyBubbles(merchants, containerW, containerH) {
-  // 상위 40개 + 나머지를 "기타"로 묶기
-  var bubbleItems = merchants.slice(0, 40).map(function(m) {
+  // 1. 카테고리 기타 항목 분리
+  var brandItems = [];
+  var etcItems = [];
+  merchants.forEach(function(m) {
+    if (m.isCategoryEtc) {
+      etcItems.push(m);
+    } else {
+      brandItems.push(m);
+    }
+  });
+
+  // 2. 브랜드 상위 20개만 버블 대상
+  var bubbleLimit = 20;
+  var bubbleSrc = brandItems.slice(0, bubbleLimit);
+  var overflowItems = brandItems.slice(bubbleLimit); // 21위 이하
+
+  // 3. "그 외" 합산: 카테고리 기타 전체 + 21위 이하 전체
+  var etcTotal = 0;
+  var etcCount = 0;
+  etcItems.forEach(function(m) { etcTotal += m.amount; etcCount += m.count; });
+  overflowItems.forEach(function(m) { etcTotal += m.amount; etcCount += m.count; });
+  var grandTotal = merchants.reduce(function(s, m) { return s + m.amount; }, 0);
+  var etcPct = grandTotal > 0 ? Math.round(etcTotal / grandTotal * 1000) / 10 : 0;
+  var etcItemCount = etcItems.length + overflowItems.length;
+
+  // 4. 버블 아이템 준비
+  var bubbleItems = bubbleSrc.map(function(m) {
     return {
       merchant: m.merchant,
       amount: m.amount,
       category: m.category,
       icon: null,
-      brand: m.isBrand ? m.merchant : null,
-      isCategoryEtc: m.isCategoryEtc || false,
-      etcItems: m.etcItems || null
+      brand: m.isBrand ? m.merchant : null
     };
   });
 
-  // 기타 묶기
-  if (merchants.length > 40) {
-    var etcAmount = 0;
-    for (var i = 40; i < merchants.length; i++) etcAmount += merchants[i].amount;
-    if (etcAmount > 0) {
-      bubbleItems.push({ merchant: '그 외', amount: etcAmount, category: 'etc', icon: null, isEtc: true });
+  if (bubbleItems.length === 0) {
+    // 브랜드 항목이 없으면 빈 영역
+    var html = '<div class="exp-yearly-bubble-wrap" style="width:100%;height:40px;"></div>';
+    if (etcTotal > 0) {
+      var yearVal = new Date(getExpenseViewYM() + '-01').getFullYear();
+      html += _renderEtcBanner(etcTotal, etcPct, etcItemCount, yearVal);
     }
+    return html;
   }
 
   var circles = _packCircles(bubbleItems, containerW, containerH);
@@ -2319,22 +2343,13 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
 
   circles.forEach(function(c) {
     var catObj = EXPENSE_CATEGORIES.find(function(cat) { return cat.id === c.item.category; });
-    var bgColor = catObj ? catObj.bg : '#f0f0f0';
-    var borderColor = catObj ? catObj.color : '#ccc';
     var size = Math.round(c.r * 2);
     var left = Math.round(c.x - c.r);
     var top = Math.round(c.y - c.r);
     var imgSize = Math.round(c.r * 2 - 4);
 
     var yearVal = new Date(getExpenseViewYM() + '-01').getFullYear();
-    var onclick;
-    if (c.item.isEtc) {
-      onclick = 'openYearlyFullPopup(' + yearVal + ',40)';
-    } else if (c.item.isCategoryEtc) {
-      onclick = 'openCategoryEtcPopup(\'' + c.item.category + '\',\'' + _escMerchant(c.item.merchant) + '\',' + yearVal + ')';
-    } else {
-      onclick = 'openMerchantDetail(\'' + _escMerchant(c.item.merchant) + '\',' + yearVal + ')';
-    }
+    var onclick = 'openMerchantDetail(\'' + _escMerchant(c.item.merchant) + '\',' + yearVal + ')';
 
     html += '<div class="exp-yearly-bubble" onclick="' + onclick + '" style="'
       + 'position:absolute;'
@@ -2349,34 +2364,36 @@ function _renderYearlyBubbles(merchants, containerW, containerH) {
       + 'cursor:pointer;transition:transform .15s,box-shadow .15s;'
       + '">';
 
-    if (c.item.isEtc) {
-      html += '<span style="font-size:' + Math.max(11, Math.round(c.r * 0.45)) + 'px;color:var(--tx-m);font-weight:500;">그 외</span>';
-    } else if (c.item.isCategoryEtc) {
-      // 카테고리 기타: 카테고리 색상 원 + 카테고리명
-      var etcCatObj = EXPENSE_CATEGORIES.find(function(cat) { return cat.id === c.item.category; });
-      var etcCatColor = etcCatObj ? etcCatObj.color : '#B0B0B8';
-      var etcCatName = etcCatObj ? etcCatObj.name : '기타';
-      var etcFontSize = Math.max(10, Math.round(c.r * 0.38));
-      if (c.item.category === 'etc') {
-        html += '<span style="font-size:' + etcFontSize + 'px;color:' + etcCatColor + ';font-weight:600;">기타</span>';
-      } else {
-        html += '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">';
-        html += '<span style="font-size:' + etcFontSize + 'px;color:' + etcCatColor + ';font-weight:600;">' + etcCatName.substring(0, 2) + '</span>';
-        html += '<span style="font-size:' + Math.max(9, etcFontSize - 2) + 'px;color:var(--tx-hint);">기타</span>';
-        html += '</div>';
-      }
-    } else {
-      var src = null;
-      if (c.item.brand) src = getBrandIcon(c.item.brand);
-      if (!src) src = findMerchantIcon(c.item.merchant) || findMerchantIcon(resolveAlias(c.item.merchant));
-      if (!src) src = DEFAULT_ICON_URL;
-      var category = c.item.category || 'etc';
-      html += '<img src="' + src + '" width="' + imgSize + '" height="' + imgSize + '" style="border-radius:50%;object-fit:cover;" onerror="_logoFallback(this,\'' + category + '\')">';
-    }
+    var src = null;
+    if (c.item.brand) src = getBrandIcon(c.item.brand);
+    if (!src) src = findMerchantIcon(c.item.merchant) || findMerchantIcon(resolveAlias(c.item.merchant));
+    if (!src) src = DEFAULT_ICON_URL;
+    var category = c.item.category || 'etc';
+    html += '<img src="' + src + '" width="' + imgSize + '" height="' + imgSize + '" style="border-radius:50%;object-fit:cover;" onerror="_logoFallback(this,\'' + category + '\')">';
 
     html += '</div>';
   });
 
+  html += '</div>';
+
+  // 5. "그 외" 배너
+  if (etcTotal > 0) {
+    var yearVal = new Date(getExpenseViewYM() + '-01').getFullYear();
+    html += _renderEtcBanner(etcTotal, etcPct, etcItemCount, yearVal);
+  }
+
+  return html;
+}
+
+// "그 외" 하단 배너 HTML
+function _renderEtcBanner(etcTotal, etcPct, etcItemCount, year) {
+  var html = '<div class="exp-yearly-etc-banner" onclick="openYearlyFullPopup(' + year + ',20)">';
+  html += '<div class="exp-yearly-etc-left">';
+  html += '<span class="exp-yearly-etc-label">그 외 ' + etcItemCount + '개</span>';
+  html += '<span class="exp-yearly-etc-amount">' + formatAmount(etcTotal) + '원</span>';
+  html += '<span class="exp-yearly-etc-pct">' + etcPct + '%</span>';
+  html += '</div>';
+  html += '<svg class="exp-yearly-etc-arrow" width="16" height="16" viewBox="0 0 16 16"><polyline points="6 3 11 8 6 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   html += '</div>';
   return html;
 }
