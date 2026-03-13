@@ -2743,9 +2743,9 @@ function renderCategoryTreemap(year) {
 
     // 셀 크기에 따라 텍스트 표시 결정
     var cellArea = (w / 100 * (window.innerWidth <= 768 ? window.innerWidth - 40 : 680)) * h;
-    var showName = cellArea > 2000;
-    var showAmount = cellArea > 3500;
-    var fontSize = cellArea > 8000 ? 14 : (cellArea > 4000 ? 12 : 11);
+    var showName = cellArea > 1200;
+    var showAmount = cellArea > 4000;
+    var fontSize = cellArea > 8000 ? 14 : (cellArea > 4000 ? 13 : 11);
 
     html += '<div class="exp-treemap-cell" onclick="openCategoryExpensePopup(\'' + item.id + '\',\'' + item.name.replace(/'/g, "\\'") + '\',' + year + ')" style="';
     html += 'left:' + x + '%;';
@@ -2760,9 +2760,6 @@ function renderCategoryTreemap(year) {
     }
     if (showAmount) {
       html += '<span class="exp-treemap-amount">' + formatAmount(item.amount) + '원</span>';
-    }
-    if (showName && item.pct >= 1) {
-      html += '<span class="exp-treemap-pct">' + item.pct + '%</span>';
     }
 
     html += '</div>';
