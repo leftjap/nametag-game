@@ -562,17 +562,15 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `newExpenseForm(mode)` — 새 항목 폼 초기화 (금액/매출처/카드/브랜드/아이콘 필드 초기화)
 - `loadExpense(id, mode)` — 기존 항목 로드 (브랜드 아이콘 우선, 비브랜드는 merchantIcons 폴백)
 - `saveExpenseForm(mode)` — 폼 저장 (브랜드/비브랜드에 따라 brandIcons/merchantIcons 분기)
-- `renderAliasSuggestions(mode)` — 레거시 빈 스텁 (브랜드 시스템으로 대체)
-- `selectAliasChip(alias, mode)` — 레거시 빈 스텁
 - `openBrandEditPopup(mode)` — 브랜드 수정 플로팅 팝업 (브랜드명 입력 + "이 항목만"/"전체 변경" 선택)
 - `_applyBrandEdit(scope, mode)` — 브랜드 수정 실행 (scope: 'single'→brandOverrides 기록, 'all'→DB 일괄 업데이트)
 - `removeBrandFromForm(mode)` — 폼에서 브랜드 삭제 (expense.brand → null, brandOverrides에 명시적 비브랜드 기록)
 
-**별명 관리:**
-- `openAliasManager(mode)` — 별명 일괄 관리 플로팅 팝업 (그룹별 목록, 수정/삭제)
-- `toggleAliasGroup(groupId)` — 별명 그룹 펼침/접힘 토글
-- `openAliasEdit(expenseId, mode)` — 팝업 닫고 해당 거래를 기존 입력 폼으로 열기
-- `deleteAlias(originalMerchant, mode)` — 개별 매출처의 별명 매핑 삭제
+**별명 관리 (레거시 — 비활성화됨):**
+- `openAliasManager(mode)` — 빈 스텁 (브랜드 시스템으로 대체)
+- `toggleAliasGroup(groupId)` — 빈 스텁
+- `openAliasEdit(expenseId, mode)` — 빈 스텁
+- `deleteAlias(originalMerchant, mode)` — 빈 스텁
 
 **타임라인 컨텍스트 메뉴:**
 - `showExpensePopup(expenseId, x, y)` — 타임라인 항목 우클릭/꾹누르기 팝업 (수정/삭제)
@@ -1418,6 +1416,7 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 | 2026-03-13 | 브랜드 아이콘 마스터 공유: Code.js loadDatabase에서 leftjap의 brandIcons를 항상 마스터로 읽어서 masterBrandIcons로 응답 포함, sync.js loadDatabase에서 masterBrandIcons를 LocalStorage brandIcons와 병합(마스터 기본+사용자 우선), 8번 Code.js/sync.js 설명 갱신 |
 | 2026-03-13 | 브랜드 시스템 3-1: 가계부 폼에서 별명 필드 제거, 브랜드 읽기 전용 표시 추가, renderAliasSuggestions/selectAliasChip 빈 스텁으로 교체, openBrandEditPopup/removeBrandFromForm 추가, saveExpenseForm에서 별명 저장 제거. index.html 브랜드 필드 추가, style.css 브랜드 스타일 추가, ui-expense.js newExpenseForm/loadExpense/saveExpenseForm 수정, 8번 WORKFLOW.md 폼 관리 섹션 갱신 |
 | 2026-03-13 | 브랜드 시스템 3-2, 3-3: openBrandEditPopup 실제 구현(브랜드명 입력+항목단위/전체 선택), _applyBrandEdit 추가, saveExpenseForm 아이콘 저장을 brandIcons/merchantIcons 분기, loadExpense 아이콘 로드 분기. ui-expense.js saveExpenseForm/loadExpense/openBrandEditPopup 수정, _applyBrandEdit 추가, 8번 WORKFLOW.md 폼 관리 섹션 갱신 |
+| 2026-03-14 | 브랜드 시스템 4단계: 별명 시스템 비활성화 — renderAliasSuggestions/selectAliasChip 삭제, openAliasManager/toggleAliasGroup/openAliasEdit/deleteAlias 빈 스텁으로 교체, saveExpenseForm confirm 문구 "별명→브랜드" 변경. merchantAliases 데이터는 보존(아이콘 폴백 경로에서 사용). 8번 별명 관리 섹션/폼 관리 섹션 갱신 |
 | 2026-03-11 | 가계부 입력 폼 카테고리 UI 변경: 그리드 항상 펼침 → 칩(선택된 태그) + 탭하면 펼치기로 변경. toggleCategoryGrid 추가, selectCategory/clearCategorySelection/loadExpense 수정, 칩 HTML(index.html) 및 CSS 추가 |
 | 2026-03-11 | GAS 웹앱 재배포 규칙 강화: clasp push 후 재배포를 "라우팅 변경 시"에서 "항상 필수"로 변경, 템플릿에 사용자 수동 재배포 안내 필수 포함, 10번 주의사항에 재배포 항목 추가 |
 | 2026-03-12 | 10번 멀티유저 보호 규칙 추가: USER_CONFIG 개별 사용자 설정 변경 금지, applyServerConfig 수정 시 전체 사용자 검증, 사용자별 설정 현황 표 추가. 19번 체크리스트에 멀티유저 관련 3개 항목 추가 |
