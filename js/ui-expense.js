@@ -2227,10 +2227,8 @@ function _packCircles(items, containerW, containerH) {
   if (!items || items.length === 0) return [];
 
   var maxAmount = items[0].amount;
-  var minR = 18;
-  var maxR = window.innerWidth <= 768
-    ? Math.min(containerW, containerH) * 0.22
-    : Math.min(containerW, containerH) * 0.28;
+  var minR = 14;
+  var maxR = Math.min(containerW * 0.4, containerH * 0.45);
   var cx = containerW / 2;
   var cy = containerH / 2;
 
@@ -2249,12 +2247,12 @@ function _packCircles(items, containerW, containerH) {
   for (var i = 1; i < circles.length; i++) {
     var angle = i * 2.4; // golden angle ~137.5°
     var dist = circles[0].r + circles[i].r + 4;
-    circles[i].x = cx + Math.cos(angle) * dist * 0.6;
-    circles[i].y = cy + Math.sin(angle) * dist * 0.6;
+    circles[i].x = cx + Math.cos(angle) * dist * 0.8;
+    circles[i].y = cy + Math.sin(angle) * dist * 0.8;
   }
 
   // 간단한 force simulation (80회 반복)
-  for (var iter = 0; iter < 80; iter++) {
+  for (var iter = 0; iter < 120; iter++) {
     // 원끼리 겹침 해소
     for (var i = 0; i < circles.length; i++) {
       for (var j = i + 1; j < circles.length; j++) {
@@ -2275,8 +2273,8 @@ function _packCircles(items, containerW, containerH) {
     }
     // 중앙으로 약하게 끌어당기기
     for (var i = 0; i < circles.length; i++) {
-      circles[i].x += (cx - circles[i].x) * 0.03;
-      circles[i].y += (cy - circles[i].y) * 0.03;
+      circles[i].x += (cx - circles[i].x) * 0.05;
+      circles[i].y += (cy - circles[i].y) * 0.05;
     }
     // 컨테이너 경계 안에 유지
     for (var i = 0; i < circles.length; i++) {
