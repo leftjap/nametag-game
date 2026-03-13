@@ -2894,8 +2894,8 @@ function renderCategoryTreemap(year, endYM) {
     var useVertical = cellPxH >= 36;
     var showAmount = true;
 
-    // 10만원 미만은 금액 생략 (항목명만 표시)
-    if (item.amount < 100000) showAmount = false;
+    // "0만"(5천원 미만)은 표시해도 의미 없으므로 생략
+    if (Math.round(item.amount / 10000) === 0) showAmount = false;
     // 가로 배치일 때 너비 부족하면 금액 숨김
     if (!useVertical && cellPxW < 65) showAmount = false;
     // 높이가 이름 한 줄도 빠듯하면 금액 숨김
