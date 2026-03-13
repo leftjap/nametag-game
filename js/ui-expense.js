@@ -2891,15 +2891,15 @@ function renderCategoryTreemap(year, endYM) {
     var amountText = Math.round(item.amount / 10000) + '만';
 
     // 레이아웃: 세로 배치 가능 여부
-    var useVertical = cellPxH >= 36;
+    var useVertical = cellPxH >= 32;
     var showAmount = true;
 
-    // "0만"(5천원 미만)은 표시해도 의미 없으므로 생략
+    // "0만"(5천원 미만)만 숨김
     if (Math.round(item.amount / 10000) === 0) showAmount = false;
-    // 가로 배치일 때 너비 부족하면 금액 숨김
-    if (!useVertical && cellPxW < 65) showAmount = false;
-    // 높이가 이름 한 줄도 빠듯하면 금액 숨김
-    if (cellPxH < 26) showAmount = false;
+    // 가로 배치일 때 너비 극히 부족하면 금액 숨김
+    if (!useVertical && cellPxW < 45) showAmount = false;
+    // 셀이 텍스트 한 줄도 못 담으면 금액 숨김
+    if (cellPxH < 18) showAmount = false;
 
     var cellStyle = 'left:' + r.x + '%;top:' + r.y + 'px;width:' + r.w + '%;height:' + r.h + 'px;'
       + 'background:' + item.treemapColor + ';';
