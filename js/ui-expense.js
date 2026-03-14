@@ -1206,6 +1206,12 @@ function newExpenseForm(mode = 'normal') {
   // 매출처 입력 가능 (새 항목)
   var merchantEl = document.getElementById('expenseMerchantInput' + suffix);
   if (merchantEl) merchantEl.removeAttribute('readonly');
+  // ── 금액, 카드 편집 가능 복원 ──
+  var amountEl = document.getElementById('expenseAmountInput' + suffix);
+  if (amountEl) amountEl.removeAttribute('readonly');
+
+  var cardEl = document.getElementById('expenseCardInput' + suffix);
+  if (cardEl) cardEl.removeAttribute('readonly');
   // 아이콘 URL 초기화
   var iconUrlEl = document.getElementById('expenseIconUrl' + suffix);
   if (iconUrlEl) iconUrlEl.value = '';
@@ -1216,7 +1222,15 @@ function newExpenseForm(mode = 'normal') {
   var trashBtn = document.getElementById(mode === 'modal' ? 'expenseTrashBtnModal' : 'expenseTrashBtn');
   if (trashBtn) trashBtn.style.display = 'none';
   const now = new Date();
-  document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(now);
+  var dateEl = document.getElementById('expenseDateValue' + suffix);
+  if (dateEl) {
+    dateEl.textContent = formatExpenseDate(now);
+    dateEl.setAttribute('onclick', "openExpenseDatePicker()");
+    dateEl.classList.remove('expense-date-readonly');
+  }
+  // ── 문자 붙여넣기 표시 복원 ──
+  var pasteBtn = document.getElementById('expensePasteBtn' + (suffix || ''));
+  if (pasteBtn) pasteBtn.style.display = '';
   clearCategorySelection(mode);
   updateExpenseSaveBtn(mode);
 }
@@ -1238,9 +1252,17 @@ function loadExpense(id, mode = 'normal') {
   // 메모 로드
   var memoEl = document.getElementById('expenseMemoInput' + suffix);
   if (memoEl) memoEl.value = e.memo || '';
+  // ── 기존 항목: 금액 읽기 전용 ──
+  var amountEl = document.getElementById('expenseAmountInput' + suffix);
+  if (amountEl) amountEl.setAttribute('readonly', true);
+
   // 매출처 읽기 전용 (기존 항목)
   var merchantEl = document.getElementById('expenseMerchantInput' + suffix);
   if (merchantEl) merchantEl.setAttribute('readonly', true);
+
+  // ── 추가: 카드 읽기 전용 ──
+  var cardEl = document.getElementById('expenseCardInput' + suffix);
+  if (cardEl) cardEl.setAttribute('readonly', true);
   // 아이콘 매핑 자동 채우기 (브랜드/비브랜드 분기)
   var existingIcon = null;
   if (e.brand) {
@@ -1252,7 +1274,12 @@ function loadExpense(id, mode = 'normal') {
   var iconUrlEl = document.getElementById('expenseIconUrl' + suffix);
   if (iconUrlEl) iconUrlEl.value = existingIcon || '';
   const d = new Date(e.date + 'T' + (e.time || '00:00'));
-  document.getElementById('expenseDateValue' + suffix).textContent = formatExpenseDate(d);
+  var dateEl = document.getElementById('expenseDateValue' + suffix);
+  if (dateEl) {
+    dateEl.textContent = formatExpenseDate(d);
+    dateEl.removeAttribute('onclick');
+    dateEl.classList.add('expense-date-readonly');
+  }
   // 그리드 접힌 상태 보장
   var catGrid = document.getElementById('expenseCategoryGrid' + suffix);
   if (catGrid) { catGrid.classList.remove('grid-open'); catGrid.style.display = 'none'; }
@@ -1273,6 +1300,10 @@ function loadExpense(id, mode = 'normal') {
   // 기존 항목이므로 상단 휴지통 버튼 표시
   var trashBtn = document.getElementById(mode === 'modal' ? 'expenseTrashBtnModal' : 'expenseTrashBtn');
   if (trashBtn) trashBtn.style.display = 'flex';
+
+  // ── 문자 붙여넣기 숨김 ──
+  var pasteBtn = document.getElementById('expensePasteBtn' + (suffix || ''));
+  if (pasteBtn) pasteBtn.style.display = 'none';
 
   updateExpenseSaveBtn(mode);
 }
@@ -1447,7 +1478,7 @@ function updateExpenseSaveBtn(mode = 'normal') {
 
 
 function openExpenseDatePicker() {
-  // TODO: 날짜 선택 모달 (현재는 간단히 일반 input date 사용 가능)
+  if (curExpenseId) return;
   alert('날짜 선택 기능은 추후 구현됩니다.');
 }
 

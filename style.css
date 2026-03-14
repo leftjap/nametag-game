@@ -2275,6 +2275,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   color: #c7c7cc;
   font-weight: 300;
 }
+.expense-amount-input[readonly] {
+  opacity: 0.65;
+  cursor: default;
+}
 .expense-amount-unit {
   flex-shrink: 0;
   font-size: 22px;
@@ -2310,6 +2314,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .expense-date-label { font-size: 14px; color: var(--tx-m); }
 .expense-date-value {
   font-size: 14px; color: var(--tx); cursor: default; font-weight: 500;
+}
+.expense-date-readonly {
+  opacity: 0.65;
+  pointer-events: none;
 }
 
 /* 카테고리 */
@@ -2411,6 +2419,12 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 .expense-optional-input:focus { border-bottom-color: var(--tab-color); }
 .expense-optional-input::placeholder { color: #c7c7cc; }
+.expense-optional-input[readonly] {
+  opacity: 0.65;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
 .expense-memo-input {
   width: 100%;
   border: none;
@@ -3040,43 +3054,43 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   stroke-linejoin: round;
 }
 
-/* 가계부 모달/에디터 상단 휴지통 버튼 */
+/* ═══ 가계부 삭제 버튼 — 모바일 에디터 상단 ═══ */
 .expense-trash-btn {
-  width: 44px;
-  height: 44px;
-  border: none;
-  background: none;
-  cursor: pointer;
   display: none;
   align-items: center;
   justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
   color: var(--tx-hint);
-  transition: color .15s, background .15s;
-  border-radius: 10px;
   flex-shrink: 0;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.expense-trash-btn:hover {
-  background: rgba(0,0,0,.05);
-  color: var(--red);
 }
 .expense-trash-btn svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 1.8;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.expense-trash-btn:active {
+  color: #E55643;
+}
 
+/* ═══ 가계부 삭제 버튼 — PC/태블릿 모달 헤더 ═══ */
 .modal-hdr .expense-trash-btn {
-  position: static;
-  transform: none;
-  margin-right: -8px;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.modal-hdr {
+  position: relative;
 }
 
 .modal-body {
@@ -3129,16 +3143,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     padding: 24px 20px 100px;
   }
 
-  .expense-trash-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    right: 20px;
-  }
-  .expense-trash-btn svg {
-    width: 28px;
-    height: 28px;
-  }
 }
 
 /* 모바일 (768px 이하) */
@@ -3179,17 +3183,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
     max-width: 100%;
   }
 
-  /* 가계부 에디터: 모바일 상단 휴지통 크기 */
-  .expense-trash-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    right: 10px;
-  }
-  .expense-trash-btn svg {
-    width: 24px;
-    height: 24px;
-  }
 }
 
 .exp-month-nav {
