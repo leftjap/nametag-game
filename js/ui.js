@@ -888,6 +888,10 @@ let contextItemId   = null;
 let contextItemType = null;
 
 function showContextMenuAt(item, x, y, fromTouch) {
+  // 꾹누르기 중 시작된 텍스트 선택 해제
+  var sel = window.getSelection();
+  if (sel) sel.removeAllRanges();
+
   const onclick = item.getAttribute('onclick') || '';
   const t = activeTab;
   contextItemId = null; contextItemType = null;
@@ -991,6 +995,10 @@ function showContextMenuAt(item, x, y, fromTouch) {
 }
 
 function closeLpPopup() {
+  // 남아있는 텍스트 선택 해제
+  var sel = window.getSelection();
+  if (sel) sel.removeAllRanges();
+
   const overlay  = document.getElementById('lpPopupOverlay');
   const card     = document.getElementById('lpPopupCard');
   if (card) card.classList.remove('open');

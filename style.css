@@ -235,6 +235,9 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   display:flex;flex-direction:column;padding:14px 16px 12px;gap:5px;cursor:pointer;
   border-bottom:none;border-left:none;
   transition:.1s;position:relative;min-height:0;height:auto;max-height:none;background:var(--bg-white);overflow:visible;flex-shrink:0;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
 }
 .lp-item::after{
   content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;
