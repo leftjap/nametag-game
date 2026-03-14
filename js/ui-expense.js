@@ -1984,7 +1984,7 @@ function openCategoryEtcPopup(catId, displayName, year) {
   var contentHtml = '<div class="exp-fp-yearly-list">';
 
   items.forEach(function(m, i) {
-    var iconItem = { merchant: m.merchant, icon: null, category: m.category };
+    var iconItem = { merchant: m.merchant, icon: null, category: m.category, brand: m.isBrand ? m.merchant : null };
 
     contentHtml += '<div class="exp-fp-yearly-row" style="cursor:pointer;" onclick="closeExpenseFloatingPopup(); openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')">';
     contentHtml += '<span class="exp-fp-yearly-rank">' + (i + 1) + '</span>';
@@ -2595,7 +2595,7 @@ function openYearlyFullPopup(year, startFrom) {
   merchants.forEach(function(m, i) {
     var catObj = EXPENSE_CATEGORIES.find(function(c) { return c.id === m.category; });
     var catColor = catObj ? catObj.color : '#B0B0B8';
-    var iconItem = { merchant: m.merchant, icon: null, category: m.category };
+    var iconItem = { merchant: m.merchant, icon: null, category: m.category, brand: m.isBrand ? m.merchant : null };
 
     var fpOnclick = m.isEtcGroup
       ? ''
@@ -2649,7 +2649,7 @@ function openEtcGroupPopup(year) {
   var contentHtml = '<div class="exp-fp-yearly-list">';
 
   items.forEach(function(m, i) {
-    var iconItem = { merchant: m.merchant, icon: null, category: m.category };
+    var iconItem = { merchant: m.merchant, icon: null, category: m.category, brand: m.isBrand ? m.merchant : null };
 
     contentHtml += '<div class="exp-fp-yearly-row" style="cursor:pointer;" onclick="closeExpenseFloatingPopup(); openMerchantDetail(\'' + _escMerchant(m.merchant) + '\',' + year + ')">';
     contentHtml += '<span class="exp-fp-yearly-rank">' + (i + 1) + '</span>';
