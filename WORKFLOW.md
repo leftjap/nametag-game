@@ -372,6 +372,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 **전역 상수:**
 - `EXPENSE_CATEGORIES` — 가계부 카테고리 배열 12개 [{id, name, color, bg}, ...] (food, dining, shopping, transport, subscribe, medical, leisure, beauty, pet, invest, utility, etc)
 - `MERCHANT_LOGOS` — 매출처 키워드 → 도메인 매핑 (Google 파비콘용)
+- `BRAND_CATEGORY_MAP` — 브랜드명 → 카테고리 ID 매핑 (143개 브랜드, BRAND-MAPPING.md 기준)
 
 **전역 상태:**
 - `activeTab` — 현재 탭 ('navi'|'fiction'|'blog'|'book'|'quote'|'memo'|'expense')
@@ -408,6 +409,10 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `getMonthlyTrendAround(centerYM)` — 중심 월 기준 월별 추이
 - `getMerchantBreakdown(ym)` — 월간 상호별 지출 분석. brand 기준 그룹핑 (brand 있으면 brand로, 없으면 매출처명으로 그룹). [{merchant, amount, count, percent, category, isBrand}, ...]
 - `getYearMerchantBreakdown(year, endYM)` — 연간 상호별 지출 분석. brand 기준 그룹핑. endYM이 주어지면 해당 월까지만 집계 (예: '2025-07' → 1~7월). 1만원 이하는 단일 "기타"로 묶기 (isEtcGroup, etcItems 필드 포함). {startDate, endDate, total, merchants: [{..., isBrand, isEtcGroup, etcItems}, ...]}
+
+**매출처 정제/분류:**
+- `cleanMerchantName(merchant)` — 매출처명 접두어 제거 + 변형 통합 (신한온누리, 민생회복, 통화코드, 사러가/또보겠지/COS/온브릭스 등)
+- `getCategoryByBrand(brand)` — BRAND_CATEGORY_MAP에서 카테고리 조회
 
 **매출처 별명:**
 - `getMerchantAliases()`, `saveMerchantAliases(arr)` — 별명 매핑 읽기/쓰기
@@ -506,6 +511,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `_logoFallback(el, category)` — 이미지 로드 실패 시 카테고리 아이콘으로 대체
 - `getCatShortName(catId)` — 카테고리 아이콘 폴백용 짧은 이름. shortNames 매핑에 있으면 해당 값, 없으면 catName 앞 2글자
 - `updateExpenseCompact()` — 사이드바 가계부 금액 업데이트
+- `validateIconUrl(url, callback)` — 아이콘 URL 이미지 로드 가능 여부 비동기 검증
 
 **대시보드 A (renderExpenseDashboard):**
 - `renderExpenseDashboard(platform)` — 'pc'|'mobile'. 요약+차트+카테고리+예상+주간캘린더+타임라인
@@ -979,6 +985,11 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `clearAllExpenses(email)` — 가계부 전체 삭제
 - `reclassifyAllExpenses(email)` — Gemini로 기존 가계부 일괄 재분류
 - `fixFutureExpenses(email)` — 미래 날짜 항목 보정
+
+**매출처 정제/분류 (공용, config 불필요):**
+- `BRAND_CATEGORY_MAP` — 브랜드명 → 카테고리 ID 매핑 (data.js와 동일, 143개 브랜드)
+- `cleanMerchantName(merchant)` — 매출처명 접두어 제거 + 변형 통합 (data.js와 동일 로직)
+- `getCategoryByBrand(brand)` — BRAND_CATEGORY_MAP에서 카테고리 조회
 
 **전역 API 키 (공용, config 불필요):**
 - `GOOGLE_CSE_API_KEY`, `GOOGLE_CSE_CX` — Google Custom Search
@@ -1477,6 +1488,8 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-03-14 | openCategoryExpensePopup 연간 모드에서 아이콘 있는 브랜드 항목 제외 — 카테고리 버블 클릭 시 개별 버블로 표시된 브랜드가 중복 표시되는 버그 수정 |
+| 2026-03-14 | data.js에 BRAND_CATEGORY_MAP(143개 브랜드→카테고리) + cleanMerchantName() + getCategoryByBrand() 추가. newExpense/updateExpense에 자동 정제·분류 삽입. ui-expense.js에 validateIconUrl 추가, _renderYearlyBubbles 아이콘 없는 브랜드→카테고리 묶음 처리, saveExpenseForm _yearlyRankLoaded 보존. Code.gs에 동일 BRAND_CATEGORY_MAP + cleanMerchantName 추가, saveExpenseFromSMS/importCardSmsSheet에 정제·분류 적용 |
 | 2026-03-14 | 22번 매출처명 정제 + 브랜드 카테고리 자동 분류 시스템 섹션 추가 — 문제 이력 6건, 근본 원인, 해결 방안 8개, 주의사항 기록 |
 | 2026-03-09 | 19번 자주 겪는 실수 체크리스트 추가, 방향 확인서에 관련 기존 규칙 항목 추가, 렌더 함수 HTML 구조(8번) 추가, CSS 선택자 인덱스(8번) 추가, 변경 로그 추가 |
 | 2026-03-10 | GAS 배포 규칙 추가: 7번 파일 구조에 gas-nametag 추가, 8번 상세 맵에 Code.gs 추가, 0번 업로드 기준에 GAS 행 추가, 2번에 GAS 배포 규칙/템플릿 추가, 10번에 GAS 수정 주의사항 추가 |

@@ -890,6 +890,7 @@ soyoun312의 자주 이용 매출처를 카테고리별 rules에 추가. Gemini 
 | 날짜 | 변경 내용 |
 |---|---|
 | 2026-03-15 | 현대백화점 입점 매장 17개 매출처를 현대백화점 식품관 브랜드로 추가 매핑 (43개로 확대). Code.gs에 현대백화점카드 자동 brand 설정 로직 추가 (saveExpenseFromSMS, importCardSmsSheet) |
+| 2026-03-14 | soyoun312 전체 데이터 재분류 — BRAND_CATEGORY_MAP 기반 브랜드→카테고리 자동 부여 + cleanMerchantName 매출처명 정제 + autoMatchCategory 비브랜드 매칭. 1차 373건 + 2차 51건 + 3차 31건 + 4차 65건 변경. 최종 etc 73건 (PG사/세금/주유/공공기관). Code.gs에 BRAND_CATEGORY_MAP + cleanMerchantName 추가, saveExpenseFromSMS/importCardSmsSheet에 적용 |
 | 2026-03-14 | 아내 계정(soyoun312) 카테고리 2차 정제 61건 + autoMatchCategoryServer rules에 soyoun312 자주 이용 매출처 195개 추가. 현대백화점 식품관 매출처 3개(귤/송/햄) 추가 |
 | 2026-03-13 | 아내 계정(soyoun312) 매출처명 정제 2차 — 서울시ETAX 금액별 분류, 신한온누리/1차민생회복 접두어 제거, 사러가 변형 통일 (51건) |
 | 2026-03-13 | 아내 계정(soyoun312) etc 카테고리 재분류 — 상위 24개 매출처 203건을 올바른 카테고리로 변경 |
