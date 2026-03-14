@@ -2084,12 +2084,8 @@ function openCategoryExpensePopup(catId, catName, year) {
       .filter(function(e) {
         if (!e.date || !e.date.startsWith(yearStr) || e.category !== catId) return false;
         if (endDate && e.date > endDate) return false;
-        // 아이콘 있는 브랜드는 개별 버블로 표시되므로 카테고리 팝업에서 제외
-        if (e.brand) {
-          var brandIcon = getBrandIcon(e.brand);
-          if (!brandIcon) brandIcon = findMerchantIcon(e.brand) || findMerchantIcon(resolveAlias(e.brand));
-          if (brandIcon) return false;
-        }
+        // 브랜드 항목은 개별 버블 또는 카테고리 묶음으로 별도 처리되므로 제외
+        if (e.brand) return false;
         return true;
       })
       .sort(function(a, b) { return (b.date + ' ' + (b.time || '')).localeCompare(a.date + ' ' + (a.time || '')); });
