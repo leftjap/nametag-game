@@ -504,6 +504,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `_findMerchantDomain(merchant)` — MERCHANT_LOGOS 매핑에서 매출처 도메인 검색 (긴 키워드 우선)
 - `getMerchantIconHtml(item)` — 매출처 아이콘 HTML. 조회 순서: brandIcons → merchantIcons → 카테고리 아이콘 폴백
 - `_logoFallback(el, category)` — 이미지 로드 실패 시 카테고리 아이콘으로 대체
+- `getCatShortName(catId)` — 카테고리 아이콘 폴백용 짧은 이름. shortNames 매핑에 있으면 해당 값, 없으면 catName 앞 2글자
 - `updateExpenseCompact()` — 사이드바 가계부 금액 업데이트
 
 **대시보드 A (renderExpenseDashboard):**
