@@ -357,6 +357,7 @@ function renderMonthlyBarChart(trend) {
 
 function _onBarChartClick(ym) {
   _expenseViewYM = ym;
+  _selectedExpenseDate = null;
   if (window.innerWidth > 768) {
     // PC/태블릿: 통합 대시보드 다시 렌더 (B화면 진입 차단)
     var dashPane = document.getElementById('expFullDashboardPane');
@@ -365,8 +366,12 @@ function _onBarChartClick(ym) {
     if (detailPane) detailPane.style.display = 'none';
     renderExpenseDashboard('pc');
   } else {
-    // 모바일: 기존 B화면 동작
-    showExpenseFullDetail(ym);
+    // 모바일: 해당 월의 대시보드(A) 렌더
+    var dashboard = document.getElementById('pane-expense-dashboard');
+    var detail = document.getElementById('pane-expense-detail');
+    if (detail) detail.style.display = 'none';
+    if (dashboard) dashboard.style.display = 'flex';
+    renderExpenseDashboard('mobile');
   }
 }
 
