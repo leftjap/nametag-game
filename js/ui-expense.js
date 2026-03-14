@@ -1837,7 +1837,7 @@ function renderMerchantRanking(merchants, limit, options) {
     var barColor = (i === 0) ? '#E55643' : '#E8E8E8';
     var catObj = EXPENSE_CATEGORIES.find(function(c) { return c.id === m.category; });
     var catName = catObj ? catObj.name : '기타';
-    var iconItem = { merchant: m.merchant, icon: null };
+    var iconItem = { merchant: m.merchant, icon: null, category: m.category, brand: m.isBrand ? m.merchant : null };
 
     html += '<div class="exp-mr-row" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\')">';
     html += getMerchantIconHtml(iconItem);
@@ -2123,7 +2123,7 @@ function renderMonthlyMerchantHero(merchants, thisYM, isCurrentMonth, monthNum) 
   var top1 = merchants[0];
   var gridItems = merchants.slice(1, 7); // 2~7위
 
-  var iconItem1 = { merchant: top1.merchant, icon: null };
+  var iconItem1 = { merchant: top1.merchant, icon: null, category: top1.category, brand: top1.isBrand ? top1.merchant : null };
 
   var html = '<div style="padding:0;">';
 
@@ -2239,7 +2239,7 @@ function renderYearlySection(year, endYM) {
 
 // 연간 그리드 아이템 HTML 생성 (공통)
 function _renderYearlyGridItem(m, rank, year) {
-  var iconItem = { merchant: m.merchant, icon: null };
+  var iconItem = { merchant: m.merchant, icon: null, category: m.category, brand: m.isBrand ? m.merchant : null };
   var onclickYear = year ? ',' + year : '';
   var html = '<div class="exp-yearly-grid-item" onclick="openMerchantDetail(\'' + _escMerchant(m.merchant) + '\'' + onclickYear + ')">';
   html += '<div class="exp-yearly-grid-rank">' + rank + '</div>';
