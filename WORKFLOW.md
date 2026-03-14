@@ -387,6 +387,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `EXPENSE_CATEGORIES` — 가계부 카테고리 배열 12개 [{id, name, color, bg}, ...] (food, dining, shopping, transport, subscribe, medical, leisure, beauty, pet, invest, utility, etc)
 - `MERCHANT_LOGOS` — 매출처 키워드 → 도메인 매핑 (Google 파비콘용)
 - `BRAND_CATEGORY_MAP` — 브랜드명 → 카테고리 ID 매핑 (143개 브랜드, BRAND-MAPPING.md 기준)
+- `MERCHANT_TO_BRAND` — 매출처명 → 브랜드명 자동 매핑 (BRAND-MAPPING.md §1 기준, 227개 매출처). brand가 null인 expense 저장 시 자동 부여
 
 **전역 상태:**
 - `activeTab` — 현재 탭 ('navi'|'fiction'|'blog'|'book'|'quote'|'memo'|'expense')
