@@ -885,7 +885,7 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   .editor-menu{top:90px!important}
   .aa-menu{top:90px!important}
   .swipe-edge{top:90px!important}
-  .ed-body{font-size:18px;line-height:1.9}
+  .ed-body{font-size:16px;line-height:1.9}
   .ed-title{font-size:26px}
   .lp-item-title{font-size:16px}
   .lp-item-preview{font-size:15px}

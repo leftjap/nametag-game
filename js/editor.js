@@ -426,7 +426,9 @@ async function handlePaste(e) {
         document.execCommand('insertHTML', false, `<img src="${trimmed}" alt="붙여넣기 이미지"><br>`);
       } else {
         const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        document.execCommand('insertHTML', false, escaped.replace(/\r\n/g,'<br>').replace(/\n/g,'<br>'));
+        const lines = escaped.split(/\r\n|\n/);
+        const html = lines.map(function(line) { return '<div>' + (line || '<br>') + '</div>'; }).join('');
+        document.execCommand('insertHTML', false, html);
       }
     }
     setTimeout(() => { if (textTypes.includes(activeTab)) saveCurDoc(activeTab); else saveMemo(); updateWC(); }, 100);
