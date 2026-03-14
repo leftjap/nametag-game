@@ -1433,10 +1433,51 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 
 ---
 
+## 22. 매출처명 정제 + 브랜드 카테고리 자동 분류 시스템
+
+### 문제 이력 (2026-03-14)
+
+아내 계정(soyoun312)의 2025년 12월 연간 대시보드에서 다음 문제들이 반복 발생:
+
+1. **커스텀멜로우 항목 사라짐** — 아이콘 URL 변경 시 대시보드 리렌더 → `_yearlyRankLoaded`가 10으로 리셋 → 16위인 커스텀멜로우가 목록에서 사라짐
+2. **버블 차트 카테고리 중복** — "외식" 버블 3개, "건강" 2개, "마트" 2개 표시. 원인: 아이콘 없는 브랜드가 카테고리 색 폴백으로 렌더링돼 카테고리 버블과 중복
+3. **카테고리 팝업에 다른 분류 항목 혼재** — "기타" 클릭 시 CJ·KIX DFS·버거킹 등 표시. 원인: brand가 있어도 category가 etc로 남아있음
+4. **아이콘 URL 로드 실패** — eomisae.co.kr 등 hotlink 차단 도메인의 URL 저장 시 이미지 로드 실패 → 카테고리 폴백
+5. **매출처명 접두어 미정제** — "신한온누리 사러가", "1차 민생회복 야키토리묵" 등 접두어가 남아 같은 가게가 분산 집계
+6. **매출처명 변형 미통합** — 사러가연/사러가연희수퍼마켓, 또부겠지스마일/또부겠지스마 등이 별도 항목으로 존재
+
+### 근본 원인
+
+- import 시점에 매출처명 정제가 없어 접두어·변형이 그대로 저장됨
+- brand→category 자동 매핑이 없어 etc로 남는 항목 다수
+- `_renderYearlyBubbles`에서 아이콘 없는 브랜드를 개별 버블로 렌더링
+- `saveExpenseForm`에서 아이콘만 변경해도 전체 대시보드 리렌더 → 상태 리셋
+
+### 해결 방안 (작업지시서 작성 완료)
+
+1. `data.js`에 `BRAND_CATEGORY_MAP` (143개 브랜드) + `getCategoryByBrand()` 추가
+2. `data.js`에 `cleanMerchantName()` — 접두어 제거 + 변형 통합
+3. expense 저장 시 자동 정제 + 카테고리 부여
+4. `_renderYearlyBubbles` — 아이콘 없는 브랜드 → 카테고리 묶음 처리
+5. `saveExpenseForm` — 아이콘 변경 시 `_yearlyRankLoaded` 보존
+6. 아이콘 URL 로드 검증 추가
+7. Code.gs에도 동일 정제·분류 로직 적용
+8. 기존 데이터 일괄 정제 (배포 후 1회)
+
+### 주의사항
+
+- 카테고리 수동 수정은 콘솔에서 하지 않는다. 반드시 `BRAND_CATEGORY_MAP`에 등록 후 코드로 적용
+- 새 브랜드 추가 시 `BRAND_CATEGORY_MAP`과 `BRAND-MAPPING.md`를 동시에 갱신
+- 아이콘 URL은 hotlink 차단 없는 도메인 사용 (gstatic.com, favicon.ico 등)
+- `cleanMerchantName()`에 새 접두어·변형 패턴 발견 시 추가
+
+---
+
 ## 변경 로그
 
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-03-14 | 22번 매출처명 정제 + 브랜드 카테고리 자동 분류 시스템 섹션 추가 — 문제 이력 6건, 근본 원인, 해결 방안 8개, 주의사항 기록 |
 | 2026-03-09 | 19번 자주 겪는 실수 체크리스트 추가, 방향 확인서에 관련 기존 규칙 항목 추가, 렌더 함수 HTML 구조(8번) 추가, CSS 선택자 인덱스(8번) 추가, 변경 로그 추가 |
 | 2026-03-10 | GAS 배포 규칙 추가: 7번 파일 구조에 gas-nametag 추가, 8번 상세 맵에 Code.gs 추가, 0번 업로드 기준에 GAS 행 추가, 2번에 GAS 배포 규칙/템플릿 추가, 10번에 GAS 수정 주의사항 추가 |
 | 2026-03-10 | 가계부 PC/태블릿 대시보드 레이아웃 개편: renderExpenseDashboard 재구성(요약/캘린더/2열+막대+연간), renderMerchantRanking 개선(1위빨강/태그회색/태그팝업), renderMonthlyBarChart 예상금액추가, renderYearlySection 재구성(순위/같은행/더보기), openCategoryExpensePopup/_renderYearlyGridItem/_loadMoreYearly/_yearlyLoadedCount 추가, 막대두께8px/태그스타일/금액정규화/그리드2열/모바일조정 CSS 변경 |
