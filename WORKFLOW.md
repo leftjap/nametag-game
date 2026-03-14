@@ -1005,6 +1005,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `BRAND_CATEGORY_MAP` — 브랜드명 → 카테고리 ID 매핑 (data.js와 동일, 143개 브랜드)
 - `cleanMerchantName(merchant)` — 매출처명 접두어 제거 + 변형 통합 (data.js와 동일 로직)
 - `getCategoryByBrand(brand)` — BRAND_CATEGORY_MAP에서 카테고리 조회
+- `MERCHANT_TO_BRAND` — 매출처명 → 브랜드명 매핑 (data.js와 동일, 양쪽 동시 갱신 필수)
 
 **전역 API 키 (공용, config 불필요):**
 - `GOOGLE_CSE_API_KEY`, `GOOGLE_CSE_CX` — Google Custom Search
