@@ -614,7 +614,7 @@ gas-nametag/          — Google Apps Script (메인 레포와 별도 폴더)
 - `_squarify(values, x, y, w, h)` — squarified treemap 레이아웃 계산
 - `_worstAspect(row, rowTotal, totalArea, shortSide)` — aspect ratio 평가 헬퍼
 - `_packCircles(items, containerW, containerH)` — circle packing 알고리즘 (force-based, 금액 비례 반지름)
-- `_renderYearlyBubbles(merchants, containerW, containerH)` — 버블 차트 HTML 생성 (브랜드/상호 상위 20개만 버블, isEtcGroup과 21위 이하는 "그 외" 인라인 태그로 분리)
+- `_renderYearlyBubbles(merchants, containerW, containerH)` — 버블 차트 HTML 생성. 브랜드 개별 버블(아이콘 있는 것만), 카테고리 묶음(비브랜드만), "그 외" 인라인 태그. **카테고리 버블 크기 = 비브랜드(!e.brand) 항목 금액만 합산**
 - `_renderYearlyRankList(merchants, limit, year)` — 랭킹 리스트 HTML 생성 (뉴트럴 톤, 순위+파비콘+상호명+금액+퍼센트)
 - `_renderYearlyGridItem(m, rank, year)` — 연간 그리드 아이템 HTML 생성 (월간 히어로 그리드에서도 사용)
 - `loadMoreYearlyRank()` — 연간 랭킹 리스트 로드모어 (10개씩 추가 표시, DOM data-attribute로 카운트/endYM 관리)
