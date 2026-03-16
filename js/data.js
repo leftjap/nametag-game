@@ -704,6 +704,9 @@ function updateExpense(id, data) {
   const expenses = getExpenses();
   const idx = expenses.findIndex(e => e.id === id);
   if (idx !== -1) {
+    // 사용자가 category를 명시적으로 전달했는지 확인
+    var userSetCategory = data.hasOwnProperty('category');
+
     Object.assign(expenses[idx], data);
 
     // 매출처명 정제
@@ -714,8 +717,8 @@ function updateExpense(id, data) {
       expenses[idx].brand = MERCHANT_TO_BRAND[expenses[idx].merchant];
     }
 
-    // brand가 있으면 BRAND_CATEGORY_MAP에서 카테고리 자동 부여
-    if (expenses[idx].brand && BRAND_CATEGORY_MAP[expenses[idx].brand]) {
+    // brand→category 자동 부여: 사용자가 카테고리를 직접 지정한 경우 건너뜀
+    if (!userSetCategory && expenses[idx].brand && BRAND_CATEGORY_MAP[expenses[idx].brand]) {
       expenses[idx].category = BRAND_CATEGORY_MAP[expenses[idx].brand];
     }
 
