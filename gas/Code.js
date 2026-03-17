@@ -689,15 +689,31 @@ function loadDatabase(config) {
     var file = getDatabaseFile(config);
     var content = file.getBlob().getDataAsString();
 
-    // 마스터 brandIcons 로드 (leftjap 계정 기준)
+    // 마스터 brandIcons 로드 (모든 사용자의 brandIcons 합집합)
     var masterBrandIcons = {};
     try {
-      var masterConfig = USER_CONFIG['leftjap@gmail.com'];
-      if (masterConfig) {
-        var masterFile = getDatabaseFile(masterConfig);
-        var masterContent = masterFile.getBlob().getDataAsString();
-        var masterDb = JSON.parse(masterContent || '{}');
-        masterBrandIcons = masterDb['gb_brand_icons'] || {};
+      var allEmails = Object.keys(USER_CONFIG);
+      for (var ei = 0; ei < allEmails.length; ei++) {
+        var userConfig = USER_CONFIG[allEmails[ei]];
+        try {
+          var userFile = getDatabaseFile(userConfig);
+          var userContent = userFile.getBlob().getDataAsString();
+          var userDb = JSON.parse(userContent || '{}');
+          var userIcons = userDb['gb_brand_icons'] || {};
+          // 합집합: 나중에 읽는 사용자의 값이 덮어쓰지만,
+          // 기존 값이 있으면 유지 (먼저 등록된 것 보존)
+          // → Object.assign(masterBrandIcons, userIcons)는 나중 것이 덮어쓰므로
+          // 반대로: 기존 master에 없는 키만 추가
+          var iconKeys = Object.keys(userIcons);
+          for (var ik = 0; ik < iconKeys.length; ik++) {
+            var brand = iconKeys[ik];
+            if (!masterBrandIcons[brand]) {
+              masterBrandIcons[brand] = userIcons[brand];
+            }
+          }
+        } catch (e3) {
+          console.warn('brandIcons 로드 실패 (' + allEmails[ei] + '):', e3);
+        }
       }
     } catch (e2) {
       console.warn('마스터 brandIcons 로드 실패:', e2);
