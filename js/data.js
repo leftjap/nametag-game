@@ -427,6 +427,7 @@ function saveBook() {
     pages:     parseInt(document.getElementById('book-pages').value) || 0,
     memo:      document.getElementById('book-body').innerHTML,
     date:      today(),
+    updated:   new Date().toISOString(),
     pinned:    false
   };
   const books = getBooks();
@@ -493,9 +494,9 @@ function saveQuote() {
   const quotes = getQuotes();
   if (curQuoteId) {
     const idx = quotes.findIndex(q => q.id === curQuoteId);
-    if (idx !== -1) { quotes[idx].text = text; quotes[idx].by = by; }
+    if (idx !== -1) { quotes[idx].text = text; quotes[idx].by = by; quotes[idx].updated = new Date().toISOString(); }
   } else {
-    const q = { id: Date.now().toString(), text, by, created: new Date().toISOString(), pinned: false };
+    const q = { id: Date.now().toString(), text, by, created: new Date().toISOString(), updated: new Date().toISOString(), pinned: false };
     quotes.unshift(q);
     curQuoteId = q.id;
   }

@@ -329,7 +329,9 @@ const SYNC = {
         var sb = serverBooks[j];
         var lb = bookMap[sb.id];
         if (lb) {
-          if (sb.date && lb.date && sb.date > lb.date) {
+          var sbTime = sb.updated || sb.date || '';
+          var lbTime = lb.updated || lb.date || '';
+          if (sbTime && lbTime && sbTime > lbTime) {
             Object.assign(lb, sb);
             booksChanged = true;
           }
@@ -375,7 +377,9 @@ const SYNC = {
         var sq = serverQuotes[j];
         var lq = quoteMap[sq.id];
         if (lq) {
-          if (sq.created && lq.created && sq.created > lq.created) {
+          var sqTime = sq.updated || sq.created || '';
+          var lqTime = lq.updated || lq.created || '';
+          if (sqTime && lqTime && sqTime > lqTime) {
             Object.assign(lq, sq);
             quotesChanged = true;
           }

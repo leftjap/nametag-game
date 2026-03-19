@@ -1340,12 +1340,12 @@ editor 영역 안에 다음 하위 패널이 있다. 한 번에 하나만 표시
 
 ### 책 (K.books)
 ```
-{ id, driveId, title, author, publisher, pages, memo, date, pinned }
+{ id, driveId, title, author, publisher, pages, memo, date, updated, pinned }
 ```
 
 ### 어구 (K.quotes)
 ```
-{ id, text, by, created, pinned }
+{ id, text, by, created, updated, pinned }
 ```
 
 ### 메모 (K.memos)
