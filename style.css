@@ -542,8 +542,10 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .comment-send-btn:active{opacity:0.8}
 
 /* 파트너 모드: 댓글 표시 시 본문 하단 패딩 축소 */
+/* 파트너 모드: 본문이 내용 크기만큼만 차지하여 댓글이 바로 아래 표시 */
 .partner-mode .editor-content-wrap {
-  padding-bottom: 0 !important;
+  padding-bottom: 20px !important;
+  flex: none !important;
 }
 
 .special-form{padding:0 0 24px;display:flex;flex-direction:column;gap:20px;border-bottom:none;margin-bottom:0}
