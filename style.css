@@ -582,25 +582,15 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color .12s, background .12s;
+  transition: color .12s, background .12s, opacity .12s;
   padding: 0;
-  opacity: 0;
-}
-
-.comment-item:hover .comment-action-btn {
-  opacity: 1;
-}
-
-/* 모바일에서는 항상 표시 (hover 없으므로) */
-@media (max-width: 768px) {
-  .comment-action-btn {
-    opacity: 0.5;
-  }
+  opacity: 0.4;
 }
 
 .comment-action-btn:hover {
   background: rgba(0,0,0,.05);
   color: var(--tx-d);
+  opacity: 1;
 }
 
 .comment-action-del:hover {
