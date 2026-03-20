@@ -1342,16 +1342,13 @@ function _getDisplayName(email) {
   return email.split('@')[0];
 }
 
-async function onNotifClick(notifId, docId, fromEmail) {
+function onNotifClick(notifId, docId, fromEmail) {
   var notif = _notifCache.find(function(n) { return n.id === notifId; });
 
-  // 읽음 처리
+  // 캐시에서 즉시 읽음 처리
   if (notif) notif.read = true;
 
-  // 서버에 읽음 표시
-  try { await SYNC.markRead([notifId]); } catch (e) { console.warn('[알림] markRead 실패:', e); }
-
-  // 뱃지 업데이트
+  // 뱃지 즉시 업데이트
   var unread = _notifCache.filter(function(n) { return !n.read; }).length;
   var badge = document.getElementById('notifBadge');
   if (badge) {
@@ -1363,16 +1360,16 @@ async function onNotifClick(notifId, docId, fromEmail) {
     }
   }
 
-  // 리스트 즉시 갱신 (읽음 스타일 반영)
-  renderNotifList();
-
-  // 팝오버 닫기
+  // 팝오버 즉시 닫기
   closeNotifPopover();
 
-  // 파트너 모드 진입
+  // 파트너 모드 즉시 진입
   if (fromEmail) {
     enterPartnerMode(fromEmail, docId || null);
   }
+
+  // 서버 읽음 표시는 백그라운드 (await 안 함)
+  SYNC.markRead([notifId]).catch(function(e) { console.warn('[알림] markRead 실패:', e); });
 }
 
 // ═══ 파트너 모드 (상대방 블로그 방문) ═══
