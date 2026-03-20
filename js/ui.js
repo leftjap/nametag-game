@@ -1368,9 +1368,9 @@ var _myBackup = null;     // { docs, books, quotes, memos, checks, expenses, act
 async function enterPartnerMode(partnerEmail, targetDocId) {
   if (_partnerMode) return;
 
-  // 로딩 표시
-  var listEl = document.getElementById('pane-list');
-  if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:80px 20px;color:var(--tx-hint);font-size:15px">불러오는 중...</div>';
+  // 로딩 화면 표시 (기존 고양이 바운스 로딩 화면)
+  var loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) { loadingScreen.classList.remove('hidden'); loadingScreen.style.display = ''; }
 
   // 현재 내 데이터 백업 (LocalStorage는 건드리지 않음, 메모리 변수만)
   _myBackup = {
@@ -1390,6 +1390,8 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
     var res = await SYNC.loadPartnerDb();
     if (!res || res.status !== 'ok') {
       alert('상대방 데이터를 불러올 수 없습니다.');
+      var loadingScreen = document.getElementById('loadingScreen');
+      if (loadingScreen) { loadingScreen.classList.add('hidden'); loadingScreen.style.display = 'none'; }
       _myBackup = null;
       renderListPanel();
       return;
@@ -1403,10 +1405,16 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
   } catch (e) {
     console.error('enterPartnerMode 실패:', e);
     alert('상대방 데이터를 불러올 수 없습니다.');
+    var loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) { loadingScreen.classList.add('hidden'); loadingScreen.style.display = 'none'; }
     _myBackup = null;
     renderListPanel();
     return;
   }
+
+  // 로딩 화면 숨기기
+  var loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) { loadingScreen.classList.add('hidden'); loadingScreen.style.display = 'none'; }
 
   _partnerMode = true;
 
