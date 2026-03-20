@@ -1715,6 +1715,14 @@ function _getPartnerTabCount(tabId) {
   return 0;
 }
 
+// 사용자별 댓글 허용 탭 목록
+function _getCommentableTabs(email) {
+  if (!email) return [];
+  if (email.indexOf('leftjap') !== -1) return ['navi', 'fiction'];
+  if (email.indexOf('soyoun') !== -1) return ['soyoun_navi', 'flight_diary'];
+  return [];
+}
+
 function _loadPartnerDoc(doc) {
   if (!doc) return;
   var type = doc.type;
@@ -1745,9 +1753,14 @@ function _loadPartnerDoc(doc) {
   // 탭 라벨 업데이트
   updateEdTabLabel();
 
-  // 댓글 렌더 (파트너 모드에서만)
+  // 댓글 렌더 (파트너 모드, 허용 탭만)
   if (_partnerMode && _partnerData) {
-    renderComments(doc.id, _partnerData.partnerEmail);
+    var commentableTabs = _getCommentableTabs(_partnerData.partnerEmail);
+    if (commentableTabs.indexOf(type) !== -1) {
+      renderComments(doc.id, _partnerData.partnerEmail);
+    } else {
+      hideComments();
+    }
   }
 
   // 모바일: 에디터 뷰로 전환
@@ -1859,6 +1872,13 @@ function _loadMyCommentsAndRender(docId) {
     }
   } catch(e) {}
   if (!myEmail) return;
+
+  // 현재 탭이 댓글 허용 탭인지 확인
+  var commentableTabs = _getCommentableTabs(myEmail);
+  if (commentableTabs.indexOf(activeTab) === -1) {
+    hideComments();
+    return;
+  }
 
   // 캐시에 이미 있는 댓글로 즉시 렌더 (빠른 표시)
   renderComments(docId, myEmail);
