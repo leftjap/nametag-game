@@ -126,7 +126,7 @@ function renderWritingGrid() {
     tabs.push({ id: id, label: TAB_META[id] || id });
   });
   nav.innerHTML = tabs.map(t => {
-    const count = getTabCount(t.id);
+    const count = (_partnerMode && _partnerData) ? _getPartnerTabCount(t.id) : getTabCount(t.id);
     return `
     <div class="side-menu ${activeTab === t.id ? 'on' : ''}" data-tab="${t.id}"
          onclick="switchTab('${t.id}'); setMobileView('list');">
@@ -1696,6 +1696,19 @@ function _getPartnerDocs(type) {
       .sort(function(a, b) { return (b.updated || b.created || '').localeCompare(a.updated || a.created || ''); });
   }
   return [];
+}
+
+// 파트너 모드: 탭별 문서 수 계산
+function _getPartnerTabCount(tabId) {
+  if (!_partnerData || !_partnerData.dbData) return 0;
+  if (textTypes.includes(tabId)) {
+    var docs = _partnerData.dbData['gb_docs'] || [];
+    return docs.filter(function(d) { return d.type === tabId; }).length;
+  }
+  if (tabId === 'book') return (_partnerData.dbData['gb_books'] || []).length;
+  if (tabId === 'quote') return (_partnerData.dbData['gb_quotes'] || []).length;
+  if (tabId === 'memo') return (_partnerData.dbData['gb_memos'] || []).length;
+  return 0;
 }
 
 function _loadPartnerDoc(doc) {
