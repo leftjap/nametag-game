@@ -1206,7 +1206,7 @@ function updateBackBtnIcon() {
 
 // ═══ 알림 (소셜) ═══
 var _notifCache = [];
-var _notifPanelOpen = false;
+var _notifPopoverOpen = false;
 
 async function checkAndUpdateNotifBadge() {
   try {
@@ -1225,63 +1225,73 @@ async function checkAndUpdateNotifBadge() {
   }
 }
 
-function toggleNotifPanel() {
-  var pane = document.getElementById('pane-notifications');
-  if (!pane) return;
-
-  if (_notifPanelOpen) {
-    // 닫기: 원래 리스트로 복원
-    pane.style.display = 'none';
-    _notifPanelOpen = false;
-    // 현재 탭에 맞는 pane 복원
-    if (activeTab === 'expense') {
-      document.getElementById('pane-expense-dashboard').style.display = 'flex';
-    } else {
-      document.getElementById('pane-list').style.display = 'flex';
-    }
+function toggleNotifPopover() {
+  if (_notifPopoverOpen) {
+    closeNotifPopover();
     return;
   }
+  openNotifPopover();
+}
 
-  // 열기: 모든 pane 숨기고 알림 pane 표시
-  document.getElementById('pane-list').style.display = 'none';
-  document.getElementById('pane-photo').style.display = 'none';
-  document.getElementById('pane-calendar').style.display = 'none';
-  document.getElementById('pane-expense-dashboard').style.display = 'none';
-  document.getElementById('pane-expense-detail').style.display = 'none';
-  var routinePane = document.getElementById('pane-routine');
-  if (routinePane) routinePane.style.display = 'none';
+function openNotifPopover() {
+  var overlay = document.getElementById('notifPopoverOverlay');
+  var card = document.getElementById('notifPopoverCard');
+  if (!overlay || !card) return;
 
-  pane.style.display = 'flex';
-  _notifPanelOpen = true;
-
-  // 캐시된 알림으로 즉시 렌더, 동시에 새로 체크
+  // 캐시된 알림으로 즉시 렌더
   renderNotifList(_notifCache);
-  checkAndUpdateNotifBadge().then(function() {
-    if (_notifPanelOpen) renderNotifList(_notifCache);
-  });
 
-  // 모바일: 사이드바 닫고 리스트 뷰로
-  if (window.innerWidth <= 768) {
-    var app = document.getElementById('mainApp');
-    app.classList.remove('view-side');
-    app.classList.remove('view-editor');
-    app.classList.add('view-list');
+  // 위치 결정
+  var bellBtn = document.getElementById('notifBellBtn');
+  var w = window.innerWidth;
+  if (w > 768 && bellBtn) {
+    // PC/태블릿: 벨 버튼 아래에 앵커
+    var rect = bellBtn.getBoundingClientRect();
+    var cardW = 340;
+    var left = rect.left;
+    if (left + cardW > w - 16) left = w - cardW - 16;
+    if (left < 16) left = 16;
+    var top = rect.bottom + 8;
+    if (top + 420 > window.innerHeight - 16) top = window.innerHeight - 420 - 16;
+    if (top < 16) top = 16;
+    card.style.left = left + 'px';
+    card.style.top = top + 'px';
+    card.style.right = 'auto';
+    card.style.bottom = 'auto';
   }
+  // 모바일은 CSS가 하단 시트로 처리
+
+  overlay.classList.add('open');
+  card.classList.add('open');
+  _notifPopoverOpen = true;
+
+  // 동시에 새로 체크
+  checkAndUpdateNotifBadge().then(function() {
+    if (_notifPopoverOpen) renderNotifList(_notifCache);
+  });
+}
+
+function closeNotifPopover() {
+  var overlay = document.getElementById('notifPopoverOverlay');
+  var card = document.getElementById('notifPopoverCard');
+  if (card) card.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  _notifPopoverOpen = false;
 }
 
 function renderNotifList(notifications) {
-  var list = document.getElementById('notifList');
-  if (!list) return;
+  var body = document.getElementById('notifPopoverBody');
+  if (!body) return;
 
   if (!notifications || notifications.length === 0) {
-    list.innerHTML = '<div class="notif-empty">새 알림이 없습니다</div>';
+    body.innerHTML = '<div class="notif-empty">새 알림이 없습니다</div>';
     return;
   }
 
   var penIcon = '<svg viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M15 5l4 4"/></svg>';
   var commentIcon = '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
-  list.innerHTML = notifications.map(function(n) {
+  body.innerHTML = notifications.map(function(n) {
     var icon = n.type === 'new_post' ? penIcon : commentIcon;
     var fromName = _getDisplayName(n.from);
     var title = '';
@@ -1310,6 +1320,9 @@ function _getDisplayName(email) {
 }
 
 function onNotifClick(notifId, docId, fromEmail) {
+  // 팝오버 닫기
+  closeNotifPopover();
+
   // 읽음 처리
   SYNC.markRead([notifId]);
   // 캐시에서 제거
@@ -1324,10 +1337,6 @@ function onNotifClick(notifId, docId, fromEmail) {
       badge.style.display = 'none';
     }
   }
-  // 알림 패널 닫기
-  var notifPane = document.getElementById('pane-notifications');
-  if (notifPane) notifPane.style.display = 'none';
-  _notifPanelOpen = false;
 
   // 상대방 페이지로 진입
   enterPartnerMode(fromEmail, docId);
@@ -1423,8 +1432,7 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
 
   // 리스트 복원 후 렌더
   document.getElementById('pane-list').style.display = 'flex';
-  document.getElementById('pane-notifications').style.display = 'none';
-  _notifPanelOpen = false;
+  closeNotifPopover();
   renderListPanel();
 
   // 모바일: 리스트 뷰로
@@ -1511,7 +1519,7 @@ function _setBellAsBack(isBack) {
   } else {
     btn.classList.remove('back-mode');
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge" id="notifBadge" style="display:none"></span>';
-    btn.onclick = function() { toggleNotifPanel(); };
+    btn.onclick = function() { toggleNotifPopover(); };
     btn.removeAttribute('onclick');
     btn.title = '알림';
     checkAndUpdateNotifBadge();

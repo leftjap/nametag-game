@@ -795,33 +795,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   color: rgba(255,255,255,.8);
 }
 
-/* 알림 리스트 pane */
-.pane-notifications {
-  flex: 1 1 0;
-  height: 0;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-white);
-}
-.notif-header {
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--border-l);
-  position: sticky;
-  top: 0;
-  background: var(--bg-white);
-  z-index: 5;
-}
-.notif-header-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--tx);
-}
-.notif-list {
-  flex: 1;
-  padding: 0;
-}
 .notif-item {
   display: flex;
   gap: 12px;
@@ -889,6 +862,120 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   padding: 60px 20px;
   color: var(--tx-hint);
   font-size: 14px;
+}
+
+/* ═══ 알림 팝오버 (드롭다운) ═══ */
+.notif-popover-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 9900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+.notif-popover-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.notif-popover-card {
+  position: fixed;
+  background: var(--bg-white);
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0,0,0,.2), 0 4px 12px rgba(0,0,0,.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-height: 420px;
+  z-index: 9901;
+  transform: scale(.96) translateY(-8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .22s cubic-bezier(.2,.7,.2,1.04), opacity .18s ease;
+}
+.notif-popover-overlay.open + .notif-popover-card,
+.notif-popover-card.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.notif-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border-l);
+  flex-shrink: 0;
+}
+.notif-popover-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tx);
+}
+.notif-popover-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: var(--bg);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-m);
+  transition: .12s;
+  flex-shrink: 0;
+}
+.notif-popover-close:hover {
+  background: var(--border-l);
+  color: var(--tx-d);
+}
+
+.notif-popover-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+}
+
+/* 팝오버 내부 항목 — 기존 .notif-item 스타일 재사용 */
+.notif-popover-body .notif-item {
+  padding: 14px 18px;
+}
+
+/* 벨/되돌아가기 버튼 내부 SVG 클릭 투과 */
+.notif-bell-btn svg,
+.notif-bell-btn svg * {
+  pointer-events: none;
+}
+
+/* 모바일: 하단 시트 스타일 */
+@media (max-width: 768px) {
+  .notif-popover-card {
+    position: fixed;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 70vh;
+    transform: translateY(100%);
+    opacity: 1;
+    transition: transform .3s cubic-bezier(.25,.46,.45,.94);
+  }
+  .notif-popover-card.open {
+    transform: translateY(0);
+  }
+  .notif-popover-body {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
 }
 
 /* ═══ 파트너 모드 (읽기 전용) ═══ */

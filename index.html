@@ -109,7 +109,7 @@
       <div class="brand">이름표 붙이기 게임</div>
     </div>
     <div class="sync-row">
-      <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifPanel()" title="알림">
+      <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifPopover()" title="알림">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -270,13 +270,6 @@
     <div id="expenseDetail"></div>
   </div>
 
-  <!-- 알림 리스트 -->
-  <div class="pane-notifications" id="pane-notifications" style="display:none">
-    <div class="notif-header">
-      <span class="notif-header-title">알림</span>
-    </div>
-    <div class="notif-list" id="notifList"></div>
-  </div>
 
   <!-- 새 글 FAB -->
   <button class="fab-btn" onclick="handleNew()" title="새 글 작성">
@@ -569,6 +562,18 @@
   </div>
 
 </div><!-- /.editor -->
+
+<!-- ─── 알림 팝오버 ─── -->
+<div class="notif-popover-overlay" id="notifPopoverOverlay" onclick="closeNotifPopover()"></div>
+<div class="notif-popover-card" id="notifPopoverCard">
+  <div class="notif-popover-header">
+    <span class="notif-popover-title">알림</span>
+    <button class="notif-popover-close" onclick="closeNotifPopover()">
+      <svg width="14" height="14" viewBox="0 0 14 14"><line x1="1" y1="1" x2="13" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="13" y1="1" x2="1" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="notif-popover-body" id="notifPopoverBody"></div>
+</div>
 
 <!-- 가계부 입력/수정 모달 (전역 — PC/태블릿) -->
 <div class="modal-overlay" id="expenseModalOverlay" style="display:none" onclick="onExpenseModalOverlayClick(event)">
