@@ -1437,8 +1437,17 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
     Object.assign(TAB_META, pc.tabNames || {});
   }
 
-  // UI 전환
-  _setBellAsBack(true);
+  // UI 전환 — 배너 표시
+  var banner = document.getElementById('partnerBanner');
+  var bannerText = document.getElementById('partnerBannerText');
+  if (banner) {
+    bannerText.textContent = _getDisplayName(_partnerData.partnerEmail) + '님의 공간';
+    banner.style.display = 'flex';
+  }
+  // 벨 버튼 숨기기
+  var bellBtn = document.getElementById('notifBellBtn');
+  if (bellBtn) bellBtn.style.display = 'none';
+
   _setReadOnly(true);
   document.getElementById('mainApp').classList.add('partner-mode');
 
@@ -1520,10 +1529,12 @@ function exitPartnerMode() {
     _myBackup = null;
   }
 
-  // UI 복원 — 벨 복원 중 팝오버 열림 차단
-  _notifBlocked = true;
-  _setBellAsBack(false);
-  setTimeout(function() { _notifBlocked = false; }, 500);
+  // UI 복원 — 배너 숨기기
+  var banner = document.getElementById('partnerBanner');
+  if (banner) banner.style.display = 'none';
+  // 벨 버튼 복원
+  var bellBtn = document.getElementById('notifBellBtn');
+  if (bellBtn) bellBtn.style.display = '';
 
   _setReadOnly(false);
   document.getElementById('mainApp').classList.remove('partner-mode');

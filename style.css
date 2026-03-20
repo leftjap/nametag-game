@@ -69,6 +69,36 @@ body{font-family:'Pretendard',-apple-system,'SF Pro Display',sans-serif;backgrou
 #syncDot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--tab-color)}
 .sync-btn{display:none}
 
+/* ═══ 파트너 모드 배너 ═══ */
+.partner-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #FFF3E0;
+  border-bottom: 1px solid #FFE0B2;
+  flex-shrink: 0;
+}
+.partner-banner-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #E65100;
+}
+.partner-banner-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: #E55643;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.partner-banner-btn:active {
+  opacity: 0.8;
+}
+
 .side-scroll{flex:1;overflow-y:auto;padding-bottom:16px}
 .sec{padding:12px 14px}.sec:has(.side-nav){padding:0;padding-top:12px}
 .sec:has(.side-nav) .sec-t{padding:0 14px}.sec-border{border-bottom:1px solid var(--border)}
