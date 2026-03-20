@@ -1246,8 +1246,13 @@ function openNotifPopover() {
 
   _notifPopoverOpen = true;
 
-  // 캐시에서 즉시 렌더링
-  renderNotifList();
+  // 캐시가 비어있으면 로딩 표시, 있으면 즉시 렌더
+  if (_notifCache.length === 0) {
+    var listEl = document.getElementById('notifPopoverBody');
+    if (listEl) listEl.innerHTML = '<div class="notif-empty" style="color:var(--tx-hint);padding:60px 20px;text-align:center;font-size:14px;">불러오는 중...</div>';
+  } else {
+    renderNotifList();
+  }
 
   // 위치 설정
   var btn = document.getElementById('notifBellBtn');
@@ -1274,15 +1279,12 @@ function openNotifPopover() {
   overlay.classList.add('open');
   card.classList.add('open');
 
-  // 캐시가 비었거나 30초 이상 지났으면 백그라운드 갱신
-  var now = Date.now();
-  if (_notifCache.length === 0 || now - _lastNotifFetch > 30000) {
-    checkAndUpdateNotifBadge().then(function() {
-      if (_notifPopoverOpen) {
-        renderNotifList();
-      }
-    });
-  }
+  // 항상 서버에서 최신 알림 가져오기
+  checkAndUpdateNotifBadge().then(function() {
+    if (_notifPopoverOpen) {
+      renderNotifList();
+    }
+  });
 }
 
 function closeNotifPopover() {
