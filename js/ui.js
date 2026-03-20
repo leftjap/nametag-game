@@ -1250,11 +1250,17 @@ function openNotifPopover() {
   // 위치 설정
   var btn = document.getElementById('notifBellBtn');
   if (window.innerWidth > 768 && btn) {
-    // PC/태블릿: 벨 버튼 아래 드롭다운
     var rect = btn.getBoundingClientRect();
+    var cardW = 340;
+    var leftPos = rect.left;
+    // 오른쪽 넘침 방지
+    if (leftPos + cardW > window.innerWidth - 16) {
+      leftPos = window.innerWidth - cardW - 16;
+    }
+    if (leftPos < 16) leftPos = 16;
     card.style.top = (rect.bottom + 8) + 'px';
-    card.style.left = 'auto';
-    card.style.right = (window.innerWidth - rect.right) + 'px';
+    card.style.left = leftPos + 'px';
+    card.style.right = 'auto';
     card.style.bottom = '';
   } else {
     // 모바일: CSS가 하단 시트로 처리 — 인라인 위치 초기화
