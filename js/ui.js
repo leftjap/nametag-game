@@ -1238,26 +1238,31 @@ function toggleNotifPopover() {
 }
 
 function openNotifPopover() {
-  var popover = document.getElementById('notifPopover');
-  if (!popover) return;
+  var overlay = document.getElementById('notifPopoverOverlay');
+  var card = document.getElementById('notifPopoverCard');
+  if (!overlay || !card) return;
+
+  _notifPopoverOpen = true;
 
   // 캐시에서 즉시 렌더링
   renderNotifList();
-  popover.style.display = 'block';
 
-  // 위치 조정
+  // PC/태블릿: 벨 버튼 아래에 위치
   var btn = document.getElementById('notifBellBtn');
-  if (btn) {
+  if (btn && window.innerWidth > 768) {
     var rect = btn.getBoundingClientRect();
-    popover.style.top = (rect.bottom + 4) + 'px';
-    popover.style.right = (window.innerWidth - rect.right) + 'px';
+    card.style.top = (rect.bottom + 8) + 'px';
+    card.style.right = (window.innerWidth - rect.right) + 'px';
+    card.style.left = '';
   }
 
-  document.getElementById('notifOverlay').style.display = 'block';
+  // 열기
+  overlay.classList.add('open');
+  card.classList.add('open');
 
   // 백그라운드에서 서버 갱신
   checkAndUpdateNotifBadge().then(function() {
-    if (popover.style.display === 'block') {
+    if (_notifPopoverOpen) {
       renderNotifList();
     }
   });
@@ -1272,28 +1277,42 @@ function closeNotifPopover() {
 }
 
 function renderNotifList() {
-  var listEl = document.getElementById('notifList');
+  var listEl = document.getElementById('notifPopoverBody');
   if (!listEl) return;
 
   if (!_notifCache || _notifCache.length === 0) {
-    listEl.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--tx-hint);font-size:14px;">알림이 없습니다</div>';
+    listEl.innerHTML = '<div class="notif-empty">알림이 없습니다</div>';
     return;
   }
 
   var html = '';
   _notifCache.forEach(function(n) {
     var readClass = n.read ? ' notif-item-read' : '';
-    var icon = n.type === 'comment' ? '💬' : '📝';
-    var title = n.type === 'comment' ? '댓글' : '새 글';
-    var time = n.created ? _relativeTime(n.created) : '';
+    var fromName = _getDisplayName(n.from);
+    var title = '';
+    var preview = '';
+    var iconSvg = '';
 
-    html += '<div class="notif-item' + readClass + '" onclick="onNotifClick(\'' + n.id + '\')">';
-    html += '<div class="notif-icon">' + icon + '</div>';
-    html += '<div class="notif-content">';
-    html += '<div class="notif-title">' + title + ': ' + (n.docTitle || '제목 없음') + '</div>';
-    html += '<div class="notif-preview">' + (n.preview || '') + '</div>';
-    html += '<div class="notif-time">' + time + '</div>';
-    html += '</div></div>';
+    if (n.type === 'comment') {
+      title = fromName + '님이 댓글을 남겼습니다';
+      preview = n.preview || '';
+      iconSvg = '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    } else {
+      title = fromName + '님이 새 글을 올렸습니다';
+      preview = n.docTitle || '';
+      iconSvg = '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    }
+
+    var time = n.created ? getRelativeTime(n.created) : '';
+
+    html += '<div class="notif-item' + readClass + '" onclick="onNotifClick(\'' + n.id + '\',\'' + (n.docId || '') + '\',\'' + (n.from || '') + '\')">';
+    html += '<div class="notif-item-icon">' + iconSvg + '</div>';
+    html += '<div class="notif-item-body">';
+    html += '<div class="notif-item-title">' + escapeHtml(title) + '</div>';
+    if (preview) html += '<div class="notif-item-preview">' + escapeHtml(preview) + '</div>';
+    html += '</div>';
+    html += '<div class="notif-item-time">' + time + '</div>';
+    html += '</div>';
   });
 
   listEl.innerHTML = html;
@@ -1306,12 +1325,11 @@ function _getDisplayName(email) {
   return email.split('@')[0];
 }
 
-async function onNotifClick(notifId) {
+async function onNotifClick(notifId, docId, fromEmail) {
   var notif = _notifCache.find(function(n) { return n.id === notifId; });
-  if (!notif) return;
 
-  // 읽음 처리 (캐시에서 제거하지 않음)
-  notif.read = true;
+  // 읽음 처리
+  if (notif) notif.read = true;
 
   // 서버에 읽음 표시
   try { await SYNC.markRead([notifId]); } catch (e) { console.warn('[알림] markRead 실패:', e); }
@@ -1328,12 +1346,15 @@ async function onNotifClick(notifId) {
     }
   }
 
+  // 리스트 즉시 갱신 (읽음 스타일 반영)
+  renderNotifList();
+
   // 팝오버 닫기
   closeNotifPopover();
 
   // 파트너 모드 진입
-  if (notif.from) {
-    enterPartnerMode(notif.from, notif.docId);
+  if (fromEmail) {
+    enterPartnerMode(fromEmail, docId || null);
   }
 }
 
