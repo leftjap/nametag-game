@@ -1208,6 +1208,7 @@ function updateBackBtnIcon() {
 var _notifCache = [];
 var _notifPopoverOpen = false;
 var _lastNotifFetch = 0;
+var _notifBlocked = false;
 
 async function checkAndUpdateNotifBadge() {
   try {
@@ -1232,6 +1233,7 @@ async function checkAndUpdateNotifBadge() {
 }
 
 function toggleNotifPopover() {
+  if (_notifBlocked) return;
   if (_notifPopoverOpen) {
     closeNotifPopover();
     return;
@@ -1518,10 +1520,11 @@ function exitPartnerMode() {
     _myBackup = null;
   }
 
-  // UI 복원 — 벨 복원을 지연시켜 이벤트 버블링 완전 종료 후 실행
-  setTimeout(function() {
-    _setBellAsBack(false);
-  }, 50);
+  // UI 복원 — 벨 복원 중 팝오버 열림 차단
+  _notifBlocked = true;
+  _setBellAsBack(false);
+  setTimeout(function() { _notifBlocked = false; }, 500);
+
   _setReadOnly(false);
   document.getElementById('mainApp').classList.remove('partner-mode');
 
