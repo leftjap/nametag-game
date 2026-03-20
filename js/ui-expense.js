@@ -437,7 +437,8 @@ function renderWeeklyCalendar(thisYM) {
 // 지출 항목 하나를 HTML로 생성
 function renderExpenseItem(item, clickAction) {
   var displayMerchant = item.brand || (item.merchant || '').trim() || '미분류';
-  var html = '<div class="exp-tl-item" data-expense-id="' + item.id + '" onclick="' + clickAction + '">';
+  var safeClick = (typeof _partnerMode !== 'undefined' && _partnerMode) ? '' : clickAction;
+  var html = '<div class="exp-tl-item" data-expense-id="' + item.id + '" onclick="' + safeClick + '"' + (safeClick ? '' : ' style="cursor:default;"') + '>';
   html += getMerchantIconHtml(item);
   html += '<div class="exp-tl-item-left">';
   html += '<span class="exp-tl-item-amount">' + item.amount.toLocaleString() + '원</span>';
@@ -1768,6 +1769,7 @@ function setupExpenseContextMenu() {
     if (!item) return;
     var id = item.getAttribute('data-expense-id');
     if (!id) return;
+    if (typeof _partnerMode !== 'undefined' && _partnerMode) return;
     e.preventDefault();
     showExpensePopup(id, e.clientX, e.clientY);
   });
@@ -1778,6 +1780,7 @@ function setupExpenseContextMenu() {
     if (!item) return;
     var id = item.getAttribute('data-expense-id');
     if (!id) return;
+    if (typeof _partnerMode !== 'undefined' && _partnerMode) return;
     _expLpItem = item;
     _expLpMoved = false;
     _expLpX = e.touches[0].clientX;

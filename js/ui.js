@@ -154,7 +154,6 @@ function switchTab(t, keepLayout) {
 
   // 파트너 모드: 저장 없이 탭만 전환하고 상대방 데이터 렌더
   if (_partnerMode) {
-    if (t === 'expense') return; // 파트너 가계부는 별도 처리 필요 — 현재는 차단
     activeTab = t;
     updateEdTabLabel();
     // 사이드바 메뉴 활성 표시
@@ -1397,7 +1396,11 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
     curQuoteId: curQuoteId,
     curMemoId: curMemoId,
     textTypes: textTypes.slice(),
-    TAB_META: JSON.parse(JSON.stringify(TAB_META))
+    TAB_META: JSON.parse(JSON.stringify(TAB_META)),
+    expenses: L(K.expenses),
+    brandIcons: L(K.brandIcons),
+    brandOverrides: L(K.brandOverrides),
+    merchantAliases: L(K.merchantAliases)
   };
 
   try {
@@ -1426,6 +1429,12 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
   if (loadingScreen) { loadingScreen.classList.add('hidden'); loadingScreen.style.display = 'none'; }
 
   _partnerMode = true;
+
+  // 파트너 가계부 데이터를 LocalStorage에 교체
+  S(K.expenses, _partnerData.dbData['gb_expenses'] || []);
+  S(K.brandIcons, _partnerData.dbData['gb_brandIcons'] || {});
+  S(K.brandOverrides, _partnerData.dbData['gb_brandOverrides'] || {});
+  S(K.merchantAliases, _partnerData.dbData['gb_merchantAliases'] || []);
 
   // 파트너 config 적용 (const 변수 내용만 교체)
   var pc = _partnerData.config;
@@ -1523,6 +1532,12 @@ function exitPartnerMode() {
 
     Object.keys(TAB_META).forEach(function(k) { delete TAB_META[k]; });
     Object.assign(TAB_META, _myBackup.TAB_META);
+
+    // 가계부 데이터 복원
+    if (_myBackup.expenses !== undefined) S(K.expenses, _myBackup.expenses);
+    if (_myBackup.brandIcons !== undefined) S(K.brandIcons, _myBackup.brandIcons);
+    if (_myBackup.brandOverrides !== undefined) S(K.brandOverrides, _myBackup.brandOverrides);
+    if (_myBackup.merchantAliases !== undefined) S(K.merchantAliases, _myBackup.merchantAliases);
 
     _myBackup = null;
   }
