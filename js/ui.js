@@ -1271,9 +1271,11 @@ function openNotifPopover() {
   card.classList.add('open');
   _notifPopoverOpen = true;
 
-  // 동시에 새로 체크
+  // 백그라운드에서 서버 갱신 (팝업이 열려있으면 자동 리렌더)
   checkAndUpdateNotifBadge().then(function() {
-    if (_notifPopoverOpen) renderNotifList(_notifCache);
+    if (_notifPopoverOpen && _notifCache.length > 0) {
+      renderNotifList(_notifCache);
+    }
   });
 }
 
