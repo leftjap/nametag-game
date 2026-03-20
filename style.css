@@ -763,6 +763,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   width: 22px;
   height: 22px;
 }
+/* 벨/되돌아가기 버튼 내부 SVG 클릭 투과 */
+.notif-bell-btn svg,
+.notif-bell-btn svg * {
+  pointer-events: none;
+}
 .notif-badge {
   position: absolute;
   top: 4px;

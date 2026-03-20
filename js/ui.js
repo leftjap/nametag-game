@@ -1503,17 +1503,17 @@ function _setBellAsBack(isBack) {
   if (isBack) {
     btn.classList.add('back-mode');
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
-    btn.setAttribute('onclick', 'exitPartnerMode()');
+    btn.onclick = function() { exitPartnerMode(); };
+    btn.removeAttribute('onclick');
     btn.title = '내 공간으로 돌아가기';
-    // 뱃지 숨김
     var badge = document.getElementById('notifBadge');
     if (badge) badge.style.display = 'none';
   } else {
     btn.classList.remove('back-mode');
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge" id="notifBadge" style="display:none"></span>';
-    btn.setAttribute('onclick', 'toggleNotifPanel()');
+    btn.onclick = function() { toggleNotifPanel(); };
+    btn.removeAttribute('onclick');
     btn.title = '알림';
-    // 뱃지 복원
     checkAndUpdateNotifBadge();
   }
 }
@@ -1677,7 +1677,7 @@ function renderComments(docId, ownerEmail) {
   // 댓글 데이터 표시 (GAS에서 로드한 댓글들)
   var comments = _partnerData && _partnerData.comments ? _partnerData.comments : [];
   comments.forEach(function(c) {
-    if (c.docId !== docId || c.owner !== ownerEmail) return;
+    if (c.docId !== docId || c.docOwner !== ownerEmail) return;
 
     var commentEl = document.createElement('div');
     commentEl.className = 'comment-item';
@@ -1698,7 +1698,7 @@ function renderComments(docId, ownerEmail) {
 
     var time = document.createElement('span');
     time.className = 'comment-time';
-    time.textContent = new Date(c.timestamp).toLocaleString('ko-KR',
+    time.textContent = new Date(c.created).toLocaleString('ko-KR',
       { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     meta.appendChild(author);
@@ -1738,7 +1738,7 @@ async function sendComment() {
   }
 
   try {
-    var res = await SYNC.postComment(_commentDocOwner, _commentDocId, text);
+    var res = await SYNC.postComment(_commentDocId, _commentDocOwner, text);
     if (res && res.status === 'ok') {
       input.value = '';
       // 댓글 다시 로드
@@ -1756,8 +1756,8 @@ async function sendComment() {
 async function loadMySocialComments() {
   if (!_partnerMode || !_partnerData) return;
   try {
-    var res = await SYNC.markRead(_commentDocOwner, _commentDocId);
-    if (res && res.comments) {
+    var res = await SYNC.loadPartnerDb();
+    if (res && res.status === 'ok' && res.comments) {
       _partnerData.comments = res.comments;
     }
   } catch (e) {
