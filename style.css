@@ -1023,6 +1023,11 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 .routine-compact.on .routine-compact-label{font-weight:500}
 
 /* ═══ 사이드바 공통 화살표 ═══ */
+.side-arrow,
+.side-arrow * {
+  pointer-events: none;
+}
+
 .side-arrow {
   position: absolute;
   right: 14px;
@@ -1035,7 +1040,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  pointer-events: none;
   display: none;
 }
 

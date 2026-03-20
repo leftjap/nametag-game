@@ -1357,7 +1357,7 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
   // 현재 내 데이터 백업 (LocalStorage는 건드리지 않음, 메모리 변수만)
   _myBackup = {
     activeTab: activeTab,
-    curIds: JSON.parse(JSON.stringify(curIds)),
+    curIdsCopy: JSON.parse(JSON.stringify(curIds)),
     curBookId: curBookId,
     curQuoteId: curQuoteId,
     curMemoId: curMemoId,
@@ -1392,13 +1392,14 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
 
   _partnerMode = true;
 
-  // 상대방 config 적용 (메모리 변수만 교체, LocalStorage 안 건드림)
+  // 상대방 config 적용 (const/let 변수는 내용만 교체, 재할당 안 함)
   var pc = _partnerData.config;
   if (pc) {
-    textTypes = pc.textTypes || ['navi'];
-    TAB_META = pc.tabNames || {};
+    textTypes.length = 0;
+    (pc.textTypes || ['navi']).forEach(function(t) { textTypes.push(t); });
+    Object.keys(TAB_META).forEach(function(k) { delete TAB_META[k]; });
+    Object.assign(TAB_META, pc.tabNames || {});
     if (pc.routines && typeof ROUTINE_META !== 'undefined') {
-      // 루틴 메타 임시 교체 (렌더링용)
       ROUTINE_META.length = 0;
       pc.routines.forEach(function(r) { ROUTINE_META.push(r); });
     }
@@ -1420,7 +1421,8 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
   // 첫 번째 텍스트 탭으로 전환하고 상대방 데이터로 리스트 렌더
   var firstTab = textTypes[0] || 'navi';
   activeTab = firstTab;
-  curIds = {};
+  // curIds는 const → 내용만 비움
+  Object.keys(curIds).forEach(function(k) { delete curIds[k]; });
   curBookId = null;
   curQuoteId = null;
   curMemoId = null;
@@ -1442,13 +1444,36 @@ async function enterPartnerMode(partnerEmail, targetDocId) {
     app.classList.add('view-list');
   }
 
-  // 타겟 문서가 있으면 로드
+  // 타겟 문서 로드 (현재 탭 → 전체 문서 → 첫 번째 문서 순으로 폴백)
   if (targetDocId) {
-    var allPartnerDocs = _getPartnerDocs(activeTab);
-    var targetDoc = allPartnerDocs.find(function(d) { return d.id === targetDocId; });
+    var currentTabDocs = _getPartnerDocs(activeTab);
+    var targetDoc = currentTabDocs.find(function(d) { return d.id === targetDocId; });
+    if (!targetDoc) {
+      // 현재 탭에 없으면 전체 문서에서 검색
+      var allDocs = (_partnerData.dbData.gb_docs || []);
+      var found = allDocs.find(function(d) { return d.id === targetDocId; });
+      if (found) {
+        // 해당 탭으로 전환
+        var docTab = found.type || 'navi';
+        if (textTypes.indexOf(docTab) !== -1) {
+          activeTab = docTab;
+          renderWritingGrid();
+          renderListPanel();
+        }
+        targetDoc = found;
+      }
+    }
     if (targetDoc) {
       _loadPartnerDoc(targetDoc);
+    } else {
+      // 타겟을 못 찾으면 첫 번째 문서 자동 로드
+      var fallbackDocs = _getPartnerDocs(activeTab);
+      if (fallbackDocs.length > 0) _loadPartnerDoc(fallbackDocs[0]);
     }
+  } else {
+    // targetDocId가 없으면 첫 번째 문서 자동 로드
+    var firstDocs = _getPartnerDocs(activeTab);
+    if (firstDocs.length > 0) _loadPartnerDoc(firstDocs[0]);
   }
 }
 
@@ -1456,18 +1481,33 @@ function exitPartnerMode() {
   if (!_partnerMode) return;
   _partnerMode = false;
 
+  // 파트너 데이터 즉시 해제 (renderListPanel 등이 참조 못 하게)
+  _partnerData = null;
+
   // 댓글 섹션 숨기기
   hideComments();
 
-  // 메모리 변수 복원
+  // 에디터에 남아있는 파트너 글 내용 비우기
+  // (switchTab → saveCurDoc이 파트너 글을 내 문서에 저장하는 것 방지)
+  currentLoadedDoc = null;
+  var edBody = document.getElementById('edBody');
+  var edTitle = document.getElementById('edTitle');
+  if (edBody) edBody.innerHTML = '';
+  if (edTitle) edTitle.value = '';
+
+  // 메모리 변수 복원 (const는 내용만 교체, let도 안전하게 내용 교체 방식 사용)
   if (_myBackup) {
     activeTab = _myBackup.activeTab;
-    curIds = _myBackup.curIds;
+    // curIds는 const → 내용만 교체
+    Object.keys(curIds).forEach(function(k) { delete curIds[k]; });
+    if (_myBackup.curIdsCopy) Object.assign(curIds, _myBackup.curIdsCopy);
     curBookId = _myBackup.curBookId;
     curQuoteId = _myBackup.curQuoteId;
     curMemoId = _myBackup.curMemoId;
-    textTypes = _myBackup.textTypes;
-    TAB_META = _myBackup.TAB_META;
+    textTypes.length = 0;
+    _myBackup.textTypes.forEach(function(t) { textTypes.push(t); });
+    Object.keys(TAB_META).forEach(function(k) { delete TAB_META[k]; });
+    Object.assign(TAB_META, _myBackup.TAB_META);
     if (_myBackup.ROUTINE_META && typeof ROUTINE_META !== 'undefined') {
       ROUTINE_META.length = 0;
       _myBackup.ROUTINE_META.forEach(function(r) { ROUTINE_META.push(r); });
@@ -1478,8 +1518,6 @@ function exitPartnerMode() {
     }
     _myBackup = null;
   }
-
-  _partnerData = null;
 
   // UI 복원: 돌아가기 → 벨
   _setBellAsBack(false);
@@ -1499,7 +1537,7 @@ function exitPartnerMode() {
   updateWritingStats();
   updateBookStats();
 
-  // 현재 탭으로 전환
+  // 현재 탭으로 전환 (switchTab이 loadDoc을 호출하여 에디터에 내 글을 다시 로드)
   switchTab(activeTab);
 }
 
@@ -1508,11 +1546,12 @@ function exitPartnerMode() {
 function _setBellAsBack(isBack) {
   var btn = document.getElementById('notifBellBtn');
   if (!btn) return;
+  // 인라인 onclick 속성이 있으면 제거 (HTML에 onclick="..."이 있는 경우 대비)
+  btn.removeAttribute('onclick');
   if (isBack) {
     btn.classList.add('back-mode');
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
     btn.onclick = function() { exitPartnerMode(); };
-    btn.removeAttribute('onclick');
     btn.title = '내 공간으로 돌아가기';
     var badge = document.getElementById('notifBadge');
     if (badge) badge.style.display = 'none';
@@ -1520,7 +1559,6 @@ function _setBellAsBack(isBack) {
     btn.classList.remove('back-mode');
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge" id="notifBadge" style="display:none"></span>';
     btn.onclick = function() { toggleNotifPopover(); };
-    btn.removeAttribute('onclick');
     btn.title = '알림';
     checkAndUpdateNotifBadge();
   }
