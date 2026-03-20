@@ -770,7 +770,7 @@ function saveSocialData(data) {
 // ═══ 소셜: 알림 확인 ═══
 function checkNotifications(config) {
   try {
-    var email = Session.getActiveUser().getEmail();
+    var email = _getEmailFromConfig(config);
     var social = loadSocialData();
     var myNotifs = [];
     var unreadCount = 0;
