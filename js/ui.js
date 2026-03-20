@@ -1518,8 +1518,10 @@ function exitPartnerMode() {
     _myBackup = null;
   }
 
-  // UI 복원
-  _setBellAsBack(false);
+  // UI 복원 — 벨 복원을 지연시켜 이벤트 버블링 완전 종료 후 실행
+  setTimeout(function() {
+    _setBellAsBack(false);
+  }, 50);
   _setReadOnly(false);
   document.getElementById('mainApp').classList.remove('partner-mode');
 
