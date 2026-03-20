@@ -1568,7 +1568,8 @@ function _setBellAsBack(isBack) {
   if (isBack) {
     newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
     newBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
+      e.stopImmediatePropagation();
+      e.preventDefault();
       exitPartnerMode();
     });
     var badge = document.getElementById('notifBadge');
@@ -1576,12 +1577,20 @@ function _setBellAsBack(isBack) {
     console.log('[벨→뒤로] 바인딩 완료');
   } else {
     newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge" id="notifBadge" style="display:none"></span>';
-    // 현재 클릭 이벤트가 끝난 후에 리스너 바인딩 (팝오버 즉시 열림 방지)
-    setTimeout(function() {
-      newBtn.addEventListener('click', function() {
-        toggleNotifPopover();
-      });
-    }, 0);
+
+    // 벨 버튼 복원 후 300ms 동안 클릭을 무시 (뒤로가기 이벤트 전파 차단)
+    var _bellReady = false;
+    setTimeout(function() { _bellReady = true; }, 300);
+
+    newBtn.addEventListener('click', function(e) {
+      if (!_bellReady) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        return;
+      }
+      toggleNotifPopover();
+    });
+
     // 뱃지 복원
     checkAndUpdateNotifBadge();
     console.log('[뒤로→벨] 복원 완료');
