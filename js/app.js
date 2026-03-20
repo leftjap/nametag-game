@@ -93,6 +93,9 @@ async function showApp() {
     // 알림 체크
     checkAndUpdateNotifBadge();
 
+    // 댓글 로드 (파트너 모드)
+    loadMySocialComments();
+
     // visibilitychange에서 알림 체크
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible') {

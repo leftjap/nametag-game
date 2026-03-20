@@ -149,6 +149,9 @@ window.addEventListener('resize', () => {
 });
 
 function switchTab(t, keepLayout) {
+  // 댓글 섹션 숨기기
+  hideComments();
+
   // 파트너 모드: 저장 없이 탭만 전환하고 상대방 데이터 렌더
   if (_partnerMode) {
     if (t === 'expense') return; // 파트너 가계부는 별도 처리 필요 — 현재는 차단
@@ -1445,6 +1448,9 @@ function exitPartnerMode() {
   if (!_partnerMode) return;
   _partnerMode = false;
 
+  // 댓글 섹션 숨기기
+  hideComments();
+
   // 메모리 변수 복원
   if (_myBackup) {
     activeTab = _myBackup.activeTab;
@@ -1641,8 +1647,120 @@ function _loadPartnerDoc(doc) {
   // 탭 라벨 업데이트
   updateEdTabLabel();
 
+  // 댓글 렌더 (파트너 모드에서만)
+  if (_partnerMode && _partnerData) {
+    renderComments(doc.id, _partnerData.partnerEmail);
+  }
+
   // 모바일: 에디터 뷰로 전환
   if (window.innerWidth <= 768) {
     setMobileView('editor');
+  }
+}
+
+// ═══ 댓글 시스템 ═══
+var _commentDocId = null;       // 현재 표시 중인 댓글 문서 ID
+var _commentDocOwner = null;    // 현재 표시 중인 댓글 문서 소유자
+
+function renderComments(docId, ownerEmail) {
+  if (!docId || !ownerEmail) return;
+  _commentDocId = docId;
+  _commentDocOwner = ownerEmail;
+
+  var commentSection = document.getElementById('commentSection');
+  if (!commentSection) return;
+  commentSection.style.display = 'flex';
+
+  var commentList = document.getElementById('commentList');
+  commentList.innerHTML = '';
+
+  // 댓글 데이터 표시 (GAS에서 로드한 댓글들)
+  var comments = _partnerData && _partnerData.comments ? _partnerData.comments : [];
+  comments.forEach(function(c) {
+    if (c.docId !== docId || c.owner !== ownerEmail) return;
+
+    var commentEl = document.createElement('div');
+    commentEl.className = 'comment-item';
+
+    var avatar = document.createElement('div');
+    avatar.className = 'comment-avatar';
+    avatar.textContent = (c.author || '?')[0].toUpperCase();
+
+    var body = document.createElement('div');
+    body.className = 'comment-body';
+
+    var meta = document.createElement('div');
+    meta.className = 'comment-meta';
+
+    var author = document.createElement('span');
+    author.className = 'comment-author';
+    author.textContent = _getDisplayName(c.author) || c.author;
+
+    var time = document.createElement('span');
+    time.className = 'comment-time';
+    time.textContent = new Date(c.timestamp).toLocaleString('ko-KR',
+      { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    meta.appendChild(author);
+    meta.appendChild(time);
+
+    var text = document.createElement('div');
+    text.className = 'comment-text';
+    text.textContent = c.text;
+
+    body.appendChild(meta);
+    body.appendChild(text);
+
+    commentEl.appendChild(avatar);
+    commentEl.appendChild(body);
+    commentList.appendChild(commentEl);
+  });
+}
+
+function hideComments() {
+  var commentSection = document.getElementById('commentSection');
+  if (commentSection) commentSection.style.display = 'none';
+  _commentDocId = null;
+  _commentDocOwner = null;
+}
+
+async function sendComment() {
+  if (!_commentDocId || !_commentDocOwner) {
+    alert('댓글을 작성할 문서가 선택되지 않았습니다.');
+    return;
+  }
+
+  var input = document.getElementById('commentInput');
+  var text = input.value.trim();
+  if (!text) {
+    alert('댓글을 입력하세요.');
+    return;
+  }
+
+  try {
+    var res = await SYNC.postComment(_commentDocOwner, _commentDocId, text);
+    if (res && res.status === 'ok') {
+      input.value = '';
+      // 댓글 다시 로드
+      await loadMySocialComments();
+      renderComments(_commentDocId, _commentDocOwner);
+    } else {
+      alert('댓글 작성 중 오류가 발생했습니다.');
+    }
+  } catch (e) {
+    console.error('sendComment error:', e);
+    alert('댓글 작성 실패: ' + e.message);
+  }
+}
+
+async function loadMySocialComments() {
+  if (!_partnerMode || !_partnerData) return;
+  try {
+    var res = await SYNC.markRead(_commentDocOwner, _commentDocId);
+    if (res && res.comments) {
+      _partnerData.comments = res.comments;
+    }
+  } catch (e) {
+    console.error('loadMySocialComments error:', e);
   }
 }

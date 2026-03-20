@@ -396,6 +396,18 @@
         <div class="ed-body" id="edBody" contenteditable="true" spellcheck="false" translate="no"
              data-placeholder="여기에 글을 쓰세요... (이미지 복사+붙여넣기 가능)"></div>
       </div>
+      <!-- 댓글 섹션 -->
+      <div class="comment-section" id="commentSection" style="display:none;">
+        <div class="comment-header">
+          <span class="comment-header-title">댓글</span>
+          <button class="comment-close-btn" onclick="hideComments()" title="댓글 닫기">×</button>
+        </div>
+        <div class="comment-list" id="commentList"></div>
+        <div class="comment-input-wrap">
+          <textarea class="comment-input" id="commentInput" placeholder="댓글을 입력하세요..." rows="2"></textarea>
+          <button class="comment-send-btn" onclick="sendComment()" title="댓글 전송">전송</button>
+        </div>
+      </div>
     </div>
     <div class="ed-foot">
       <button class="ed-foot-loc" id="edFootLoc" onclick="openLocationModal(currentLocProfile())">
