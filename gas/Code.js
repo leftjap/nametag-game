@@ -629,9 +629,16 @@ function saveDocument(docId, driveId, folderName, title, content, config) {
 
 // ═══ 네비 글 저장 시 상대방에게 알림 ═══
 function _notifyNaviPost(docId, title, content, folderName, config) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (e) {
+    console.warn('_notifyNaviPost lock 획득 실패 (무시):', e);
+    return;
+  }
+
   try {
     if (folderName !== '오늘의 네비') return;
-    // 빈 문서는 알림하지 않음
     if (!content || content.trim().length < 10) return;
 
     var myEmail = _getEmailFromConfig(config);
@@ -639,38 +646,48 @@ function _notifyNaviPost(docId, title, content, folderName, config) {
     if (!partnerEmail) return;
 
     var social = loadSocialData();
-    var todayStr = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
-
-    // 오늘 같은 docId로 이미 알림을 보냈는지 확인
-    for (var i = 0; i < social.notifications.length; i++) {
-      var n = social.notifications[i];
-      if (n.type === 'new_post' && n.docId === docId && n.from === myEmail) {
-        var nDate = (n.created || '').substring(0, 10);
-        if (nDate === todayStr) return; // 오늘 이미 알림 보냄
-      }
-    }
 
     // 미리보기 텍스트 생성 (HTML 태그 제거, 50자)
     var preview = (content || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
     if (preview.length > 50) preview = preview.substring(0, 50) + '...';
 
-    var notif = {
-      id: 'ntf_' + new Date().getTime(),
-      type: 'new_post',
-      from: myEmail,
-      to: partnerEmail,
-      docId: docId,
-      docTitle: title || '제목 없음',
-      preview: preview,
-      created: new Date().toISOString(),
-      read: false
-    };
+    // 같은 docId + 같은 from의 기존 new_post 알림 찾기 (날짜 무관)
+    var existingIdx = -1;
+    for (var i = 0; i < social.notifications.length; i++) {
+      var n = social.notifications[i];
+      if (n.type === 'new_post' && n.docId === docId && n.from === myEmail) {
+        existingIdx = i;
+        break;
+      }
+    }
 
-    social.notifications.push(notif);
+    if (existingIdx !== -1) {
+      // 기존 알림 업데이트 — 최신 내용으로 갱신, 미읽음 상태로 복원
+      social.notifications[existingIdx].docTitle = title || '제목 없음';
+      social.notifications[existingIdx].preview = preview;
+      social.notifications[existingIdx].created = new Date().toISOString();
+      social.notifications[existingIdx].read = false;
+    } else {
+      // 새 알림 생성
+      var notif = {
+        id: 'ntf_' + new Date().getTime(),
+        type: 'new_post',
+        from: myEmail,
+        to: partnerEmail,
+        docId: docId,
+        docTitle: title || '제목 없음',
+        preview: preview,
+        created: new Date().toISOString(),
+        read: false
+      };
+      social.notifications.push(notif);
+    }
+
     saveSocialData(social);
   } catch (e) {
-    // 알림 실패가 문서 저장을 막으면 안 됨
     console.warn('_notifyNaviPost 에러 (무시):', e);
+  } finally {
+    lock.releaseLock();
   }
 }
 

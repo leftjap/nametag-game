@@ -1310,34 +1310,47 @@ function renderNotifList() {
     return;
   }
 
+  // 같은 docId의 new_post 알림을 최신 1건으로 병합
+  var merged = [];
+  var seenDocIds = {};
+  // _notifCache는 이미 최신순 정렬됨
+  for (var i = 0; i < _notifCache.length; i++) {
+    var n = _notifCache[i];
+    if (n.type === 'new_post' && n.docId) {
+      var key = n.docId + '_' + n.from;
+      if (seenDocIds[key]) continue; // 이미 최신 1건을 포함함
+      seenDocIds[key] = true;
+    }
+    merged.push(n);
+  }
+
   var html = '';
-  _notifCache.forEach(function(n) {
+  merged.forEach(function(n) {
     var readClass = n.read ? ' notif-item-read' : '';
     var fromName = _getDisplayName(n.from);
-    var title = '';
-    var preview = '';
-    var iconSvg = '';
-
-    if (n.type === 'comment') {
-      title = fromName + '님이 댓글을 남겼습니다';
-      preview = n.preview || '';
-      iconSvg = '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-    } else {
-      title = fromName + '님이 새 글을 올렸습니다';
-      preview = n.docTitle || '';
-      iconSvg = '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-    }
-
     var time = n.created ? getRelativeTime(n.created) : '';
 
-    html += '<div class="notif-item' + readClass + '" onclick="onNotifClick(\'' + n.id + '\',\'' + (n.docId || '') + '\',\'' + (n.from || '') + '\')">';
-    html += '<div class="notif-item-icon">' + iconSvg + '</div>';
-    html += '<div class="notif-item-body">';
-    html += '<div class="notif-item-title">' + escapeHtml(title) + '</div>';
-    if (preview) html += '<div class="notif-item-preview">' + escapeHtml(preview) + '</div>';
-    html += '</div>';
-    html += '<div class="notif-item-time">' + time + '</div>';
-    html += '</div>';
+    if (n.type === 'comment') {
+      // 댓글 알림: 기존 형식 유지
+      html += '<div class="notif-item' + readClass + '" onclick="onNotifClick(\'' + n.id + '\',\'' + (n.docId || '') + '\',\'' + (n.from || '') + '\')">';
+      html += '<div class="notif-item-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>';
+      html += '<div class="notif-item-body">';
+      html += '<div class="notif-item-title">' + escapeHtml(fromName) + '님이 댓글을 남겼습니다</div>';
+      if (n.preview) html += '<div class="notif-item-preview">' + escapeHtml(n.preview) + '</div>';
+      html += '</div>';
+      html += '<div class="notif-item-time">' + time + '</div>';
+      html += '</div>';
+    } else {
+      // new_post 알림: 새 형식
+      var previewText = n.preview || n.docTitle || '';
+      html += '<div class="notif-item' + readClass + '" onclick="onNotifClick(\'' + n.id + '\',\'' + (n.docId || '') + '\',\'' + (n.from || '') + '\')">';
+      html += '<div class="notif-item-icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>';
+      html += '<div class="notif-item-body">';
+      html += '<div class="notif-item-title"><strong>' + escapeHtml(fromName) + '</strong>의 최근 게시물 · ' + time + '</div>';
+      html += '<div class="notif-item-preview">' + escapeHtml(previewText) + '</div>';
+      html += '</div>';
+      html += '</div>';
+    }
   });
 
   listEl.innerHTML = html;

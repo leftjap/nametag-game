@@ -1033,9 +1033,13 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 .notif-item-title {
   font-size: 14px;
-  font-weight: 500;
-  color: var(--tx);
+  font-weight: 400;
+  color: var(--tx-d);
   line-height: 1.4;
+}
+.notif-item-title strong {
+  font-weight: 600;
+  color: var(--tx);
 }
 .notif-item-preview {
   font-size: 13px;
