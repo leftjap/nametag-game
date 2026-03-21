@@ -809,13 +809,57 @@ function checkNotifications(config) {
     var myNotifs = [];
     var unreadCount = 0;
 
+    // 발신자별 DB 캐시 — 같은 발신자의 DB를 여러 번 읽지 않기 위함
+    var senderDbCache = {};
+
     for (var i = 0; i < social.notifications.length; i++) {
       var n = social.notifications[i];
-      if (n.to === email) {
-        myNotifs.push(n);
-        if (!n.read || n.read === false || n.read === 'false' || n.read === '') {
-          unreadCount++;
+      if (n.to !== email) continue;
+
+      // new_post 알림: 발신자 DB에 해당 docId가 존재하는지 확인
+      if (n.type === 'new_post' && n.docId && n.from) {
+        var senderEmail = n.from;
+
+        // 발신자 DB를 아직 로드하지 않았으면 한 번만 로드
+        if (!senderDbCache.hasOwnProperty(senderEmail)) {
+          var senderConfig = USER_CONFIG[senderEmail];
+          if (senderConfig) {
+            try {
+              var senderFile = getDatabaseFile(senderConfig);
+              var senderContent = senderFile.getBlob().getDataAsString();
+              var senderDb = JSON.parse(senderContent || '{}');
+              senderDbCache[senderEmail] = senderDb;
+            } catch (e2) {
+              console.warn('checkNotifications: 발신자 DB 로드 실패 (' + senderEmail + '):', e2);
+              senderDbCache[senderEmail] = null;
+            }
+          } else {
+            senderDbCache[senderEmail] = null;
+          }
         }
+
+        var db = senderDbCache[senderEmail];
+        if (db) {
+          // 문서 존재 여부 확인 (gb_docs 배열에서 docId 검색)
+          var docs = db['gb_docs'] || [];
+          var docExists = false;
+          for (var j = 0; j < docs.length; j++) {
+            if (docs[j].id === n.docId) {
+              docExists = true;
+              break;
+            }
+          }
+          if (!docExists) {
+            // 문서가 삭제됨 — 이 알림을 건너뜀
+            continue;
+          }
+        }
+        // db가 null이면 (발신자 DB 로드 실패) 안전하게 알림을 포함
+      }
+
+      myNotifs.push(n);
+      if (!n.read || n.read === false || n.read === 'false' || n.read === '') {
+        unreadCount++;
       }
     }
 
