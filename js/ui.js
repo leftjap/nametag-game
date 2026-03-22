@@ -1902,7 +1902,7 @@ function renderComments(docId, ownerEmail) {
     var text = document.createElement('div');
     text.className = 'comment-text';
     text.setAttribute('id', 'comment-text-' + c.id);
-    text.textContent = c.text;
+    text.innerHTML = escapeHtml(c.text).replace(/\n/g, '<br>');
 
     commentEl.appendChild(meta);
     commentEl.appendChild(text);
