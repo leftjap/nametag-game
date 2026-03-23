@@ -1289,6 +1289,26 @@ function openNotifPopover() {
   checkAndUpdateNotifBadge().then(function() {
     if (_notifPopoverOpen) {
       renderNotifList();
+
+      // 미읽음 알림 전체 읽음 처리
+      var unreadIds = [];
+      for (var i = 0; i < _notifCache.length; i++) {
+        if (!_notifCache[i].read) {
+          _notifCache[i].read = true;
+          unreadIds.push(_notifCache[i].id);
+        }
+      }
+      if (unreadIds.length > 0) {
+        // 뱃지 즉시 제거
+        var badge = document.getElementById('notifBadge');
+        if (badge) badge.style.display = 'none';
+        // 리스트 리렌더 (읽음 스타일 적용)
+        renderNotifList();
+        // 서버 읽음 처리 (백그라운드)
+        SYNC.markRead(unreadIds).catch(function(e) {
+          console.warn('[알림] 일괄 markRead 실패:', e);
+        });
+      }
     }
   });
 }
