@@ -1252,6 +1252,10 @@ function openNotifPopover() {
 
   _notifPopoverOpen = true;
 
+  // 뱃지 즉시 제거
+  var badge = document.getElementById('notifBadge');
+  if (badge) badge.style.display = 'none';
+
   // 캐시가 비어있으면 로딩 표시, 있으면 즉시 렌더
   if (_notifCache.length === 0) {
     var listEl = document.getElementById('notifPopoverBody');
@@ -1285,31 +1289,38 @@ function openNotifPopover() {
   overlay.classList.add('open');
   card.classList.add('open');
 
-  // 항상 서버에서 최신 알림 가져오기
-  checkAndUpdateNotifBadge().then(function() {
-    if (_notifPopoverOpen) {
-      renderNotifList();
+  // 서버에서 최신 알림 가져오기 (checkAndUpdateNotifBadge를 우회)
+  SYNC.checkNotifications().then(function(res) {
+    if (res && res.notifications) {
+      _notifCache = res.notifications;
+      _lastNotifFetch = Date.now();
+    }
+    if (!_notifPopoverOpen) return;
 
-      // 미읽음 알림 전체 읽음 처리
-      var unreadIds = [];
-      for (var i = 0; i < _notifCache.length; i++) {
-        if (!_notifCache[i].read) {
-          _notifCache[i].read = true;
-          unreadIds.push(_notifCache[i].id);
-        }
-      }
-      if (unreadIds.length > 0) {
-        // 뱃지 즉시 제거
-        var badge = document.getElementById('notifBadge');
-        if (badge) badge.style.display = 'none';
-        // 리스트 리렌더 (읽음 스타일 적용)
-        renderNotifList();
-        // 서버 읽음 처리 (백그라운드)
-        SYNC.markRead(unreadIds).catch(function(e) {
-          console.warn('[알림] 일괄 markRead 실패:', e);
-        });
+    // 미읽음 알림 전체 읽음 처리
+    var unreadIds = [];
+    for (var i = 0; i < _notifCache.length; i++) {
+      if (!_notifCache[i].read) {
+        _notifCache[i].read = true;
+        unreadIds.push(_notifCache[i].id);
       }
     }
+
+    // 리스트 렌더 (읽음 스타일 적용)
+    renderNotifList();
+
+    // 뱃지 확실히 제거
+    var b = document.getElementById('notifBadge');
+    if (b) b.style.display = 'none';
+
+    // 서버 읽음 처리 (백그라운드)
+    if (unreadIds.length > 0) {
+      SYNC.markRead(unreadIds).catch(function(e) {
+        console.warn('[알림] 일괄 markRead 실패:', e);
+      });
+    }
+  }).catch(function(e) {
+    console.warn('[알림] 가져오기 실패:', e);
   });
 }
 
