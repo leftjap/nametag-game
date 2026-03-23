@@ -603,9 +603,15 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 }
 
 /* AI (클로드) 댓글 구분 */
-.comment-item.comment-ai {
-  border-left: 3px solid #E55643;
-  padding-left: 12px;
+.comment-item.comment-ai .comment-author::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: #E55643;
+  border-radius: 1.5px;
+  margin-right: 6px;
+  vertical-align: -1px;
 }
 
 .comment-input-wrap{
