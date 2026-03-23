@@ -750,10 +750,14 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
   color: var(--tx-m);
 }
 
-/* 파트너 모드: 댓글 표시 시 본문 하단 패딩 축소 */
 /* 파트너 모드: 본문이 내용 크기만큼만 차지하여 댓글이 바로 아래 표시 */
 .partner-mode .editor-content-wrap {
   padding-bottom: 20px !important;
+  flex: none !important;
+  min-height: 0 !important;
+}
+.partner-mode .ed-body {
+  min-height: 0 !important;
   flex: none !important;
 }
 
@@ -5954,12 +5958,6 @@ mark.highlight{background-color:color-mix(in srgb, var(--tab-color) 15%, transpa
 /* ═══ 사이드바 화살표 SVG 클릭 관통 ═══ */
 .side-arrow, .side-arrow * {
   pointer-events: none;
-}
-
-/* ═══ 파트너 모드: 댓글창이 본문 바로 아래에 표시 ═══ */
-.partner-mode .editor-content-wrap {
-  padding-bottom: 20px !important;
-  flex: none !important;
 }
 
 /* ═══ 읽은 알림 스타일 ═══ */
