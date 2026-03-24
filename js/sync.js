@@ -87,7 +87,19 @@ const SYNC = {
         if (db[K.quotes])  S(K.quotes,  db[K.quotes]);
         if (db[K.memos])   S(K.memos,   db[K.memos]);
         if (db[K.checks])  S(K.checks,  db[K.checks]);
-        if (db[K.expenses]) S(K.expenses, db[K.expenses]);
+        if (db[K.expenses]) {
+          var serverExp = db[K.expenses];
+          var localExp = L(K.expenses) || [];
+          var serverIds = new Set(serverExp.map(function(e) { return e.id; }));
+          var localOnly = localExp.filter(function(e) { return !serverIds.has(e.id); });
+          var merged = serverExp.concat(localOnly);
+          merged.sort(function(a, b) {
+            var da = (b.date || '') + (b.time || '');
+            var db2 = (a.date || '') + (a.time || '');
+            return da.localeCompare(db2);
+          });
+          S(K.expenses, merged);
+        }
         if (db[K.merchantIcons]) S(K.merchantIcons, db[K.merchantIcons]);
         if (db[K.merchantAliases]) S(K.merchantAliases, db[K.merchantAliases]);
         if (db[K.brandIcons]) S(K.brandIcons, db[K.brandIcons]);

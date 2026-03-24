@@ -43,7 +43,23 @@ function _applyLoadedDb(dbData) {
   if (dbData[K.quotes])  S(K.quotes,  dbData[K.quotes]);
   if (dbData[K.memos])   S(K.memos,   dbData[K.memos]);
   if (dbData[K.checks])  S(K.checks,  dbData[K.checks]);
-  if (dbData[K.expenses]) S(K.expenses, dbData[K.expenses]);
+  if (dbData[K.expenses]) {
+    // expenses는 병합: 로컬에만 있는 항목(미동기화 수기 입력) 보존
+    var serverExp = dbData[K.expenses];
+    var localExp = L(K.expenses) || [];
+    var serverIds = new Set(serverExp.map(function(e) { return e.id; }));
+    // 로컬에만 있는 항목 수집
+    var localOnly = localExp.filter(function(e) { return !serverIds.has(e.id); });
+    // 서버 데이터를 기본으로, 로컬 전용 항목을 추가
+    var merged = serverExp.concat(localOnly);
+    // 날짜+시간 내림차순 정렬
+    merged.sort(function(a, b) {
+      var da = (b.date || '') + (b.time || '');
+      var db2 = (a.date || '') + (a.time || '');
+      return da.localeCompare(db2);
+    });
+    S(K.expenses, merged);
+  }
   if (dbData[K.merchantIcons]) S(K.merchantIcons, dbData[K.merchantIcons]);
   if (dbData[K.merchantAliases]) S(K.merchantAliases, dbData[K.merchantAliases]);
   if (dbData[K.brandIcons]) S(K.brandIcons, dbData[K.brandIcons]);

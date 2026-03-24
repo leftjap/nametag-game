@@ -1361,7 +1361,7 @@ function deleteExpenseFromForm(mode = 'normal') {
   }
 
   updateExpenseCompact();
-  SYNC.scheduleDatabaseSave();
+  SYNC.saveDatabase().catch(function(e) { console.warn('deleteExpenseFromForm 즉시 동기화 실패:', e.message); });
 }
 
 function formatExpenseAmount(input) {
@@ -1665,7 +1665,7 @@ function _saveIconAfterValidation(currentBrand, merchant, iconUrl, mode) {
 
   // UI 업데이트 및 정리
   updateExpenseCompact();
-  SYNC.scheduleDatabaseSave();
+  SYNC.saveDatabase().catch(function(e) { console.warn('saveExpenseForm 즉시 동기화 실패:', e.message); });
 
   // 아이콘 변경 시 _yearlyRankLoaded 보존
   var prevRankLoaded = _yearlyRankLoaded;
