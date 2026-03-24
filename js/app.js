@@ -60,40 +60,9 @@ async function showApp() {
 
   var serverConfig = null;
   try {
-    // ── 단일 요청으로 모든 데이터 로드 ──
-    var allData = await SYNC.loadAll();
-
-    if (!allData || allData.status !== 'ok') {
-      throw new Error('load_all failed');
-    }
-
-    // DB 데이터 적용
-    serverConfig = allData.config || null;
-    if (allData.db) {
-      _applyLoadedDb(allData.db);
-    }
-    SYNC.isDbLoaded = true;
-
-    // 알림 캐시 적용
-    if (allData.notifications) {
-      _notifCache = allData.notifications;
-      _lastNotifFetch = Date.now();
-      var unread = allData.unreadCount || _notifCache.filter(function(n) { return !n.read; }).length;
-      var badge = document.getElementById('notifBadge');
-      if (badge) {
-        if (unread > 0) {
-          badge.textContent = unread > 99 ? '99+' : String(unread);
-          badge.style.display = '';
-        } else {
-          badge.style.display = 'none';
-        }
-      }
-    }
-
-    // 내 댓글 캐시 적용
-    if (allData.myComments) {
-      _myCommentCache = allData.myComments;
-    }
+    // ── 1단계: 내 DB만 로드 (빠른 로딩) ──
+    serverConfig = await SYNC.loadDatabase();
+    // loadDatabase() 내부에서 _applyLoadedDb 역할을 수행하고 isDbLoaded = true 설정됨
 
   } catch (e) {
     if (e && e.message === 'Unauthorized') {
@@ -104,21 +73,7 @@ async function showApp() {
       document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
       return;
     }
-    // load_all 실패 시 기존 방식으로 폴백
-    console.warn('[showApp] load_all 실패, 개별 로드로 폴백:', e);
-    try {
-      serverConfig = await SYNC.loadDatabase();
-    } catch(e2) {
-      if (e2 && e2.message === 'Unauthorized') {
-        localStorage.removeItem('gb_auth');
-        localStorage.removeItem('gb_id_token');
-        loading.classList.add('hidden');
-        document.getElementById('lockScreen').classList.remove('hidden');
-        document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
-        return;
-      }
-    }
-    checkAndUpdateNotifBadge().catch(function(e){});
+    console.warn('[showApp] loadDatabase 실패:', e);
   }
 
   // 서버 config 적용
@@ -156,6 +111,18 @@ async function showApp() {
       renderListPanel();
     }
     setupTabletPCGestures();
+
+    // ── 2단계: 백그라운드 로드 (UI 표시 후) ──
+    // 순서: 1) masterBrandIcons 병합 → 2) 알림+댓글 체크
+    setTimeout(function() {
+      // 2-1. masterBrandIcons는 loadDatabase() 응답에 이미 포함되어 병합됨 — 추가 작업 불필요
+
+      // 2-2. 알림 + 댓글 백그라운드 로드
+      checkAndUpdateNotifBadge().catch(function(e) {
+        console.warn('[showApp] 백그라운드 알림 로드 실패:', e);
+      });
+      // 댓글은 파트너 모드 진입 시 로드하므로 여기서는 생략
+    }, 1000);
 
     // visibilitychange에서 알림 체크
     document.addEventListener('visibilitychange', function() {
