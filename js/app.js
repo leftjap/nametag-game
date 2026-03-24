@@ -44,30 +44,8 @@ function _applyLoadedDb(dbData) {
   if (dbData[K.memos])   S(K.memos,   dbData[K.memos]);
   if (dbData[K.checks])  S(K.checks,  dbData[K.checks]);
   if (dbData[K.expenses]) {
-    // expenses는 병합: 로컬에만 있는 항목(미동기화 수기 입력) 보존
-    var serverExp = dbData[K.expenses];
-    var localExp = L(K.expenses) || [];
-    var serverIds = new Set(serverExp.map(function(e) { return e.id; }));
-    // 로컬에만 있는 항목 수집
-    var localOnly = localExp.filter(function(e) { return !serverIds.has(e.id); });
-    // 서버 데이터를 기본으로, 로컬 전용 항목을 추가
-    var merged = serverExp.concat(localOnly);
-    // 날짜+시간 내림차순 정렬
-    merged.sort(function(a, b) {
-      var da = (b.date || '') + (b.time || '');
-      var db2 = (a.date || '') + (a.time || '');
-      return da.localeCompare(db2);
-    });
-    S(K.expenses, merged);
-    // 로컬 전용 항목이 있으면 서버에 즉시 업로드
-    if (localOnly.length > 0) {
-      console.log('[_applyLoadedDb] 로컬 전용 expenses ' + localOnly.length + '건 발견, 서버 재저장');
-      setTimeout(function() {
-        SYNC.saveDatabase().catch(function(e) {
-          console.warn('로컬 전용 expenses 서버 저장 실패:', e.message);
-        });
-      }, 2000);
-    }
+    // LWW: 서버 데이터를 그대로 적용 (삭제 항목 부활 방지)
+    S(K.expenses, dbData[K.expenses]);
   }
   if (dbData[K.merchantIcons]) S(K.merchantIcons, dbData[K.merchantIcons]);
   if (dbData[K.merchantAliases]) S(K.merchantAliases, dbData[K.merchantAliases]);

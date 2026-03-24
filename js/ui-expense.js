@@ -1753,7 +1753,7 @@ function _deleteExpenseFromPopup(expenseId) {
   closeLpPopup();
   delExpense(expenseId);
   updateExpenseCompact();
-  SYNC.scheduleDatabaseSave();
+  SYNC.saveDatabase().catch(function(e) { console.warn('_deleteExpenseFromPopup 즉시 동기화 실패:', e.message); });
   // 현재 화면 리렌더
   if (window.innerWidth > 768) {
     // PC/태블릿: 항상 통합 대시보드 렌더
@@ -2302,7 +2302,7 @@ function _deleteExpensesOnDate(dateStr) {
 
   _selectedExpenseDate = null;
   updateExpenseCompact();
-  SYNC.scheduleDatabaseSave();
+  SYNC.saveDatabase().catch(function(e) { console.warn('_deleteExpensesOnDate 즉시 동기화 실패:', e.message); });
 
   // 현재 화면 리렌더
   if (window.innerWidth > 768) {

@@ -90,24 +90,8 @@ const SYNC = {
         if (db[K.memos])   S(K.memos,   db[K.memos]);
         if (db[K.checks])  S(K.checks,  db[K.checks]);
         if (db[K.expenses]) {
-          var serverExp = db[K.expenses];
-          var localExp = L(K.expenses) || [];
-          var serverIds = new Set(serverExp.map(function(e) { return e.id; }));
-          var localOnly = localExp.filter(function(e) { return !serverIds.has(e.id); });
-          var merged = serverExp.concat(localOnly);
-          merged.sort(function(a, b) {
-            var da = (b.date || '') + (b.time || '');
-            var db2 = (a.date || '') + (a.time || '');
-            return da.localeCompare(db2);
-          });
-          S(K.expenses, merged);
-          if (localOnly.length > 0) {
-            console.log('[loadDatabase] 로컬 전용 expenses ' + localOnly.length + '건 발견, 서버 재저장');
-            var self = this;
-            setTimeout(function() {
-              self.saveDatabase().catch(function(e) { console.warn('로컬 전용 expenses 서버 저장 실패:', e.message); });
-            }, 2000);
-          }
+          // LWW: 서버 데이터를 그대로 적용 (삭제 항목 부활 방지)
+          S(K.expenses, db[K.expenses]);
         }
         if (db[K.merchantIcons]) S(K.merchantIcons, db[K.merchantIcons]);
         if (db[K.merchantAliases]) S(K.merchantAliases, db[K.merchantAliases]);
@@ -487,6 +471,11 @@ const SYNC = {
   // ═══ 서버 expenses 병합 (SMS 자동 반영) ═══
   async mergeServerExpenses(dbData) {
     if (!this.isDbLoaded) return;
+    // 미동기화 로컬 변경이 있으면 서버로 덮어쓰지 않음
+    if (window._unsyncedLocal) {
+      console.log('mergeServerExpenses: 미동기화 로컬 변경이 있어 서버 병합 건너뜀');
+      return;
+    }
     // dbData가 없으면 직접 로드 (단독 호출 대비)
     if (!dbData) {
       try {
@@ -500,27 +489,18 @@ const SYNC = {
     }
     var serverExpenses = dbData[K.expenses];
     if (!serverExpenses || !Array.isArray(serverExpenses)) return;
+
+    // LWW: 서버 데이터로 교체
     var localExpenses = getExpenses();
-    var localIds = new Set(localExpenses.map(function(e) { return e.id; }));
-    var added = 0;
-    for (var i = 0; i < serverExpenses.length; i++) {
-      if (!localIds.has(serverExpenses[i].id)) {
-        localExpenses.unshift(serverExpenses[i]);
-        added++;
-      }
-    }
-    if (added > 0) {
-      localExpenses.sort(function(a, b) {
-        var da = (b.date || '') + (b.time || '');
-        var db = (a.date || '') + (a.time || '');
-        return da.localeCompare(db);
-      });
-      saveExpenses(localExpenses);
-      updateExpenseCompact();
-      if (activeTab === 'expense') {
-        var platform = window.innerWidth > 768 ? 'pc' : 'mobile';
-        renderExpenseDashboard(platform);
-      }
+    var localStr = JSON.stringify(localExpenses.map(function(e) { return e.id; }).sort());
+    var serverStr = JSON.stringify(serverExpenses.map(function(e) { return e.id; }).sort());
+    if (localStr === serverStr) return; // 동일하면 리렌더 불필요
+
+    saveExpenses(serverExpenses);
+    updateExpenseCompact();
+    if (activeTab === 'expense') {
+      var platform = window.innerWidth > 768 ? 'pc' : 'mobile';
+      renderExpenseDashboard(platform);
     }
   },
 
