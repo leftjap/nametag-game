@@ -61,12 +61,10 @@ function _applyLoadedDb(dbData) {
     S(K.expenses, merged);
     // 로컬 전용 항목이 있으면 서버에 즉시 업로드
     if (localOnly.length > 0) {
-      alert('[디버그] localOnly ' + localOnly.length + '건 감지');
+      console.log('[_applyLoadedDb] 로컬 전용 expenses ' + localOnly.length + '건 발견, 서버 재저장');
       setTimeout(function() {
-        SYNC.saveDatabase().then(function() {
-          alert('[디버그] saveDatabase 성공');
-        }).catch(function(e) {
-          alert('[디버그] saveDatabase 실패: ' + e.message);
+        SYNC.saveDatabase().catch(function(e) {
+          console.warn('로컬 전용 expenses 서버 저장 실패:', e.message);
         });
       }, 2000);
     }
