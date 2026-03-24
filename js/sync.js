@@ -98,12 +98,6 @@ const SYNC = {
         if (db[K.brandIcons]) S(K.brandIcons, db[K.brandIcons]);
         if (db[K.brandOverrides]) S(K.brandOverrides, db[K.brandOverrides]);
 
-        // 마스터 brandIcons 병합 (마스터 기본 + 사용자 것 우선)
-        if (res.masterBrandIcons && typeof res.masterBrandIcons === 'object') {
-          var merged = Object.assign({}, res.masterBrandIcons, L(K.brandIcons) || {});
-          S(K.brandIcons, merged);
-        }
-
         this.isDbLoaded = true;
         this.setSyncStatus('동기화 완료', 'ok');
         return res.config || null;
@@ -510,12 +504,6 @@ const SYNC = {
     try {
       var res = await this._post({ action: 'load_db' });
       if (!res || !res.dbData) return;
-
-      // 마스터 brandIcons 병합 (loadDatabase와 동일 로직)
-      if (res.masterBrandIcons && typeof res.masterBrandIcons === 'object') {
-        var merged = Object.assign({}, res.masterBrandIcons, L(K.brandIcons) || {});
-        S(K.brandIcons, merged);
-      }
 
       await this.mergeServerExpenses(res.dbData);
       await this.mergeServerDocs(res.dbData);
