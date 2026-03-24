@@ -1374,7 +1374,8 @@ function formatExpenseAmount(input) {
   let val = input.value.replace(/[^\d]/g, '');
   if (val) input.value = parseInt(val).toLocaleString();
   else input.value = '';
-  updateExpenseSaveBtn();
+  var mode = (input.id && input.id.endsWith('Modal')) ? 'modal' : 'normal';
+  updateExpenseSaveBtn(mode);
 }
 
 function toggleCategoryGrid(mode) {
