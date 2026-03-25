@@ -1255,9 +1255,14 @@ function newExpenseForm(mode = 'normal') {
     var nowH = ('0' + now.getHours()).slice(-2);
     var nowM = ('0' + now.getMinutes()).slice(-2);
     dateEl.setAttribute('data-time', nowH + ':' + nowM);
-    dateEl.removeAttribute('onclick');
-    dateEl.classList.add('expense-date-readonly');
+    // 수기 작성: 날짜 클릭 가능
+    dateEl.setAttribute('onclick', '_triggerExpenseDatePicker(\'' + mode + '\')');
+    dateEl.classList.remove('expense-date-readonly');
+    dateEl.classList.add('expense-date-editable');
   }
+  // 숨겨진 date picker 초기화
+  var pickerEl = document.getElementById('expenseDatePicker' + suffix);
+  if (pickerEl) pickerEl.value = today();
   // ── 문자 붙여넣기 표시 복원 ──
   var pasteBtn = document.getElementById('expensePasteBtn' + (suffix || ''));
   if (pasteBtn) pasteBtn.style.display = '';
@@ -1309,9 +1314,14 @@ function loadExpense(id, mode = 'normal') {
     dateEl.textContent = formatExpenseDate(d);
     dateEl.setAttribute('data-date', e.date);
     dateEl.setAttribute('data-time', e.time || '');
-    dateEl.removeAttribute('onclick');
-    dateEl.classList.add('expense-date-readonly');
+    // 기존 항목도 날짜 변경 가능
+    dateEl.setAttribute('onclick', '_triggerExpenseDatePicker(\'' + mode + '\')');
+    dateEl.classList.remove('expense-date-readonly');
+    dateEl.classList.add('expense-date-editable');
   }
+  // 숨겨진 date picker에 현재 날짜 세팅
+  var pickerEl = document.getElementById('expenseDatePicker' + suffix);
+  if (pickerEl) pickerEl.value = e.date;
   // 그리드 접힌 상태 보장
   var catGrid = document.getElementById('expenseCategoryGrid' + suffix);
   if (catGrid) { catGrid.classList.remove('grid-open'); catGrid.style.display = 'none'; }
@@ -1511,8 +1521,28 @@ function updateExpenseSaveBtn(mode = 'normal') {
 
 
 function openExpenseDatePicker() {
-  // 날짜 선택 UI 미구현 — 향후 구현 시 이 함수에 로직 추가
+  // 레거시 함수 — _triggerExpenseDatePicker로 대체
   return;
+}
+
+function _triggerExpenseDatePicker(mode) {
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var pickerEl = document.getElementById('expenseDatePicker' + suffix);
+  if (pickerEl) {
+    pickerEl.showPicker ? pickerEl.showPicker() : pickerEl.click();
+  }
+}
+
+function onExpenseDatePickerChange(inputEl, mode) {
+  var suffix = mode === 'modal' ? 'Modal' : '';
+  var newDate = inputEl.value; // 'YYYY-MM-DD'
+  if (!newDate) return;
+  var dateEl = document.getElementById('expenseDateValue' + suffix);
+  if (!dateEl) return;
+  var oldTime = dateEl.getAttribute('data-time') || '00:00';
+  var d = new Date(newDate + 'T' + oldTime);
+  dateEl.textContent = formatExpenseDate(d);
+  dateEl.setAttribute('data-date', newDate);
 }
 
 var _smsPasteMode = 'normal';
