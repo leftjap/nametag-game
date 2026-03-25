@@ -8,8 +8,8 @@ const GOOGLE_CLIENT_ID = '910366325974-3ollm3pose37r1fvv8ngnd0v09f2p57l.apps.goo
 function handleCredentialResponse(response) {
   try {
     const jwt = response.credential;
-    localStorage.setItem('gb_auth',     '1');
-    localStorage.setItem('gb_id_token', jwt);
+    localStorage.setItem(_LS_PREFIX + 'gb_auth',     '1');
+    localStorage.setItem(_LS_PREFIX + 'gb_id_token', jwt);
     document.getElementById('lockScreen').classList.add('hidden');
     showApp();
   } catch (e) {
@@ -19,7 +19,7 @@ function handleCredentialResponse(response) {
 
 window.onload = function() {
   const isLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
-  if (isLocal || localStorage.getItem('gb_id_token')) {
+  if (isLocal || localStorage.getItem(_LS_PREFIX + 'gb_id_token')) {
     document.getElementById('lockScreen').classList.add('hidden');
     showApp();
   } else {
@@ -80,8 +80,8 @@ async function showApp() {
       SYNC.setSyncStatus('완료됨', 'ok');
     }).catch(function(e) {
       if (e && e.message === 'Unauthorized') {
-        localStorage.removeItem('gb_auth');
-        localStorage.removeItem('gb_id_token');
+        localStorage.removeItem(_LS_PREFIX + 'gb_auth');
+        localStorage.removeItem(_LS_PREFIX + 'gb_id_token');
         document.getElementById('lockScreen').classList.remove('hidden');
         document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
         return;
@@ -97,8 +97,8 @@ async function showApp() {
       serverConfig = await SYNC.loadDatabase();
     } catch (e) {
       if (e && e.message === 'Unauthorized') {
-        localStorage.removeItem('gb_auth');
-        localStorage.removeItem('gb_id_token');
+        localStorage.removeItem(_LS_PREFIX + 'gb_auth');
+        localStorage.removeItem(_LS_PREFIX + 'gb_id_token');
         loading.classList.add('hidden');
         document.getElementById('lockScreen').classList.remove('hidden');
         document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';

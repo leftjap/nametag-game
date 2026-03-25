@@ -17,15 +17,18 @@ const K = {
   brandOverrides:   'gb_brand_overrides'
 };
 
+// ═══ LocalStorage 키 접두사 (멀티유저 격리) ═══
+const _LS_PREFIX = (window.APP_USER === 'soyoun312') ? 'sy_' : '';
+
 // ═══ LocalStorage 읽기/쓰기 ═══
 const L = k => {
-  try { return JSON.parse(localStorage.getItem(k)) || null; }
+  try { return JSON.parse(localStorage.getItem(_LS_PREFIX + k)) || null; }
   catch { return null; }
 };
 
 const S = (k, v) => {
   try {
-    localStorage.setItem(k, JSON.stringify(v));
+    localStorage.setItem(_LS_PREFIX + k, JSON.stringify(v));
   } catch (e) {
     console.error('localStorage 저장 실패:', k, e.message);
     if (e.name === 'QuotaExceededError' || e.code === 22) {

@@ -44,7 +44,7 @@ const SYNC = {
 
   async _post(data) {
     data.token   = APP_TOKEN;
-    data.idToken = localStorage.getItem('gb_id_token');
+    data.idToken = localStorage.getItem(_LS_PREFIX + 'gb_id_token');
     if (!data.idToken) throw new Error('LocalMode');
     try {
       const res = await fetch(GAS_URL, {
