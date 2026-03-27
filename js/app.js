@@ -62,39 +62,44 @@ async function showApp() {
   var hasLocalData = !!(L(K.docs) && L(K.expenses));
 
   if (hasLocalData) {
-    // ── 로컬 캐시 우선: 즉시 UI 표시 ──
-    _initAndShow(loading, serverConfig);
+    // ── 로컬 캐시 있음: 서버 동기화 후 UI 표시 (최대 4초 대기) ──
+    var _syncDone = false;
 
-    // 백그라운드에서 서버 동기화
+    // 타임아웃: 4초 안에 서버 응답 없으면 로컬 데이터로 표시
+    var _syncTimeout = setTimeout(function() {
+      if (!_syncDone) {
+        _syncDone = true;
+        console.warn('[showApp] 서버 동기화 타임아웃 — 로컬 데이터로 표시');
+        SYNC.isDbLoaded = true;
+        SYNC.setSyncStatus('오프라인', 'error');
+        _initAndShow(loading, serverConfig);
+      }
+    }, 4000);
+
     SYNC.loadDatabase().then(function(config) {
+      if (_syncDone) return; // 타임아웃 이미 발동
+      _syncDone = true;
+      clearTimeout(_syncTimeout);
       SYNC.isDbLoaded = true;
       if (config) applyServerConfig(config);
-      // 서버 데이터가 LocalStorage에 반영됨 (loadDatabase 내부에서 처리)
-      // 가계부 탭이 열려있으면 리렌더
-      if (activeTab === 'expense') {
-        var platform = window.innerWidth > 768 ? 'pc' : 'mobile';
-        renderExpenseDashboard(platform);
-      }
-      updateExpenseCompact();
-      renderListPanel();
-      // 서버 동기화 후 현재 열린 문서 리프레시
-      if (currentLoadedDoc && currentLoadedDoc.type && currentLoadedDoc.id) {
-        if (textTypes.includes(currentLoadedDoc.type)) loadDoc(currentLoadedDoc.type, currentLoadedDoc.id, true);
-        else if (currentLoadedDoc.type === 'book') loadBook(currentLoadedDoc.id, true);
-        else if (currentLoadedDoc.type === 'memo') loadMemo(currentLoadedDoc.id, true);
-      }
+      _initAndShow(loading, config);
       SYNC.setSyncStatus('완료됨', 'ok');
     }).catch(function(e) {
+      if (_syncDone) return;
+      _syncDone = true;
+      clearTimeout(_syncTimeout);
       if (e && e.message === 'Unauthorized') {
+        loading.classList.add('hidden');
         localStorage.removeItem(_LS_PREFIX + 'gb_auth');
         localStorage.removeItem(_LS_PREFIX + 'gb_id_token');
         document.getElementById('lockScreen').classList.remove('hidden');
         document.getElementById('lockErr').textContent = '접근 권한이 없는 계정입니다.';
         return;
       }
-      console.warn('[showApp] 백그라운드 loadDatabase 실패:', e);
+      console.warn('[showApp] loadDatabase 실패 — 로컬 데이터로 표시:', e);
       SYNC.isDbLoaded = true;
       SYNC.setSyncStatus('오프라인', 'error');
+      _initAndShow(loading, serverConfig);
     });
 
   } else {
