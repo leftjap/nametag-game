@@ -1565,7 +1565,7 @@ function parseSMSServer(text, config) {
   }
 
   // 날짜 추출
-  var dateMatch = text.match(/(\d{1,2})[\/\.\-](\d{1,2})/);
+  var dateMatch = text.match(/(\d{1,2})[\/\-](\d{1,2})/);
   if (dateMatch) {
     var m = ('0' + dateMatch[1]).slice(-2);
     var d = ('0' + dateMatch[2]).slice(-2);
@@ -1626,12 +1626,12 @@ function parseSMSServer(text, config) {
   // 해외 결제 매출처명 정제: 통화코드+금액 접두어 제거
   // 패턴1: "달러 SUPREME", "유로 LARINASCEN", "엔화 LAWSON" → 통화 한글명 제거
   result.merchant = result.merchant.replace(/^(달러|유로|엔화|위안|바트|동|링깃|루피|페소)\s+/i, '');
-  // 패턴2: "HUF 124 COS HU0360", "VND 13 386 659 INTERCONTI" → 통화코드+숫자+공백 접두어 제거
+  // 패턴2: "USD 22.00 CLAUDE", "HUF 124,000.00 COS" → 영문 통화코드+금액 접두어 제거
+  result.merchant = result.merchant.replace(/^[A-Z]{3}\s+[\d,.]+\s+/, '');
+  // 패턴3: "HUF 124 000 COS" → 통화코드+숫자+공백 접두어 제거 (콤마/점 없는 경우)
   result.merchant = result.merchant.replace(/^[A-Z]{3}(\s+[\d\s]+\s+)/, '');
-  // 패턴3: "KRW 912 500 CUREFIP.CO" → KRW+숫자 접두어 제거
-  result.merchant = result.merchant.replace(/^KRW\s+[\d\s]+\s+/i, '');
-  // 패턴4: "100 KIX DFS", "200 KIX DFS", "700 KIX TENANT" → 숫자만으로 시작하는 접두어 제거
-  result.merchant = result.merchant.replace(/^\d+\s+/, '');
+  // 패턴4: "22.00 CLAUDE", "8,100 LAWSON" → 숫자+소수점+콤마로 시작하는 접두어 제거
+  result.merchant = result.merchant.replace(/^[\d,.]+\s+/, '');
   // 정제 후 trim
   result.merchant = result.merchant.trim();
   // 정제 후 빈 문자열이면 원래 값 유지
