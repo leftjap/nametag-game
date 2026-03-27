@@ -504,3 +504,14 @@ editorText, editorBook, editorQuote, editorMemo, editorExpense, editorDayList, e
 ### 컨텍스트 압축 발생 시
 - 사용자에게 알림 + 재업로드 요청
 - 기억 의존 금지, GitHub raw로 재확인
+
+---
+
+## 18. 완료된 수정
+
+작업 완료 후 변경 사항을 기록합니다.
+
+* B-24: `parseSMSServer()`(gas/Code.js)와 `parseSMS()`(js/sms-parser.js)에 '자동결제' SMS 파싱 분기 추가.
+  - 트리거: 아이폰 단축어 자동화 "자동결제" 포함 메시지 별도 생성 (기존 "승인" 자동화와 동일 POST 엔드포인트).
+  - 형식: `[삼성카드]1337 자동결제 MM/DD접수 / 매출처명 / 금액원` (이름·시간 없음).
+  - 기존 승인·해외승인 파싱 로직은 변경 없음.
