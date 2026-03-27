@@ -169,6 +169,7 @@ function _initAndShow(loading, serverConfig) {
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible') {
         checkAndUpdateNotifBadge();
+        SYNC.mergeServerAll();
       }
     });
 
