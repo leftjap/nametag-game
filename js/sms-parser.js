@@ -151,7 +151,7 @@ function parseSMS(text) {
   mt = mt.replace(/(삼성|신한|국민|현대|롯데|하나|우리|BC|NH|KB)\d{4}/g, '');
   mt = mt.replace(/\w*카드[^()\s]*/g, '');
   mt = mt.replace(/[가-힣]{1,3}\*[가-힣]{1,3}/g, '');
-  mt = mt.replace(/\d{1,2}[\/\.\-]\d{1,2}/g, '');
+  mt = mt.replace(/\d{1,2}[\/\-]\d{1,2}/g, '');
   mt = mt.replace(/\d{1,2}:\d{2}(:\d{2})?/g, '');
   mt = mt.replace(/(승인|일시불|취소|해외|결제|체크|신용|할부|\d+회차|누적|잔액|거절)/gi, '');
   mt = mt.replace(/&[^)\s]*/g, '');
