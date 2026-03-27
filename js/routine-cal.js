@@ -1,3 +1,5 @@
+// ═══ PROJECT: keep ═══
+
 // ═══ routine-cal.js — 루틴 캘린더 뷰 (3단 에디터) ═══
 var _routineViewYM = null;
 var _selectedRoutineDate = null;
