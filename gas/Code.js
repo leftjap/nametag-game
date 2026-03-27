@@ -430,6 +430,7 @@ function getUserConfig(idToken, fallbackToken) {
 function doGet(e) {
   try {
     var action = (e.parameter && e.parameter.action) ? e.parameter.action : '';
+    var token = (e.parameter && e.parameter.token) ? e.parameter.token : '';
 
     if (action === 'searchMerchant') {
       var query = e.parameter.query || '';
@@ -437,7 +438,6 @@ function doGet(e) {
         return _jsonResponse({ items: [], error: 'No query' });
       }
 
-      // Google Custom Search — 이미지 검색으로 로고를 찾는다
       var apiUrl = 'https://www.googleapis.com/customsearch/v1'
         + '?key=' + GOOGLE_CSE_API_KEY
         + '&cx=' + GOOGLE_CSE_CX
@@ -453,7 +453,6 @@ function doGet(e) {
       var result = JSON.parse(response.getContentText());
 
       if (result && result.items && result.items.length > 0) {
-        // 첫 번째 이미지 URL을 반환
         var imageUrl = result.items[0].link || '';
         return _jsonResponse({ items: [{ imageUrl: imageUrl }] });
       }
@@ -462,7 +461,6 @@ function doGet(e) {
     }
 
     if (action === 'load_partner_db') {
-      var token = e.parameter.token || '';
       if (token !== 'claude-feedback') {
         return _jsonResponse({ status: 'error', message: 'Unauthorized' });
       }
@@ -471,6 +469,114 @@ function doGet(e) {
         return _jsonResponse({ status: 'error', message: 'Config not found' });
       }
       return _jsonResponse(loadPartnerDb(config));
+    }
+
+    // ═══ 어구록 검색 (GET) ═══
+    if (action === 'load_quotes') {
+      if (token !== 'claude-feedback') {
+        return _jsonResponse({ status: 'error', message: 'Unauthorized' });
+      }
+      var config = getUserConfig(null, token);
+      if (!config || !config.quoteSheetId) {
+        return _jsonResponse({ status: 'error', message: 'Quote sheet not configured' });
+      }
+      var keyword = e.parameter.keyword || '';
+      var limit = parseInt(e.parameter.limit || '20');
+      if (limit > 100) limit = 100;
+
+      var ss = SpreadsheetApp.openById(config.quoteSheetId);
+      var sheet = ss.getSheets()[0];
+      var data = sheet.getDataRange().getValues();
+
+      var results = [];
+      var totalMatched = 0;
+
+      for (var i = 1; i < data.length; i++) {
+        var text = String(data[i][1] || '');
+        var by = String(data[i][2] || '');
+        var dateVal = data[i][0];
+        var dateStr = '';
+        if (dateVal instanceof Date) {
+          dateStr = Utilities.formatDate(dateVal, 'Asia/Seoul', 'yyyy-MM-dd');
+        } else if (dateVal) {
+          dateStr = String(dateVal).substring(0, 10);
+        }
+
+        if (keyword) {
+          var kw = keyword.toLowerCase();
+          if (text.toLowerCase().indexOf(kw) === -1 && by.toLowerCase().indexOf(kw) === -1) {
+            continue;
+          }
+        }
+
+        totalMatched++;
+        if (results.length < limit) {
+          results.push({ text: text, by: by, date: dateStr });
+        }
+      }
+
+      return _jsonResponse({
+        status: 'ok',
+        count: results.length,
+        totalMatched: totalMatched,
+        results: results
+      });
+    }
+
+    // ═══ 서재(책) 목록 조회 (GET) ═══
+    if (action === 'list_books') {
+      if (token !== 'claude-feedback') {
+        return _jsonResponse({ status: 'error', message: 'Unauthorized' });
+      }
+      var config = getUserConfig(null, token);
+      if (!config) {
+        return _jsonResponse({ status: 'error', message: 'Config not found' });
+      }
+
+      var file = getDatabaseFile(config);
+      var content = file.getBlob().getDataAsString();
+      var db = JSON.parse(content || '{}');
+
+      var books = [];
+      var totalQuotes = 0;
+
+      // gb_docs에서 type이 book인 문서의 quote 필드 수집
+      var docs = db['gb_docs'] || [];
+      for (var i = 0; i < docs.length; i++) {
+        if (docs[i].type === 'book') {
+          var bookQuotes = docs[i].quotes || [];
+          totalQuotes += bookQuotes.length;
+          books.push({
+            id: docs[i].id,
+            title: docs[i].title || '제목 없음',
+            quoteCount: bookQuotes.length
+          });
+        }
+      }
+
+      // 구 구조 (gb_books) 폴백
+      var legacyBooks = db['gb_books'] || [];
+      var migratedCount = 0;
+      for (var j = 0; j < legacyBooks.length; j++) {
+        var lbQuotes = legacyBooks[j].quotes || [];
+        totalQuotes += lbQuotes.length;
+        migratedCount++;
+        books.push({
+          id: legacyBooks[j].id || ('legacy_' + j),
+          title: legacyBooks[j].title || '제목 없음',
+          quoteCount: lbQuotes.length,
+          legacy: true
+        });
+      }
+
+      return _jsonResponse({
+        status: 'ok',
+        total: books.length,
+        totalQuotes: totalQuotes,
+        migratedBooks: migratedCount,
+        legacyBooks: legacyBooks.length,
+        books: books
+      });
     }
 
     return _jsonResponse({ status: 'ok', message: 'GAS is running' });
