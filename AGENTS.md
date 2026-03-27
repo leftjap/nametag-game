@@ -525,3 +525,10 @@ editorText, editorBook, editorQuote, editorMemo, editorExpense, editorDayList, e
   - 트리거: 아이폰 단축어 자동화 "자동결제" 포함 메시지 별도 생성 (기존 "승인" 자동화와 동일 POST 엔드포인트).
   - 형식: `[삼성카드]1337 자동결제 MM/DD접수 / 매출처명 / 금액원` (이름·시간 없음).
   - 기존 승인·해외승인 파싱 로직은 변경 없음.
+
+* 파트너 모드 데이터 오염 (Critical): `enterPartnerMode()`에서 상대방의 expenses/brandIcons/brandOverrides/merchantAliases를 `S(K.expenses, ...)` 등으로 LocalStorage에 직접 덮어써서, 파트너 모드 중 `scheduleDatabaseSave()` 타이머가 실행되면 상대방 데이터가 서버에 저장되는 버그.
+  - 증상: leftjap 가계부에 soyoun312의 지출 내역 전체 혼입 (728건 중 소연 데이터 포함), brandIcons/brandOverrides/merchantAliases 유실 (0건).
+  - 원인: `enterPartnerMode()`에서 파트너 가계부를 렌더링하기 위해 LocalStorage의 `gb_expenses`를 상대방 데이터로 교체. 파트너 모드 중 동기화 타이머(`scheduleDatabaseSave` 3초)가 실행되면 오염된 데이터가 서버에 저장됨. 단일 백업 파일(`app_database_backup.json`)도 오염 데이터로 덮어쓰기되어 복구 불가.
+  - 수정 1 — 파트너 격리 (ui.js, data.js): `enterPartnerMode()`에서 LocalStorage 쓰기 4줄 제거. `getExpenses()`, `getBrandIcons()`, `getBrandOverrides()`, `getMerchantAliases()`에 `_partnerMode` 분기 추가하여 `_partnerData.dbData`에서 직접 읽도록 변경. 파트너 모드 진입 시 `SYNC.isDbLoaded=false` + 타이머 취소로 동기화 완전 차단.
+  - 수정 2 — 다세대 백업 (gas/Code.js): `_backupDatabaseIfNeeded`를 1일 1회 날짜별 파일(`app_database_backup_YYYY-MM-DD.json`) 생성, 7일분 보관으로 변경. `listBackups()`, `restoreFromBackup()` 유틸 추가.
+  - 수정 3 — 무결성 검증 (gas/Code.js): `saveDatabase()`에 expenses 건수 급변(±50%) 감지 시 저장 차단. `OWNER_CARDS` 매핑으로 타 사용자 카드 혼입 시 저장 차단.
