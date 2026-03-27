@@ -1319,19 +1319,19 @@ function _getPartnerEmail(myEmail) {
 }
 
 // ═══ DB 저장 전 자동 백업 (10분 쿨다운) ═══
+// ═══ DB 저장 전 다세대 백업 (1일 1회, 7일분 보관) ═══
 function _backupDatabaseIfNeeded(config) {
   try {
     var props = PropertiesService.getScriptProperties();
     var email = _getEmailFromConfig(config);
-    var cooldownKey = 'db_backup_ts_' + (email || 'default');
-    var lastBackup = parseInt(props.getProperty(cooldownKey) || '0');
-    var now = new Date().getTime();
+    var cooldownKey = 'db_backup_date_' + (email || 'default');
+    var todayStr = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
+    var lastBackupDate = props.getProperty(cooldownKey) || '';
 
-    // 10분(600,000ms) 미경과 시 건너뜀
-    if (now - lastBackup < 600000) return;
+    // 오늘 이미 백업했으면 건너뜀
+    if (lastBackupDate === todayStr) return;
 
     var folder = getOrCreateFolder(DriveApp.getRootFolder(), config.rootFolder);
-    var backupName = 'app_database_backup.json';
 
     // 현재 DB 파일 내용 읽기
     var dbFile = getDatabaseFile(config);
@@ -1340,16 +1340,42 @@ function _backupDatabaseIfNeeded(config) {
     // 빈 DB는 백업하지 않음
     if (!content || content === '{}') return;
 
-    // 기존 백업 파일이 있으면 덮어쓰기, 없으면 새로 생성
-    var backupFiles = folder.getFilesByName(backupName);
-    if (backupFiles.hasNext()) {
-      var backupFile = backupFiles.next();
-      backupFile.setContent(content);
+    // 오늘 날짜 백업 파일 생성
+    var backupName = 'app_database_backup_' + todayStr + '.json';
+    var existingFiles = folder.getFilesByName(backupName);
+    if (existingFiles.hasNext()) {
+      // 오늘 파일이 이미 있으면 덮어쓰기
+      existingFiles.next().setContent(content);
     } else {
       folder.createFile(backupName, content, MimeType.PLAIN_TEXT);
     }
 
-    props.setProperty(cooldownKey, String(now));
+    // 7일 이전 백업 삭제
+    var cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 7);
+    var cutoffStr = Utilities.formatDate(cutoffDate, 'Asia/Seoul', 'yyyy-MM-dd');
+
+    var allFiles = folder.getFiles();
+    while (allFiles.hasNext()) {
+      var f = allFiles.next();
+      var fname = f.getName();
+      // app_database_backup_YYYY-MM-DD.json 패턴 매칭
+      var match = fname.match(/^app_database_backup_(\d{4}-\d{2}-\d{2})\.json$/);
+      if (match && match[1] < cutoffStr) {
+        f.setTrashed(true);
+        console.log('오래된 백업 삭제: ' + fname);
+      }
+    }
+
+    // 레거시 단일 백업 파일도 삭제 (구버전 호환)
+    var legacyFiles = folder.getFilesByName('app_database_backup.json');
+    while (legacyFiles.hasNext()) {
+      legacyFiles.next().setTrashed(true);
+      console.log('레거시 백업 파일 삭제: app_database_backup.json');
+    }
+
+    props.setProperty(cooldownKey, todayStr);
+    console.log('다세대 백업 완료: ' + backupName);
   } catch (e) {
     // 백업 실패는 저장을 막지 않는다
     console.warn('_backupDatabaseIfNeeded 실패 (무시):', e);
@@ -1358,9 +1384,42 @@ function _backupDatabaseIfNeeded(config) {
 
 function saveDatabase(dbData, config) {
   try {
-    _backupDatabaseIfNeeded(config);
-    var file = getDatabaseFile(config);
-    file.setContent(JSON.stringify(dbData));
+    // ═══ 무결성 검증: expenses 급변 감지 ═══
+    var newExpenses = dbData['gb_expenses'];
+    if (newExpenses && Array.isArray(newExpenses)) {
+      var file = getDatabaseFile(config);
+      var currentContent = file.getBlob().getDataAsString();
+      var currentDb = {};
+      try { currentDb = JSON.parse(currentContent || '{}'); } catch(e) {}
+      var currentExpenses = currentDb['gb_expenses'] || [];
+      var currentCount = currentExpenses.length;
+      var newCount = newExpenses.length;
+
+      // 기존 데이터가 50건 이상이고, 신규가 50% 이상 증가하면 차단
+      if (currentCount >= 50 && newCount > currentCount * 1.5) {
+        var email = _getEmailFromConfig(config);
+        console.error('⚠️ saveDatabase 차단: expenses 급증 감지 (' + email + '). 기존 ' + currentCount + '건 → 신규 ' + newCount + '건 (' + Math.round(newCount / currentCount * 100) + '%)');
+        return { status: 'error', message: 'Integrity check failed: expenses count surge (' + currentCount + ' → ' + newCount + ')' };
+      }
+
+      // 기존 데이터가 50건 이상이고, 신규가 50% 이상 감소하면 차단
+      if (currentCount >= 50 && newCount < currentCount * 0.5) {
+        var email = _getEmailFromConfig(config);
+        console.error('⚠️ saveDatabase 차단: expenses 급감 감지 (' + email + '). 기존 ' + currentCount + '건 → 신규 ' + newCount + '건 (' + Math.round(newCount / currentCount * 100) + '%)');
+        return { status: 'error', message: 'Integrity check failed: expenses count drop (' + currentCount + ' → ' + newCount + ')' };
+      }
+
+      // ★ 검증 통과 시에만 백업 (이미 읽은 file을 재사용)
+      _backupDatabaseIfNeeded(config);
+
+      // 저장 (이미 읽은 file 재사용)
+      file.setContent(JSON.stringify(dbData));
+    } else {
+      // expenses가 없는 저장 (정상 케이스: 초기 상태 등)
+      _backupDatabaseIfNeeded(config);
+      var file = getDatabaseFile(config);
+      file.setContent(JSON.stringify(dbData));
+    }
 
     // 캐시 갱신
     try {
@@ -2558,5 +2617,65 @@ function fixFutureExpenses(email) {
     }
   }
   console.log('앱에서 새로고침하면 반영됩니다.');
+}
+
+// ═══ 백업 목록 조회 (GAS 편집기에서 수동 실행) ═══
+function listBackups(email) {
+  var config = _getConfigForEmail(email);
+  var folder = getOrCreateFolder(DriveApp.getRootFolder(), config.rootFolder);
+  var allFiles = folder.getFiles();
+  var backups = [];
+  while (allFiles.hasNext()) {
+    var f = allFiles.next();
+    var fname = f.getName();
+    if (fname.match(/^app_database_backup.*\.json$/)) {
+      var size = f.getSize();
+      var updated = f.getLastUpdated();
+      backups.push(fname + ' (' + Math.round(size / 1024) + 'KB, ' + Utilities.formatDate(updated, 'Asia/Seoul', 'yyyy-MM-dd HH:mm') + ')');
+    }
+  }
+  backups.sort();
+  console.log('=== 백업 목록 (' + config.rootFolder + ') ===');
+  if (backups.length === 0) {
+    console.log('백업 파일 없음');
+  } else {
+    for (var i = 0; i < backups.length; i++) {
+      console.log(backups[i]);
+    }
+  }
+  console.log('총 ' + backups.length + '개');
+}
+
+// ═══ 특정 날짜 백업에서 복원 (GAS 편집기에서 수동 실행) ═══
+// 사용법: restoreFromBackup('leftjap@gmail.com', '2026-03-27')
+function restoreFromBackup(email, dateStr) {
+  var config = _getConfigForEmail(email);
+  var folder = getOrCreateFolder(DriveApp.getRootFolder(), config.rootFolder);
+  var backupName = 'app_database_backup_' + dateStr + '.json';
+  var files = folder.getFilesByName(backupName);
+  if (!files.hasNext()) {
+    console.log('백업 파일을 찾을 수 없습니다: ' + backupName);
+    return;
+  }
+  var backupFile = files.next();
+  var backupContent = backupFile.getBlob().getDataAsString();
+  var backupDb = JSON.parse(backupContent || '{}');
+
+  console.log('=== 백업 내용 (' + backupName + ') ===');
+  console.log('docs: ' + (backupDb.gb_docs || []).length);
+  console.log('books: ' + (backupDb.gb_books || []).length);
+  console.log('expenses: ' + (backupDb.gb_expenses || []).length);
+  console.log('memos: ' + (backupDb.gb_memos || []).length);
+  console.log('quotes: ' + (backupDb.gb_quotes || []).length);
+  console.log('brandOverrides: ' + Object.keys(backupDb.gb_brand_overrides || {}).length);
+  console.log('brandIcons: ' + Object.keys(backupDb.gb_brand_icons || {}).length);
+
+  // 안전장치: 확인 후 수동으로 아래 주석을 해제하여 실행
+  // var dbFile = getDatabaseFile(config);
+  // dbFile.setContent(backupContent);
+  // console.log('★ 복원 완료. 앱에서 새로고침하세요.');
+
+  console.log('');
+  console.log('복원하려면 이 함수 내부의 주석 3줄을 해제하고 다시 실행하세요.');
 }
 
