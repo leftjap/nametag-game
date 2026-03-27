@@ -1486,6 +1486,67 @@ function parseSMSServer(text, config) {
   // 명세서/결제예정 안내 문자는 무시 (실제 결제가 아님)
   if (/명세서|결제금액.*기준/.test(text)) return null;
 
+  // ═══ 자동결제 문자 분기 ═══
+  // 형식: [삼성카드]1337 자동결제 03/19접수\nSK통신료(491949)\n38,000원
+  if (/자동결제/.test(text)) {
+    var autoResult = {
+      amount: 0, merchant: '', card: '',
+      date: '', time: '', category: 'etc'
+    };
+
+    // 금액
+    var autoAmountMatch = text.match(/([\d,]+)\s*원/);
+    if (!autoAmountMatch) return null;
+    autoResult.amount = parseInt(autoAmountMatch[1].replace(/,/g, ''));
+    if (autoResult.amount <= 0) return null;
+
+    // 카드: "[삼성카드]1337"
+    var autoCardMatch = text.match(/\[([^\]]*카드[^\]]*)\](\d{4})/);
+    if (autoCardMatch) {
+      var autoIssuer = autoCardMatch[1].replace(/카드.*$/, '');
+      var autoShortKey = autoIssuer + autoCardMatch[2];
+      if (config.cardNameMap && config.cardNameMap[autoShortKey]) {
+        autoResult.card = config.cardNameMap[autoShortKey];
+      } else {
+        autoResult.card = autoCardMatch[1];
+      }
+    }
+
+    // 날짜: "03/19접수"
+    var autoDateMatch = text.match(/(\d{1,2})\/(\d{1,2})접수/);
+    if (autoDateMatch) {
+      var am = ('0' + autoDateMatch[1]).slice(-2);
+      var ad = ('0' + autoDateMatch[2]).slice(-2);
+      var now = new Date();
+      var ay = now.getFullYear();
+      var autoTodayStr = Utilities.formatDate(now, 'Asia/Seoul', 'yyyy-MM-dd');
+      while (ay + '-' + am + '-' + ad > autoTodayStr && ay > 2020) { ay--; }
+      autoResult.date = ay + '-' + am + '-' + ad;
+    } else {
+      autoResult.date = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
+    }
+
+    // 시간: 자동결제 문자에는 없음
+    autoResult.time = '';
+
+    // 매출처: 태그/금액/카드/날짜 제거 후 남는 텍스트
+    var autoMt = text;
+    autoMt = autoMt.replace(/\[Web발신\]/g, '').replace(/\[웹발신\]/g, '');
+    autoMt = autoMt.replace(/\[[^\]]+\]/g, '');
+    autoMt = autoMt.replace(/자동결제/g, '');
+    autoMt = autoMt.replace(/\d{1,2}\/\d{1,2}접수/g, '');
+    autoMt = autoMt.replace(/([\d,]+)\s*원/g, '');
+    autoMt = autoMt.replace(/\d{4}/g, '');
+    autoMt = autoMt.replace(/\([^)]*\)/g, ' ');
+    autoMt = autoMt.replace(/자동/g, '');
+    autoMt = autoMt.replace(/[|\-\/·,]/g, ' ').replace(/\s+/g, ' ').trim();
+    var autoTokens = autoMt.split(' ').filter(function(t) { return t.length >= 2; });
+    autoResult.merchant = autoTokens.join(' ').substring(0, 30) || '자동결제';
+
+    autoResult.category = autoMatchCategoryServer(autoResult.merchant, config);
+    return autoResult;
+  }
+
   var result = {
     amount: 0, merchant: '', card: '',
     date: '', time: '', category: 'etc'

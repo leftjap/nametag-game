@@ -21,6 +21,61 @@ function parseSMS(text) {
   // 명세서/결제예정 안내 문자는 무시 (실제 결제가 아님)
   if (/명세서|결제금액.*기준/.test(text)) return null;
 
+  // ═══ 자동결제 문자 분기 ═══
+  if (/자동결제/.test(text)) {
+    const autoResult = {
+      amount: 0, merchant: '', card: '',
+      date: '', time: '', category: 'etc'
+    };
+
+    const autoAmountMatch = text.match(/([\d,]+)\s*원/);
+    if (!autoAmountMatch) return null;
+    autoResult.amount = parseInt(autoAmountMatch[1].replace(/,/g, ''));
+    if (autoResult.amount <= 0) return null;
+
+    const autoCardMatch = text.match(/\[([^\]]*카드[^\]]*)\](\d{4})/);
+    if (autoCardMatch) {
+      const autoIssuer = autoCardMatch[1].replace(/카드.*$/, '');
+      const autoShortKey = autoIssuer + autoCardMatch[2];
+      if (CARD_NAME_MAP[autoShortKey]) {
+        autoResult.card = CARD_NAME_MAP[autoShortKey];
+      } else {
+        autoResult.card = autoCardMatch[1];
+      }
+    }
+
+    const autoDateMatch = text.match(/(\d{1,2})\/(\d{1,2})접수/);
+    if (autoDateMatch) {
+      const am = ('0' + autoDateMatch[1]).slice(-2);
+      const ad = ('0' + autoDateMatch[2]).slice(-2);
+      const now = new Date();
+      let ay = now.getFullYear();
+      const autoTodayStr = now.getFullYear() + '-' + ('0' + (now.getMonth()+1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+      while (ay + '-' + am + '-' + ad > autoTodayStr && ay > 2020) { ay--; }
+      autoResult.date = ay + '-' + am + '-' + ad;
+    } else {
+      autoResult.date = today();
+    }
+
+    autoResult.time = '';
+
+    let autoMt = text;
+    autoMt = autoMt.replace(/\[Web발신\]/g, '').replace(/\[웹발신\]/g, '');
+    autoMt = autoMt.replace(/\[[^\]]+\]/g, '');
+    autoMt = autoMt.replace(/자동결제/g, '');
+    autoMt = autoMt.replace(/\d{1,2}\/\d{1,2}접수/g, '');
+    autoMt = autoMt.replace(/([\d,]+)\s*원/g, '');
+    autoMt = autoMt.replace(/\d{4}/g, '');
+    autoMt = autoMt.replace(/\([^)]*\)/g, ' ');
+    autoMt = autoMt.replace(/자동/g, '');
+    autoMt = autoMt.replace(/[|\-\/·,]/g, ' ').replace(/\s+/g, ' ').trim();
+    const autoTokens = autoMt.split(' ').filter(t => t.length >= 2);
+    autoResult.merchant = autoTokens.join(' ').substring(0, 30) || '자동결제';
+
+    autoResult.category = autoMatchCategory(autoResult.merchant);
+    return autoResult;
+  }
+
   const result = {
     amount: 0, merchant: '', card: '',
     date: '', time: '', category: 'etc'
