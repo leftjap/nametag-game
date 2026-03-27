@@ -1884,7 +1884,7 @@ function renderComments(docId, ownerEmail) {
   // 내 이메일 가져오기 (버튼 표시 판단용)
   var myEmail = '';
   try {
-    var jwt = localStorage.getItem('gb_id_token');
+    var jwt = localStorage.getItem(_LS_PREFIX + 'gb_id_token');
     if (jwt) {
       var payload = JSON.parse(atob(jwt.split('.')[1]));
       myEmail = payload.email || '';
@@ -1946,7 +1946,7 @@ function _loadMyCommentsAndRender(docId) {
   // 자기 이메일 가져오기
   var myEmail = '';
   try {
-    var jwt = localStorage.getItem('gb_id_token');
+    var jwt = localStorage.getItem(_LS_PREFIX + 'gb_id_token');
     if (jwt) {
       var payload = JSON.parse(atob(jwt.split('.')[1]));
       myEmail = payload.email || '';
@@ -2090,7 +2090,7 @@ function sendComment() {
   // 로컬 캐시에 즉시 추가
   var myEmail = '';
   try {
-    var jwt = localStorage.getItem('gb_id_token');
+    var jwt = localStorage.getItem(_LS_PREFIX + 'gb_id_token');
     if (jwt) {
       var payload = JSON.parse(atob(jwt.split('.')[1]));
       myEmail = payload.email || '';
