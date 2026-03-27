@@ -1530,9 +1530,25 @@ function openExpenseDatePicker() {
 function _triggerExpenseDatePicker(mode) {
   var suffix = mode === 'modal' ? 'Modal' : '';
   var pickerEl = document.getElementById('expenseDatePicker' + suffix);
-  if (pickerEl) {
-    pickerEl.showPicker ? pickerEl.showPicker() : pickerEl.click();
+  if (!pickerEl) return;
+  // iOS Safari/PWA에서 display:none 또는 크기 0인 요소에 showPicker()/click()이 무시됨.
+  // 잠시 가시 상태로 만들어 picker를 트리거한 뒤, change/blur 후 복원한다.
+  var orig = pickerEl.style.cssText;
+  pickerEl.style.cssText = 'position:absolute;opacity:0;pointer-events:auto;width:1px;height:1px;overflow:hidden;z-index:-1;';
+  function restore() {
+    pickerEl.style.cssText = orig;
+    pickerEl.removeEventListener('change', restore);
+    pickerEl.removeEventListener('blur', restore);
   }
+  pickerEl.addEventListener('change', restore, { once: true });
+  pickerEl.addEventListener('blur', restore, { once: true });
+  if (typeof pickerEl.showPicker === 'function') {
+    try { pickerEl.showPicker(); } catch (e) { pickerEl.click(); }
+  } else {
+    pickerEl.click();
+  }
+  // 5초 안전망: 사용자가 취소해서 change/blur가 안 오는 경우
+  setTimeout(restore, 5000);
 }
 
 function onExpenseDatePickerChange(inputEl, mode) {
