@@ -95,6 +95,16 @@ USER_CONFIG 개별 설정은 해당 사용자 명시 요청 없이 변경 금지
 ### 에디터 패널 규칙
 editor 안 하위 패널은 한 번에 하나만 표시. 새 패널 추가 시 다른 패널 모두 숨기기 포함.
 
+### 작업 전 체크리스트
+- [ ] switchTab else 블록 패널/UI 복원?
+- [ ] gesture.js 인라인 스타일을 CSS !important로?
+- [ ] .side-arrow right 값과 부모 패딩?
+- [ ] SVG viewBox와 CSS 영역 비율?
+- [ ] 미디어쿼리 3곳?
+- [ ] 캘린더 선택 시 가계부/루틴/모바일/PC 4곳?
+- [ ] USER_CONFIG 무단 변경?
+- [ ] getMerchantIconHtml에 category, brand?
+
 ---
 
 ## 3. 동기화 호출 규칙
@@ -125,20 +135,7 @@ iOS 단축어 → GAS POST (action: save_expense_sms, token: nametag2026, smsTex
 
 ---
 
-## 5. 실수 체크리스트
-
-- [ ] switchTab else 블록 패널/UI 복원?
-- [ ] gesture.js 인라인 스타일을 CSS !important로?
-- [ ] .side-arrow right 값과 부모 패딩?
-- [ ] SVG viewBox와 CSS 영역 비율?
-- [ ] 미디어쿼리 3곳?
-- [ ] 캘린더 선택 시 가계부/루틴/모바일/PC 4곳?
-- [ ] USER_CONFIG 무단 변경?
-- [ ] getMerchantIconHtml에 category, brand?
-
----
-
-## 6. 가계부/매출처 운영
+## 5. 가계부/매출처 운영
 
 - importCardSmsSheet 후 미래 날짜 확인. fixFutureExpenses(email).
 - reclassifyAllExpenses는 brandOverrides 건너뜀.
@@ -148,7 +145,7 @@ iOS 단축어 → GAS POST (action: save_expense_sms, token: nametag2026, smsTex
 
 ---
 
-## 7. 소스 참조
+## 6. 소스 참조
 
 | 항목 | 값 |
 |---|---|
@@ -156,10 +153,3 @@ iOS 단축어 → GAS POST (action: save_expense_sms, token: nametag2026, smsTex
 | GitHub raw base | https://raw.githubusercontent.com/leftjap/keep/main/ |
 
 크롤링 제외 (항상 업로드): style.css (~3,000줄), gas/Code.js (~1,600줄)
-
----
-
-## 8. 완료된 수정
-
-* B-24: parseSMSServer/parseSMS에 자동결제 분기. 아이폰 단축어 "자동결제" 트리거 추가.
-* 파트너 모드 데이터 오염 (Critical): enterPartnerMode LocalStorage 쓰기 제거, data.js 파트너 분기, 동기화 차단, 다세대 백업 7일, expenses 급변/카드 교차 검증.
