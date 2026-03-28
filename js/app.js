@@ -56,6 +56,10 @@ function _applyLoadedDb(dbData) {
 }
 
 async function showApp() {
+  // iOS Safari 저장공간 보호 요청
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(function() {});
+  }
   const loading = document.getElementById('loadingScreen');
   loading.classList.remove('hidden');
   SYNC.setSyncStatus('동기화 중', 'syncing');
